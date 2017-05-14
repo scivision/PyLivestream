@@ -1,11 +1,26 @@
 from pathlib import Path
 from getpass import getpass
 import subprocess as S
+from sys import platform
 # %%
 try:
     S.check_call(('ffmpeg','-h'), stdout=S.DEVNULL, stderr=S.DEVNULL)
 except S.CalledProcessError:
     raise FileNotFoundError('FFmpeg is not installed for your system.')
+# %% https://trac.ffmpeg.org/wiki/Capture/Desktop
+if platform.startswith('linux'):
+    vcap = 'x11grab'
+    acap = 'pulse'
+elif platform.startswith('darwin'):
+    vcap = 'avfoundation'
+    acap = '0:0'  # determine from ffmpeg -f avfoundation -list_devices true -i ""
+elif platform.startswith('win'):
+    vcap = 'dshow'
+    acap =' video="UScreenCapture":audio="Microphone"'
+else:
+    raise RuntimeError('not sure which operating system you are using {}'.format(platform))
+
+
 
 # %% minimum bitrates specified by YouTube. Key is vertical pixels (height)
 br30 = {'2160':13000,
@@ -46,14 +61,14 @@ def videostream(P):
 
 def audiostream(P):
 
-    return ['-f','pulse', '-ac',str(P['Nchan']), '-i',P['audiochan']]
+    return ['-f',acap, '-ac',str(P['Nchan']), '-i',P['audiochan']]
 
 def audiocomp(P):
 
     return ['-acodec','libmp3lame','-ar','48000' ]
 
 def screengrab(P):
-    vid1 = ['-f', 'x11grab',
+    vid1 = ['-f', vcap,
         '-r',str(P['fps']), '-s',P['res'],
         '-i',f':0.0+{P["origin"][0]},{P["origin"][1]}']
 
