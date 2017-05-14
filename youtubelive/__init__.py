@@ -45,10 +45,11 @@ def videostream(P):
 
 def audiostream(P):
 
-    aud1 = ['-f','pulse', '-ac',str(P['Nchan']), '-i',P['audiochan']]
-    aud2 = ['-acodec','libmp3lame','-ar','48000' ]
+    return ['-f','pulse', '-ac',str(P['Nchan']), '-i',P['audiochan']]
 
-    return aud1, aud2
+def audiocomp(P):
+
+    return ['-acodec','libmp3lame','-ar','48000' ]
 
 def screengrab(P):
     vid1 = ['-f', 'x11grab',
@@ -64,7 +65,8 @@ def youtubelive(P):
 
     vid1,vid2,cvbr = videostream(P)
 
-    aud1,aud2 = audiostream(P)
+    aud1 = audiostream(P)
+    aud2 = audiocomp(P)
 
     codec = ['-threads','0',
              '-bufsize',str(2*cvbr)+'k',
@@ -88,7 +90,8 @@ def youtube(P,outfn):
 
     vid1 = screengrab(P)
 
-    aud1,aud2 = audiostream(P)
+    aud1 = audiostream(P)
+    aud2 = audiocomp(P)
 
     cmd = ['ffmpeg'] + vid1 + aud1 + aud2
 
