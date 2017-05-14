@@ -2,11 +2,13 @@
 """
 Cross-platform screen/desktop capture for YouTube (and others) using FFmpeg
 
-https://www.scivision.co/youtube-live-ffmpeg-livestream/
+https://www.scivision.co/youtube-ffmpeg-screen-capture-with-audio/
+
+https://trac.ffmpeg.org/wiki/Capture/Desktop
 
 https://support.google.com/youtube/answer/2853702
 """
-from youtubelive import youtubelive
+from youtubelive import youtube
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
@@ -14,6 +16,7 @@ if __name__ == '__main__':
     p.add_argument('-fps',default=10,type=int)
     p.add_argument('-res',default='1024x720')
     p.add_argument('-xy',help='coordinates of upper-left hand capture area (pixel)',nargs=2,type=int,default=[0,0])
+    p.add_argument('outfn',help='output file to write')
     p = p.parse_args()
 
     P = {'fps': p.fps,
@@ -23,4 +26,4 @@ if __name__ == '__main__':
          'Nchan': 1
             }
 
-    youtubelive(P)
+    youtube(P,p.outfn)
