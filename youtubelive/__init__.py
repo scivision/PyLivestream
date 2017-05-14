@@ -3,9 +3,10 @@ from getpass import getpass
 import subprocess as S
 # %%
 try:
-    S.check_call(('ffmpeg','-h'), stdout=S.DEVNULL)
+    S.check_call(('ffmpeg','-h'), stdout=S.DEVNULL, stderr=S.DEVNULL)
 except S.CalledProcessError:
     raise FileNotFoundError('FFmpeg is not installed for your system.')
+
 # %% minimum bitrates specified by YouTube. Key is vertical pixels (height)
 br30 = {'2160':13000,
         '1440':6000,

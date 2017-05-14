@@ -13,7 +13,7 @@ if __name__ == '__main__':
     p = ArgumentParser()
     p.add_argument('-fps',default=10,type=int)
     p.add_argument('-res',default='1024x720')
-    p.add_argument('-xy',help='coordinates of upper-left hand capture area (pixel)',nargs=2,type=int,default=[0,0])
+    p.add_argument('-o','--origin',help='x,y coordinates of upper-left hand capture area (pixel)',nargs=2,type=int,default=[0,0])
     p = p.parse_args()
 
     P = {'fps': p.fps,
