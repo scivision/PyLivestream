@@ -98,11 +98,11 @@ def youtubelive(P):
 def youtube(P,outfn):
     """
     records screen capture with audio for YouTube
-    """
-    if not outfn:
-        raise ValueError('must specify output file')
 
-    outfn = Path(outfn).expanduser()
+    if not outfn, just cite command that would have run
+    """
+    if outfn:
+        outfn = Path(outfn).expanduser()
 
     vid1 = screengrab(P)
 
@@ -113,5 +113,6 @@ def youtube(P,outfn):
 
     print(' '.join(cmd))
 
-    S.run(cmd + [str(outfn)])
+    if outfn:
+        S.run(cmd + [str(outfn)])
 
