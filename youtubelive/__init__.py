@@ -60,8 +60,10 @@ def videostream(P):
     return vid1,vid2,cvbr
 
 def audiostream(P):
-
-    return ['-f',acap, '-ac',str(P['Nchan']), '-i',P['audiochan']]
+    """
+    -ac 2 NOT -ac 1 to avoid "non monotonous DTS in output stream" errors
+    """
+    return ['-f',acap, '-ac','2', '-i',P['audiochan']]
 
 def audiocomp(P):
 

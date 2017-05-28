@@ -20,7 +20,6 @@ if __name__ == '__main__':
          'res': p.res,
          'origin':p.xy,
          'audiochan': 'default',
-         'Nchan': 1
             }
 
     youtubelive(P)
