@@ -7,7 +7,7 @@ Cross-platform screen/desktop LIVE STREAM for YouTube LIVE using FFmpeg
 https://www.scivision.co/youtube-live-ffmpeg-livestream/
 https://support.google.com/youtube/answer/2853702
 """
-from youtubelive import youtubelive
+from youtubelive_ffmpeg import youtubelive
 
 if __name__ == '__main__':
     import signal

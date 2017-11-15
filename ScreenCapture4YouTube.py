@@ -8,7 +8,7 @@ https://www.scivision.co/youtube-ffmpeg-screen-capture-with-audio/
 https://trac.ffmpeg.org/wiki/Capture/Desktop
 https://support.google.com/youtube/answer/2853702
 """
-from youtubelive import disksave4youtube
+from youtubelive_ffmpeg import disksave4youtube
 
 if __name__ == '__main__':
     import signal
