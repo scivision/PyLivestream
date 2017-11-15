@@ -7,6 +7,7 @@ python:
 os:
   - linux
 
+sudo: required
 dist: trusty
 group: edge
   
@@ -17,12 +18,8 @@ notifications:
 git:
   depth: 3
 
-addons:
-  apt:
-    packages:
-    - ffmpeg
-
 before_install:
+  - sudo apt install ffmpeg
   - pip -q install coveralls
 
 install: pip -q install -e .
