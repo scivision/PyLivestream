@@ -102,7 +102,7 @@ def youtubelive(P:dict):
              '-bufsize',str(2*cvbr)+'k',
             '-f','flv']
 
-    cmd = ['ffmpeg'] + vid1 + aud1 + vid2 + aud2 + codec
+    cmd = [FFMPEG] + vid1 + aud1 + vid2 + aud2 + codec
 
     print('\n',' '.join(cmd),'\n')
 
@@ -124,7 +124,7 @@ def disksave4youtube(P:dict, outfn:Path=None):
     aud1 = audiostream(P)
     aud2 = audiocomp(P)
 
-    cmd = ['ffmpeg'] + vid1 + aud1 + aud2
+    cmd = [FFMPEG] + vid1 + aud1 + aud2
 
     print('\n',' '.join(cmd),'\n')
 
