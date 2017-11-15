@@ -20,6 +20,7 @@ git:
 
 before_install:
   - sudo add-apt-repository -y ppa:mc3man/trusty-media
+  - sudo apt update 
   - sudo apt install ffmpeg
   - pip -q install coveralls
 
