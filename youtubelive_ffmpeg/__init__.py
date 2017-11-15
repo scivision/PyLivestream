@@ -105,7 +105,7 @@ def youtubelive(P:dict):
                 stdout=sp.DEVNULL)
 
 
-def disksave4youtube(P:dict, outfn:Path):
+def disksave4youtube(P:dict, outfn:Path=None):
     """
     records to disk screen capture with audio for upload to YouTube
 

@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(name='YouTubeLiveFFmpeg',
       packages=['youtubelive_ffmpeg'],
-      version = '0.2.1',
+      version = '0.2.2',
       author='Michael Hirsch, Ph.D.',
       url='https://github.com/scivision/ffmpeg-youtube-live',
       description='Easy streaming using FFmpeg to YouTube Live.',

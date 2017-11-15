@@ -1,0 +1,33 @@
+language: python
+fast_finish: true
+
+python:
+  - 3.6
+
+os:
+  - linux
+
+dist: trusty
+group: edge
+  
+
+notifications:
+  email: false
+
+git:
+  depth: 3
+
+addons:
+  apt:
+    packages:
+    - ffmpeg
+
+before_install:
+  - pip -q install coveralls
+
+install: pip -q install -e .
+
+script: coverage run tests/test.py -v
+
+after_success: coveralls
+
