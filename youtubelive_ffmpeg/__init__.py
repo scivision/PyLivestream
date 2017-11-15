@@ -6,11 +6,16 @@ import logging,os
 # %%
 try:
     sp.check_call(('ffmpeg','-h'), stdout=sp.DEVNULL, stderr=sp.DEVNULL)
+    FFMPEG = 'ffmpeg'
 except sp.CalledProcessError:
-    raise FileNotFoundError('FFmpeg is not installed for your system.')
+    try:
+        sp.check_call(('avconv','-h'), stdout=sp.DEVNULL, stderr=sp.DEVNULL)
+        FFMPEG = 'avconv'
+    except sp.CalledProcessError:
+        raise FileNotFoundError('FFmpeg is not installed for your system.')
 # %% https://trac.ffmpeg.org/wiki/Capture/Desktop
 if platform.startswith('linux'):
-    if os.environ['XDG_SESSION_TYPE'] == 'wayland':
+    if 'XDG_SESSION_TYPE' in os.environ and os.environ['XDG_SESSION_TYPE'] == 'wayland':
         logging.error('Wayland may only give black output with cursor. Login with X11 desktop')
     vcap = 'x11grab'
     acap = 'pulse'
