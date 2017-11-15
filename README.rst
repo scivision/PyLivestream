@@ -1,10 +1,14 @@
-.. |pyversions| image:: https://img.shields.io/pypi/pyversions/youtubeliveffmpeg.svg
+.. image:: https://img.shields.io/pypi/pyversions/youtubeliveffmpeg.svg
   :target: https://pypi.python.org/pypi/youtubeliveffmpeg
   :alt: Python versions (PyPI)
   
-.. |format| image::  https://img.shields.io/pypi/format/youtubeliveffmpeg.svg
+.. image::  https://img.shields.io/pypi/format/youtubeliveffmpeg.svg
   :target: https://pypi.python.org/pypi/youtubeliveffmpeg
   :alt: Distribution format (PyPI)
+  
+.. image:: https://api.codeclimate.com/v1/badges/b6557d474ec050e74629/maintainability
+   :target: https://codeclimate.com/github/scivision/ffmpeg-youtube-live/maintainability
+   :alt: Maintainability
 
 ========================
 YouTube Live via FFmpeg
