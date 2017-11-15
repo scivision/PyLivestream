@@ -1,3 +1,11 @@
+.. |pyversions| image:: https://img.shields.io/pypi/pyversions/youtubeliveffmpeg.svg
+  :target: https://pypi.python.org/pypi/youtubeliveffmpeg
+  :alt: Python versions (PyPI)
+  
+.. |format| image::  https://img.shields.io/pypi/format/youtubeliveffmpeg.svg
+  :target: https://pypi.python.org/pypi/youtubeliveffmpeg
+  :alt: Distribution format (PyPI)
+
 ========================
 YouTube Live via FFmpeg
 ========================
