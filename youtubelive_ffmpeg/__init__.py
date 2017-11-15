@@ -7,11 +7,11 @@ import logging,os
 try:
     sp.check_call(('ffmpeg','-h'), stdout=sp.DEVNULL, stderr=sp.DEVNULL)
     FFMPEG = 'ffmpeg'
-except sp.CalledProcessError:
+except FileNotFoundError:
     try:
         sp.check_call(('avconv','-h'), stdout=sp.DEVNULL, stderr=sp.DEVNULL)
         FFMPEG = 'avconv'
-    except sp.CalledProcessError:
+    except FileNotFoundError:
         raise FileNotFoundError('FFmpeg is not installed for your system.')
 # %% https://trac.ffmpeg.org/wiki/Capture/Desktop
 if platform.startswith('linux'):
