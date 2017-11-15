@@ -1,3 +1,9 @@
+.. image:: https://travis-ci.org/scivision/ffmpeg-youtube-live.svg?branch=master
+    :target: https://travis-ci.org/scivision/ffmpeg-youtube-live
+    
+.. image:: https://coveralls.io/repos/github/scivision/ffmpeg-youtube-live/badge.svg?branch=master
+    :target: https://coveralls.io/github/scivision/ffmpeg-youtube-live?branch=master
+
 .. image:: https://img.shields.io/pypi/pyversions/youtubeliveffmpeg.svg
   :target: https://pypi.python.org/pypi/youtubeliveffmpeg
   :alt: Python versions (PyPI)
