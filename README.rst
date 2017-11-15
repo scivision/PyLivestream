@@ -14,7 +14,7 @@ Install
 =======
 Normally just do::
 
-    pip install youtubelive
+    pip install youtubeliveffmpeg
 
 
 Prereq
