@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-from setuptools import setup
+from setuptools import setup,find_packages
 
 setup(name='YouTubeLiveFFmpeg',
-      packages=['youtubelive_ffmpeg'],
+      packages=find_packages(),
       version = '0.2.2',
       author='Michael Hirsch, Ph.D.',
       url='https://github.com/scivision/ffmpeg-youtube-live',
