@@ -22,12 +22,9 @@ addons:
     packages:
     - libav-tools
 
-before_install:
-  - pip -q install coveralls
 
-install: pip -q install -e .
+install: pip -q install -e .[tests]
 
 script: coverage run tests/test.py -v
 
 after_success: coveralls
-

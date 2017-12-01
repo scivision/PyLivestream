@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+tests_require=['nose','coveralls']
 from setuptools import setup,find_packages
 
 setup(name='YouTubeLiveFFmpeg',
@@ -9,6 +10,8 @@ setup(name='YouTubeLiveFFmpeg',
       description='Easy streaming using FFmpeg to YouTube Live.',
       long_description=open("README.rst").read(),
       python_requires='>=3.6',
+      tests_require=tests_require,
+      extras_require={'tests':tests_require},
       classifiers=[
       'Development Status :: 4 - Beta',
       'Intended Audience :: End Users/Desktop',
