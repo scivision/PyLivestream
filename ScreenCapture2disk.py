@@ -2,8 +2,6 @@
 """
 Save to disk screen capture for upload to YOUTUBE using FFMPEG
 
-Cross-platform screen/desktop capture TO DISK for upload to YouTube using FFmpeg
-
 https://www.scivision.co/youtube-ffmpeg-screen-capture-with-audio/
 https://trac.ffmpeg.org/wiki/Capture/Desktop
 https://support.google.com/youtube/answer/2853702

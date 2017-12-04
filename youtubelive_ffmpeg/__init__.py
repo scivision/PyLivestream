@@ -59,17 +59,25 @@ COMPPRESET='veryfast'
 # %% video
 def _videostream(P:dict) -> tuple:
     """optimizes video settings for YouTube Live"""
-    y = P['res'].split('x')[1]
+    if 'res' in P:
+        y = P['res'].split('x')[1]
 
-    if P['fps'] <= 30:
-       cvbr = br30[y]
-    else:
-       cvbr = br60[y]
+        if P['fps'] <= 30:
+           cvbr = br30[y]
+        else:
+           cvbr = br60[y]
+    else:  # TODO assuming 720 webcam for now
+        if P['fps'] <= 30:
+            cvbr = br30['720']
+        else:
+            cvbr = br60['720']
 
     if P['vidsource'] == 'screen':
         vid1 = _screengrab(P)
     elif P['vidsource'].startswith('cam'):
         vid1 = _webcam(P)
+    elif P['vidsource'] == 'file':
+        vid1 = _filein(P)
     else:
         raise ValueError('unknown vidsource {}'.format(P['vidsource']))
 
@@ -96,6 +104,13 @@ def _webcam(P:dict) -> list:
     vid1 = ['-f',hcam,
             '-r',str(P['fps']),
             '-i',cam]
+
+    return vid1
+
+def _filein(P:dict) -> list:
+    """file input"""
+    fn = Path(P['filein']).expanduser()
+    vid1 = ['-stream_loop','-1','-i',str(fn)]
 
     return vid1
 

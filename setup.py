@@ -4,7 +4,7 @@ from setuptools import setup,find_packages
 
 setup(name='YouTubeLiveFFmpeg',
       packages=find_packages(),
-      version = '0.2.2',
+      version = '0.3.0',
       author='Michael Hirsch, Ph.D.',
       url='https://github.com/scivision/ffmpeg-youtube-live',
       description='Easy streaming using FFmpeg to YouTube Live.',
