@@ -20,6 +20,7 @@ if __name__ == '__main__':
          'fps':30, # TODO auto-determine input FPS
          'audiochan': 'default',
          'vidsource': 'file',
+         'loop':True,
             }
 
     youtubelive(P)

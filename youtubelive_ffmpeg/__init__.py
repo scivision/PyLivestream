@@ -110,7 +110,13 @@ def _webcam(P:dict) -> list:
 def _filein(P:dict) -> list:
     """file input"""
     fn = Path(P['filein']).expanduser()
-    vid1 = ['-stream_loop','-1','-i',str(fn)]
+
+    if 'loop' in P and P['loop']:
+        vid1 = ['-stream_loop','-1']  # FFmpeg >= 3
+    else:
+        vid1 = []
+
+    vid1 += ['-i',str(fn)]
 
     return vid1
 
