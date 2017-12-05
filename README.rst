@@ -28,9 +28,13 @@ Linux: requires X11, not Wayland (choose at login)
 
 Install
 =======
-Normally just do::
+From PyPi::
 
-    pip install youtubeliveffmpeg
+    pip install YouTubeLiveFFmpeg
+
+Or for the latest copy from Github::
+
+    pip install -e .
 
 
 Prereq
@@ -43,17 +47,6 @@ If you're on Ubuntu, you can use a `PPA <https://launchpad.net/~mc3man/+archive/
 
 
 
-
-Development
-===========
-
-For development work using the `Git repo <https://github.com/scivision/ffmpeg-youtube-live>`_::
-
-    git clone https://github.com/scivision/ffmpeg-youtube-live
-
-    cd ffmpeg-youtube-live
-
-    pip install -e .
 
 
 
