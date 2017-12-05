@@ -35,7 +35,7 @@ elif platform.startswith('win'):
     cam = 'Integrated Camera'        # ffmpeg -list_devices true -f dshow -i dummy
     hcam = 'dshow'
 else:
-    raise ValueError('not sure which operating system you are using {}'.format(platform))
+    raise ValueError(f'not sure which operating system you are using {platform}')
 
 # %% minimum bitrates specified by YouTube. Key is vertical pixels (height)
 br30 = {'2160':13000,
@@ -79,7 +79,7 @@ def _videostream(P:dict) -> tuple:
     elif P['vidsource'] == 'file':
         vid1 = _filein(P)
     else:
-        raise ValueError('unknown vidsource {}'.format(P['vidsource']))
+        raise ValueError(f'unknown vidsource {P["vidsource"]}')
 
     vid2 = ['-vcodec','libx264','-pix_fmt','yuv420p',
             '-preset',COMPPRESET,
