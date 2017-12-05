@@ -151,7 +151,12 @@ def youtubelive(P:dict):
 
     print('\n',' '.join(cmd),'\n')
 
-    sp.run(cmd+['rtmp://a.rtmp.youtube.com/live2/', getpass('YouTube Live Stream ID: ')],
+    if 'streamid' in P: # for loop case
+        streamid = P['streamid']
+    else:
+        streamid = getpass('YouTube Live Stream ID: ')
+
+    sp.check_call(cmd+['rtmp://a.rtmp.youtube.com/live2/', streamid],
                 stdout=sp.DEVNULL)
 
 
@@ -174,7 +179,7 @@ def disksave4youtube(P:dict, outfn:Path=None):
     print('\n',' '.join(cmd),'\n')
 
     if outfn:
-        sp.run(cmd + [str(outfn)])
+        sp.check_call(cmd + [str(outfn)])
     else:
         print('specify filename to save screen capture with audio to disk.')
 

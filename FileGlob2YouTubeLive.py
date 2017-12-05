@@ -6,6 +6,7 @@ https://www.scivision.co/youtube-live-ffmpeg-livestream/
 https://support.google.com/youtube/answer/2853702
 """
 from pathlib import Path
+from getpass import getpass
 from youtubelive_ffmpeg import youtubelive
 
 if __name__ == '__main__':
@@ -27,11 +28,13 @@ if __name__ == '__main__':
     print('streaming to YouTube Live these files. Be sure list is correct! \n')
     print('\n'.join([str(f) for f in flist]))
 
+    streamid = getpass('YouTube Live Stream ID: ')
     for f in flist:
         P = {'filein': f,
              'fps':30, # TODO auto-determine input FPS
              'audiochan': 'default',
              'vidsource': 'file',
+             'streamid':streamid,
                 }
 
         youtubelive(P)
