@@ -30,11 +30,11 @@ Install
 =======
 From PyPi::
 
-    pip install YouTubeLiveFFmpeg
+    python -m pip install YouTubeLiveFFmpeg
 
 Or for the latest copy from Github::
 
-    pip install -e .
+    python -m pip install -e .
 
 
 Prereq
