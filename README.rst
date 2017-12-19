@@ -28,6 +28,9 @@ Should work on any OS (Mac, Linux, Windows).
 :FFmpeg: >= 3.0 required
 :Python: >= 3.5 required
 
+
+.. contents::
+
 Install
 =======
 From PyPi::
