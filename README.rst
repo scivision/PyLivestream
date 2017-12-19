@@ -55,3 +55,4 @@ Notes
 
 `Reference webpage <https://www.scivision.co/youtube-live-ffmpeg-livestream/>`_
 
+`Test videos for looping/globbing <http://www.divx.com/en/devices/profiles/video>`_
