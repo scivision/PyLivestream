@@ -24,7 +24,9 @@ FFmpeg can easily be used to stream to YouTube Live for streaming broadcasts.
 These Python scripts compute the optimal parameters.
 Should work on any OS (Mac, Linux, Windows).
 
-Linux: requires X11, not Wayland (choose at login)
+:Linux: requires X11, not Wayland (choose at login)
+:FFmpeg: >= 3.0 required
+:Python: >= 3.5 required
 
 Install
 =======
@@ -37,22 +39,10 @@ Or for the latest copy from Github::
     python -m pip install -e .
 
 
-Prereq
-------
-* FFmpeg
-* Python (just for scripting)
-
-Note: for FileLoop2YouTubeLive.py, FFmpeg >= 3 required.
-If you're on Ubuntu, you can use a `PPA <https://launchpad.net/~mc3man/+archive/ubuntu/trusty-media>`_ to update your FFmpeg version.
-
-
-
-
-
-
 Notes
 =====
 
-`Reference webpage <https://www.scivision.co/youtube-live-ffmpeg-livestream/>`_
-
-`Test videos for looping/globbing <http://www.divx.com/en/devices/profiles/video>`_
+* FFmpeg Ubuntu `PPA <https://launchpad.net/~mc3man/+archive/ubuntu/trusty-media>`_
+* `Reference webpage <https://www.scivision.co/youtube-live-ffmpeg-livestream/>`_
+* `Test videos for looping/globbing <http://www.divx.com/en/devices/profiles/video>`_
+* `FFmpeg streaming encoding reference <https://trac.ffmpeg.org/wiki/EncodingForStreamingSites>`_
