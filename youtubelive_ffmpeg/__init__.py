@@ -156,7 +156,7 @@ def youtubelive(P:dict):
     else:
         streamid = getpass('YouTube Live Stream ID: ')
 
-    sp.check_call(cmd+['rtmp://a.rtmp.youtube.com/live2/', streamid],
+    sp.check_call(cmd+['rtmp://a.rtmp.youtube.com/live2/' + streamid],
                 stdout=sp.DEVNULL)
 
 
