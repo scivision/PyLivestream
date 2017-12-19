@@ -59,6 +59,41 @@ COMPPRESET='veryfast'
 # %% video
 def _videostream(P:dict) -> tuple:
     """optimizes video settings for YouTube Live"""
+    cvbr = _bitrate(P)
+
+    if P['vidsource'] == 'screen':
+        vid1 = _screengrab(P)
+    elif P['vidsource'].startswith('cam'):
+        vid1 = _webcam(P)
+    elif P['vidsource'] == 'file':
+        vid1 = _filein(P)
+    else:
+        raise ValueError(f'unknown vidsource {P["vidsource"]}')
+        
+    g = _group(P)
+
+    vid2 = ['-c:v','libx264','-pix_fmt','yuv420p',
+            '-preset',COMPPRESET,
+            '-b:v',str(cvbr)+'k',
+            '-g',g]
+
+    return vid1, vid2, cvbr
+    
+    
+def _group(P:dict) -> str:
+
+    if 'fps' in P:
+        g = str(2*P['fps'])
+    else: # TODO assume 30 fps
+        g = '60' 
+        
+    return g
+    
+
+def _bitrate(P:dict) -> list:
+    if P['vidsource'] == 'file': # TODO get from input file
+        return 3000
+        
     if 'res' in P:
         y = P['res'].split('x')[1]
 
@@ -71,23 +106,8 @@ def _videostream(P:dict) -> tuple:
             cvbr = br30['720']
         else:
             cvbr = br60['720']
-
-    if P['vidsource'] == 'screen':
-        vid1 = _screengrab(P)
-    elif P['vidsource'].startswith('cam'):
-        vid1 = _webcam(P)
-    elif P['vidsource'] == 'file':
-        vid1 = _filein(P)
-    else:
-        raise ValueError(f'unknown vidsource {P["vidsource"]}')
-
-    vid2 = ['-vcodec','libx264','-pix_fmt','yuv420p',
-            '-preset',COMPPRESET,
-            '-b:v',str(cvbr)+'k',
-            '-g',str(2*P['fps'])]
-
-    return vid1, vid2, cvbr
-
+            
+    return cvbr
 
 def _screengrab(P:dict) -> list:
     """choose to grab video from desktop. May not work for Wayland."""
@@ -110,11 +130,13 @@ def _webcam(P:dict) -> list:
 def _filein(P:dict) -> list:
     """file input"""
     fn = Path(P['filein']).expanduser()
+    
+    vid1 = ['-re']
 
     if 'loop' in P and P['loop']:
-        vid1 = ['-stream_loop','-1']  # FFmpeg >= 3
+        vid1 += ['-stream_loop','-1']  # FFmpeg >= 3
     else:
-        vid1 = []
+        vid1 += []
 
     vid1 += ['-i',str(fn)]
 
@@ -126,18 +148,15 @@ def _audiostream(P:dict) -> list:
     """
     -ac 2 NOT -ac 1 to avoid "non monotonous DTS in output stream" errors
     """
-    if 'audiochan' in P:
+    if not P['vidsource'] == 'file':
         return ['-f',acap, '-ac','2', '-i', P['audiochan']]
-    else: # no audio, or file input
-        return []
+    else: #  file input
+        return ['-ac','2']
 
 
 def _audiocomp(P:dict) -> list:
     """select audio codec"""
-    if 'audiochan' in P:
-        return ['-acodec','libmp3lame','-ar','48000' ]
-    else: # no audio, or file input
-        return []
+    return ['-c:a','aac','-b:a','160k','-ar','44100' ]
 
 # %% top-level
 def youtubelive(P:dict):

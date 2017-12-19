@@ -31,7 +31,6 @@ if __name__ == '__main__':
     streamid = getpass('YouTube Live Stream ID: ')
     for f in flist:
         P = {'filein': f,
-             'fps':30, # TODO auto-determine input FPS
              'vidsource': 'file',
              'streamid':streamid,
                 }
