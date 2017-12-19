@@ -25,6 +25,7 @@ if __name__ == '__main__':
          'res': p.res,
          'origin':p.origin,
          'audiochan': 'default',
+         'vidsource': 'screen',
             }
 
     disksave4youtube(P, p.outfn)
