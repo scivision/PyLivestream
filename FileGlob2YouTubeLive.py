@@ -17,6 +17,7 @@ if __name__ == '__main__':
     p = ArgumentParser()
     p.add_argument('path',help='path to discover files from')
     p.add_argument('glob',help='file glob pattern for YouTube Live.  Keep in mind copyright and TOS!')
+    p.add_argument('-image',help='static image to display, typically used for audio-only files.')
     p = p.parse_args()
 
     path = Path(p.path).expanduser()
@@ -32,6 +33,7 @@ if __name__ == '__main__':
     for f in flist:
         P = {'filein': f,
              'vidsource': 'file',
+             'image':p.image,
              'streamid':streamid,
                 }
 

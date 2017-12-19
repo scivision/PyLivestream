@@ -59,8 +59,7 @@ COMPPRESET='veryfast'
 # %% video
 def _videostream(P:dict) -> tuple:
     """optimizes video settings for YouTube Live"""
-    cvbr = _bitrate(P)
-
+# %% configure video input
     if P['vidsource'] == 'screen':
         vid1 = _screengrab(P)
     elif P['vidsource'].startswith('cam'):
@@ -69,31 +68,39 @@ def _videostream(P:dict) -> tuple:
         vid1 = _filein(P)
     else:
         raise ValueError(f'unknown vidsource {P["vidsource"]}')
-        
-    g = _group(P)
+# %% configure video output
+    cvbr = _bitrate(P)
 
-    vid2 = ['-c:v','libx264','-pix_fmt','yuv420p',
-            '-preset',COMPPRESET,
-            '-b:v',str(cvbr)+'k',
-            '-g',g]
+    vid2 = ['-c:v','libx264','-pix_fmt','yuv420p']
+
+    if 'image' in P and P['image']:
+        vid2 += ['-tune','stillimage']
+    else:
+        vid2 += ['-preset',COMPPRESET,
+                '-b:v',str(cvbr)+'k',
+                '-g',_group(P)]
+
 
     return vid1, vid2, cvbr
-    
-    
+
+
 def _group(P:dict) -> str:
 
     if 'fps' in P:
         g = str(2*P['fps'])
     else: # TODO assume 30 fps
-        g = '60' 
-        
+        g = '60'
+
     return g
-    
+
 
 def _bitrate(P:dict) -> list:
+    if 'image' in P and P['image']:
+        return
+
     if P['vidsource'] == 'file': # TODO get from input file
         return 3000
-        
+# %%
     if 'res' in P:
         y = P['res'].split('x')[1]
 
@@ -106,7 +113,7 @@ def _bitrate(P:dict) -> list:
             cvbr = br30['720']
         else:
             cvbr = br60['720']
-            
+
     return cvbr
 
 def _screengrab(P:dict) -> list:
@@ -130,13 +137,22 @@ def _webcam(P:dict) -> list:
 def _filein(P:dict) -> list:
     """file input"""
     fn = Path(P['filein']).expanduser()
-    
-    vid1 = ['-re']
+
+    if 'image' in P and P['image']:
+        vid1 = ['-loop','1']
+    else:
+        vid1 = ['-re']
+
+
 
     if 'loop' in P and P['loop']:
         vid1 += ['-stream_loop','-1']  # FFmpeg >= 3
     else:
         vid1 += []
+
+    if 'image' in P and P['image']: # still image, typically used with audio-only input files
+        vid1 += ['-i',str(P['image'])]
+
 
     vid1 += ['-i',str(fn)]
 
@@ -158,6 +174,19 @@ def _audiocomp(P:dict) -> list:
     """select audio codec"""
     return ['-c:a','aac','-b:a','160k','-ar','44100' ]
 
+def _buffer(P:dict,cvbr:int) -> list:
+    buf = ['-threads','0']
+
+    if not 'image' in P or not P['image']:
+        buf += ['-maxrate','{}k'.format(cvbr),
+                  '-bufsize','{}k'.format(2*cvbr)]
+    else: # static image + audio
+        buf += ['-shortest']
+
+    buf += ['-f','flv']
+
+    return buf
+
 # %% top-level
 def youtubelive(P:dict):
     """LIVE STREAM to YouTube Live"""
@@ -167,12 +196,9 @@ def youtubelive(P:dict):
     aud1 = _audiostream(P)
     aud2 = _audiocomp(P)
 
-    codec = ['-threads','0',
-             '-maxrate','{}k'.format(cvbr),
-             '-bufsize','{}k'.format(2*cvbr),
-            '-f','flv']
+    buf = _buffer(P,cvbr)
 
-    cmd = [FFMPEG] + vid1 + aud1 + vid2 + aud2 + codec
+    cmd = [FFMPEG] + vid1 + aud1 + vid2 + aud2 + buf
 
     print('\n',' '.join(cmd),'\n')
 
