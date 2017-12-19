@@ -37,6 +37,74 @@ From PyPi::
 Or for the latest copy from Github::
 
     python -m pip install -e .
+    
+    
+Usage
+=====
+In all cases, you must first `configure YouTube Live <https://www.youtube.com/live_dashboard>`_.
+Then your chosen input will stream live on YouTube Live.
+
+Webcam
+------
+Audio is included::
+
+    python Webcam2YouTubeLive.py
+    
+    
+Screen Share
+------------
+Audio is included::
+
+    python Screenshare2YouTubeLive.py
+    
+-fps      set frames/second
+-res      set resolution XxY of your screen
+-o        set origin (upper left)
+
+
+Several video files
+-------------------
+Glob list of video files to stream::
+
+    python FileGlob2YouTubeLive.py path pattern
+    
+path      path to where video files are
+pattern   e.g. "*.avi"  pattern matching video files
+
+e.g. stream all .avi video under ``~/Videos`` directory::
+
+    python FileGlob2YouTubeLive.py ~/Videos "*.avi"
+
+
+
+Several audio files
+-------------------
+Glob list of video files to stream. Note you must include a static image (could be your logo)::
+
+    python FileGlob2YouTubeLive.py path pattern -i image
+    
+path      path to where video files are
+pattern   e.g. "*.avi"  pattern matching video files
+-i        filename of image to use as stream background
+
+e.g. stream all .mp3 audio under ``~/Library`` directory::
+
+    python FileGlob2YouTubeLive.py ~/Library "*.mp3" -i mylogo.jpg
+
+
+Loop single video endlessly
+---------------------------
+::
+
+    FileLoop2YouTubeLive.py videofile
+
+
+Screen capture to disk
+----------------------
+This is NOT streaming, just saves to a file on your disk, perhaps for upload as a standard non-live YouTube video::
+
+    python ScreenCapture2disk.py myvid.avi
+
 
 
 Notes
