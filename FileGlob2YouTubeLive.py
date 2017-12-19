@@ -32,7 +32,6 @@ if __name__ == '__main__':
     for f in flist:
         P = {'filein': f,
              'fps':30, # TODO auto-determine input FPS
-             'audiochan': 'default',
              'vidsource': 'file',
              'streamid':streamid,
                 }

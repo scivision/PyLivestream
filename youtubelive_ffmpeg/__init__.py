@@ -126,13 +126,18 @@ def _audiostream(P:dict) -> list:
     """
     -ac 2 NOT -ac 1 to avoid "non monotonous DTS in output stream" errors
     """
-    return ['-f',acap, '-ac','2', '-i', P['audiochan']]
+    if 'audiochan' in P:
+        return ['-f',acap, '-ac','2', '-i', P['audiochan']]
+    else: # no audio, or file input
+        return []
 
 
 def _audiocomp(P:dict) -> list:
     """select audio codec"""
-    return ['-acodec','libmp3lame','-ar','48000' ]
-
+    if 'audiochan' in P:
+        return ['-acodec','libmp3lame','-ar','48000' ]
+    else: # no audio, or file input
+        return []
 
 # %% top-level
 def youtubelive(P:dict):
@@ -144,7 +149,8 @@ def youtubelive(P:dict):
     aud2 = _audiocomp(P)
 
     codec = ['-threads','0',
-             '-bufsize',str(2*cvbr)+'k',
+             '-maxrate','{}k'.format(cvbr),
+             '-bufsize','{}k'.format(2*cvbr),
             '-f','flv']
 
     cmd = [FFMPEG] + vid1 + aud1 + vid2 + aud2 + codec
