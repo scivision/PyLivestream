@@ -71,13 +71,20 @@ Glob list of video files to stream::
 
     python FileGlob2YouTubeLive.py path pattern
     
-path      path to where video files are
-pattern   e.g. "*.avi"  pattern matching video files
+-loop       optionally loop endlessly the globbed file list
 
-e.g. stream all .avi video under ``~/Videos`` directory::
+
+stream all .avi in ``~/Videos``
+-------------------------------
+::
 
     python FileGlob2YouTubeLive.py ~/Videos "*.avi"
 
+stream endlessly (repeating) all .avi in ``~/Videos``
+-----------------------------------------------------
+::
+
+    python FileGlob2YouTubeLive.py ~/Videos "*.avi" -loop
 
 
 Several audio files
