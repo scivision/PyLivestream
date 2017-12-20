@@ -26,7 +26,7 @@ Should work on any OS (Mac, Linux, Windows).
 
 :Linux: requires X11, not Wayland (choose at login)
 :FFmpeg: >= 3.0 required
-:Python: >= 3.5 required
+:Python: >= 3.6 required
 
 
 .. contents::
