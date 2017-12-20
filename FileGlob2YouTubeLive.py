@@ -9,6 +9,7 @@ from pathlib import Path
 from getpass import getpass
 from youtubelive_ffmpeg import youtubelive
 
+
 def playonce(flist:list, P:dict):
 
     for f in flist:

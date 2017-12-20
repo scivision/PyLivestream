@@ -17,8 +17,6 @@ if __name__ == '__main__':
     p = p.parse_args()
 
     P = {'filein': p.filein,
-         'fps':30, # TODO auto-determine input FPS
-         'audiochan': 'default',
          'vidsource': 'file',
          'loop':True,
             }

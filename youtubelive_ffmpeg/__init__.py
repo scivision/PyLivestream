@@ -12,7 +12,7 @@ except FileNotFoundError:
         sp.check_call(('avconv','-h'), stdout=sp.DEVNULL, stderr=sp.DEVNULL)
         FFMPEG = 'avconv'
     except FileNotFoundError:
-        raise FileNotFoundError('FFmpeg is not installed for your system.')
+        raise FileNotFoundError('FFmpeg program is not found. Is ffmpeg on your PATH?')
 # %% https://trac.ffmpeg.org/wiki/Capture/Desktop
 if platform.startswith('linux'):
     if 'XDG_SESSION_TYPE' in os.environ and os.environ['XDG_SESSION_TYPE'] == 'wayland':
@@ -119,8 +119,14 @@ def _screengrab(P:dict) -> list:
     """choose to grab video from desktop. May not work for Wayland."""
     vid1 = ['-f', vcap,
             '-r',str(P['fps']),
-            '-s',P['res'],
-            '-i',f':0.0+{P["origin"][0]},{P["origin"][1]}']
+            '-s',P['res']]
+
+    if platform.startswith('linux'):
+        vid1 += ['-i',f':0.0+{P["origin"][0]},{P["origin"][1]}']
+    elif platform.startswith('win'):
+        vid1 += ['-i',P['videochan']]
+    elif platform.startswith('darwin'):
+        pass  # FIXME: verify
 
     return vid1
 

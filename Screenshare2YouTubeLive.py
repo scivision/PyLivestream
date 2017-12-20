@@ -4,8 +4,23 @@ LIVE STREAM TO YOUTUBE LIVE using FFMPEG -- screenshare
 
 https://www.scivision.co/youtube-live-ffmpeg-livestream/
 https://support.google.com/youtube/answer/2853702
+
+Windows: get DirectShow device list from:
+   ffmpeg -list_devices true -f dshow -i dummy
 """
 from youtubelive_ffmpeg import youtubelive
+import sys
+#
+if sys.platform.startswith('win'):
+    audiochan = 'audio="Internal Microphone"'
+    videochan = 'video="UScreenCapture"'
+elif sys.platform.startswith('darwin'):
+    audiochan = 'default'
+    videochan = 'default'
+elif sys.platform.startswith('linux'):
+    audiochan = 'default'
+    videochan = '/dev/video0'
+
 
 if __name__ == '__main__':
     import signal
@@ -22,7 +37,8 @@ if __name__ == '__main__':
     P = {'fps': p.fps,
          'res': p.res,
          'origin':p.origin,
-         'audiochan': 'default',
+         'videochan': videochan,
+         'audiochan': audiochan,
          'vidsource': 'screen',
             }
 

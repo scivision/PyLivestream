@@ -40,26 +40,33 @@ From PyPi::
 Or for the latest copy from Github::
 
     python -m pip install -e .
-    
-    
+
+
 Usage
 =====
 In all cases, you must first `configure YouTube Live <https://www.youtube.com/live_dashboard>`_.
 Then your chosen input will stream live on YouTube Live.
+
+In the non-file streaming scripts, you can specify your video/audio device if desired at the top of the script.
+You can find device names with commands like:
+
+* Windows: ``ffmpeg -list_devices true -f dshow -i dummy``
+* Mac: ``ffmpeg -f avfoundation -list_devices true -i ""``
+* Linux: ``v4l2-ctl --list-devices``
 
 Webcam
 ------
 Audio is included::
 
     python Webcam2YouTubeLive.py
-    
-    
+
+
 Screen Share
 ------------
 Audio is included::
 
     python Screenshare2YouTubeLive.py
-    
+
 -fps      set frames/second
 -res      set resolution XxY of your screen
 -o        set origin (upper left)
@@ -70,7 +77,7 @@ Several video files
 Glob list of video files to stream::
 
     python FileGlob2YouTubeLive.py path pattern
-    
+
 -loop       optionally loop endlessly the globbed file list
 
 
@@ -92,7 +99,7 @@ Several audio files
 Glob list of video files to stream. Note you must include a static image (could be your logo)::
 
     python FileGlob2YouTubeLive.py path pattern -i image
-    
+
 path      path to where video files are
 pattern   e.g. "*.avi"  pattern matching video files
 -i        filename of image to use as stream background
