@@ -75,13 +75,13 @@ Glob list of video files to stream::
 
 
 stream all .avi in ``~/Videos``
--------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ::
 
     python FileGlob2YouTubeLive.py ~/Videos "*.avi"
 
 stream endlessly (repeating) all .avi in ``~/Videos``
------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ::
 
     python FileGlob2YouTubeLive.py ~/Videos "*.avi" -loop
