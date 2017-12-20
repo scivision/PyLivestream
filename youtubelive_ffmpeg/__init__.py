@@ -19,20 +19,18 @@ if platform.startswith('linux'):
         logging.error('Wayland may only give black output with cursor. Login with X11 desktop')
     vcap = 'x11grab'
     acap = 'pulse'
-
-    cam = '/dev/video0'      # v4l2-ctl --list-devices
+# v4l2-ctl --list-devices
     hcam = 'v4l2'
 elif platform.startswith('darwin'):
     vcap = 'avfoundation'
     acap = '0:0'  # determine from ffmpeg -f avfoundation -list_devices true -i ""
-
-    cam = 'default'       # ffmpeg -f avfoundation -list_devices true -i ""
+  # ffmpeg -f avfoundation -list_devices true -i ""
     hcam = 'avfoundation'
 elif platform.startswith('win'):
     vcap = 'dshow'
-    acap = 'video="UScreenCapture":audio="Microphone"'
-
-    cam = 'Integrated Camera'        # ffmpeg -list_devices true -f dshow -i dummy
+    hvcap = 'video="UScreenCapture"'
+    acap = 'dshow'
+    # ffmpeg -list_devices true -f dshow -i dummy
     hcam = 'dshow'
 else:
     raise ValueError(f'not sure which operating system you are using {platform}')
@@ -116,6 +114,7 @@ def _bitrate(P:dict) -> list:
 
     return cvbr
 
+
 def _screengrab(P:dict) -> list:
     """choose to grab video from desktop. May not work for Wayland."""
     vid1 = ['-f', vcap,
@@ -130,9 +129,10 @@ def _webcam(P:dict) -> list:
     """configure webcam"""
     vid1 = ['-f',hcam,
             '-r',str(P['fps']),
-            '-i',cam]
+            '-i',P['videochan']]
 
     return vid1
+
 
 def _filein(P:dict) -> list:
     """file input"""
@@ -173,6 +173,7 @@ def _audiostream(P:dict) -> list:
 def _audiocomp(P:dict) -> list:
     """select audio codec"""
     return ['-c:a','aac','-b:a','160k','-ar','44100' ]
+
 
 def _buffer(P:dict,cvbr:int) -> list:
     buf = ['-threads','0']
@@ -226,6 +227,8 @@ def disksave4youtube(P:dict, outfn:Path=None):
     aud2 = _audiocomp(P)
 
     cmd = [FFMPEG] + vid1 + aud1 + aud2
+    if platform.startswith('win'):
+        cmd += ['-copy_ts']
 
     print('\n',' '.join(cmd),'\n')
 

@@ -123,4 +123,14 @@ Notes
 * FFmpeg Ubuntu `PPA <https://launchpad.net/~mc3man/+archive/ubuntu/trusty-media>`_
 * `Reference webpage <https://www.scivision.co/youtube-live-ffmpeg-livestream/>`_
 * `Test videos for looping/globbing <http://www.divx.com/en/devices/profiles/video>`_
-* `FFmpeg streaming encoding reference <https://trac.ffmpeg.org/wiki/EncodingForStreamingSites>`_
+
+FFmpeg References
+-----------------
+
+* `streaming <https://trac.ffmpeg.org/wiki/EncodingForStreamingSites>`_
+* `webcam <https://trac.ffmpeg.org/wiki/Capture/Webcam>`_
+
+Windows
+~~~~~~~
+* `DirectShow <https://trac.ffmpeg.org/wiki/DirectShow>`_ device selection
+* DirectShow `examples <https://ffmpeg.org/ffmpeg-devices.html#Examples-4>`_
