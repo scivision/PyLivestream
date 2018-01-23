@@ -179,13 +179,15 @@ def _audiostream(P:dict) -> list:
 
 
 def _audiocomp(P:dict) -> list:
-    """select audio codec"""
+    """select audio codec
+    https://trac.ffmpeg.org/wiki/Encode/AAC#FAQ
+    """
     return ['-c:a','aac',
             '-b:a','64k',  # 64k for Periscope, good for others too
             '-ar','44100' ]
 
 
-def _buffer(P:dict,cvbr:int) -> list:
+def _buffer(P:dict, cvbr:int) -> list:
     buf = ['-threads','0']
 
     if not 'image' in P or not P['image']:
@@ -199,6 +201,32 @@ def _buffer(P:dict,cvbr:int) -> list:
     return buf
 
 # %% top-level
+def facebooklive(P:dict):
+    """LIVE STREAM to Facebook Live
+    https://www.facebook.com/live/create
+    """
+
+    vid1,vid2,cvbr = _videostream(P)
+
+    aud1 = _audiostream(P)
+    aud2 = _audiocomp(P)
+
+    buf = _buffer(P,cvbr)
+
+    cmd = [FFMPEG] + vid1 + aud1 + vid2 + aud2 + buf
+
+    print('\n',' '.join(cmd),'\n')
+
+    if 'streamid' in P: # for loop case
+        streamid = P['streamid']
+    else:
+        streamid = getpass('Facebook Live Stream ID: ')
+
+#    sp.check_call(cmd+['rtmps://live-api.facebook.com:443/rtmp/' + streamid],
+    sp.check_call(cmd+['rtmp://live-api.facebook.com:80/rtmp/' + streamid],
+                stdout=sp.DEVNULL)
+                
+                
 def periscope(P:dict):
     """LIVE STREAM to Periscope"""
     
