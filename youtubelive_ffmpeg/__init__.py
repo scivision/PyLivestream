@@ -40,6 +40,7 @@ br30 = {'2160':13000,
         '1440':6000,
         '1080':3000,
         '720':1500,
+        '540':800, # Periscope 960 x 540
         '480':500,
         '360':400,
         '240':300,
@@ -95,9 +96,9 @@ def _group(P:dict) -> str:
 def _bitrate(P:dict) -> list:
     if 'image' in P and P['image']:
         return
-
-    if P['vidsource'] == 'file': # TODO get from input file
+    elif P['vidsource'] == 'file': # TODO get from input file
         return 3000
+
 # %%
     if 'res' in P:
         y = P['res'].split('x')[1]
@@ -178,7 +179,9 @@ def _audiostream(P:dict) -> list:
 
 def _audiocomp(P:dict) -> list:
     """select audio codec"""
-    return ['-c:a','aac','-b:a','160k','-ar','44100' ]
+    return ['-c:a','aac',
+            '-b:a','96k',  # 96k for Periscope, good for others too
+            '-ar','44100' ]
 
 
 def _buffer(P:dict,cvbr:int) -> list:
@@ -195,6 +198,28 @@ def _buffer(P:dict,cvbr:int) -> list:
     return buf
 
 # %% top-level
+def periscope(P:dict):
+    """LIVE STREAM to Periscope"""
+
+    vid1,vid2,cvbr = _videostream(P)
+
+    aud1 = _audiostream(P)
+    aud2 = _audiocomp(P)
+
+    buf = _buffer(P,cvbr)
+
+    cmd = [FFMPEG] + vid1 + aud1 + vid2 + aud2 + buf
+
+    print('\n',' '.join(cmd),'\n')
+
+    if 'streamid' in P: # for loop case
+        streamid = P['streamid']
+    else:
+        streamid = getpass('Periscope Stream ID: ')
+
+    sp.check_call(cmd+['rtmp://va.pscp.tv:80/x' + streamid],
+                stdout=sp.DEVNULL)
+
 def youtubelive(P:dict):
     """LIVE STREAM to YouTube Live"""
 
