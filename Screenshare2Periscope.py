@@ -19,8 +19,7 @@ elif sys.platform.startswith('darwin'):
     videochan = 'default'
 elif sys.platform.startswith('linux'):
     audiochan = 'default'
-    videochan = '/dev/video0'
-
+    videochan = None
 
 if __name__ == '__main__':
     import signal
@@ -28,12 +27,13 @@ if __name__ == '__main__':
 
     from argparse import ArgumentParser
     p = ArgumentParser()
+    p.add_argument('-r','--res', help='resolution:  HD or SD  (default SD)',default='SD')
     p.add_argument('-o','--origin',help='x,y coordinates of upper-left hand capture area (pixel)',
                    nargs=2,type=int,default=[100,100])
     p = p.parse_args()
 
     P = {'fps': 30,
-         'res': '960x540',
+         'res': p.res,
          'origin':p.origin,
          'videochan': videochan,
          'audiochan': audiochan,
@@ -41,4 +41,4 @@ if __name__ == '__main__':
             }
 
     periscope(P)
-    
+

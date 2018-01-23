@@ -28,7 +28,6 @@ elif platform.startswith('darwin'):
     hcam = 'avfoundation'
 elif platform.startswith('win'):
     vcap = 'dshow'
-    hvcap = 'video="UScreenCapture"'
     acap = 'dshow'
     # ffmpeg -list_devices true -f dshow -i dummy
     hcam = 'dshow'
@@ -40,7 +39,7 @@ br30 = {'2160':13000,
         '1440':6000,
         '1080':3000,
         '720':1500,
-        '540':800, # Periscope 960 x 540
+        '540':800,
         '480':500,
         '360':400,
         '240':300,
@@ -98,11 +97,13 @@ def _bitrate(P:dict) -> list:
         return
     elif P['vidsource'] == 'file': # TODO get from input file
         return 3000
-
+    elif 'site' in P and P['site'] == 'periscope':
+        return 800  # same for HD and SD Periscope
+        
 # %%
     if 'res' in P:
         y = P['res'].split('x')[1]
-
+        
         if P['fps'] <= 30:
            cvbr = br30[y]
         else:
@@ -180,7 +181,7 @@ def _audiostream(P:dict) -> list:
 def _audiocomp(P:dict) -> list:
     """select audio codec"""
     return ['-c:a','aac',
-            '-b:a','96k',  # 96k for Periscope, good for others too
+            '-b:a','64k',  # 64k for Periscope, good for others too
             '-ar','44100' ]
 
 
@@ -200,6 +201,11 @@ def _buffer(P:dict,cvbr:int) -> list:
 # %% top-level
 def periscope(P:dict):
     """LIVE STREAM to Periscope"""
+    
+    if P['res'].lower() == 'hd':
+        P['res'] = '1280x720'
+    elif P['res'].lower() == 'sd':
+        P['res'] = '960x540'
 
     vid1,vid2,cvbr = _videostream(P)
 
@@ -217,8 +223,9 @@ def periscope(P:dict):
     else:
         streamid = getpass('Periscope Stream ID: ')
 
-    sp.check_call(cmd+['rtmp://va.pscp.tv:80/x' + streamid],
+    sp.check_call(cmd+['rtmp://va.pscp.tv:80/x/' + streamid],
                 stdout=sp.DEVNULL)
+
 
 def youtubelive(P:dict):
     """LIVE STREAM to YouTube Live"""
