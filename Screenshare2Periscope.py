@@ -38,6 +38,7 @@ if __name__ == '__main__':
          'videochan': videochan,
          'audiochan': audiochan,
          'vidsource': 'screen',
+         'site': 'periscope',
             }
 
     periscope(P)

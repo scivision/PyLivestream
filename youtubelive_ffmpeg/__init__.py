@@ -99,11 +99,11 @@ def _bitrate(P:dict) -> list:
         return 3000
     elif 'site' in P and P['site'] == 'periscope':
         return 800  # same for HD and SD Periscope
-        
+
 # %%
     if 'res' in P:
         y = P['res'].split('x')[1]
-        
+
         if P['fps'] <= 30:
            cvbr = br30[y]
         else:
@@ -225,11 +225,11 @@ def facebooklive(P:dict):
 #    sp.check_call(cmd+['rtmps://live-api.facebook.com:443/rtmp/' + streamid],
     sp.check_call(cmd+['rtmp://live-api.facebook.com:80/rtmp/' + streamid],
                 stdout=sp.DEVNULL)
-                
-                
+
+
 def periscope(P:dict):
     """LIVE STREAM to Periscope"""
-    
+
     if P['res'].lower() == 'hd':
         P['res'] = '1280x720'
     elif P['res'].lower() == 'sd':
