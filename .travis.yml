@@ -1,6 +1,5 @@
 language: python
 fast_finish: true
-sudo: true
 
 python:
   - 3.6
@@ -8,15 +7,16 @@ python:
 os:
   - linux
 
-dist: xenial
+dist: trusty
 group: edge
 
 git:
   depth: 3
   
-before_install:
-  - sudo apt -qq update
-  - sudo apt install -y ffmpeg
+addons:
+  apt:
+    packages:
+    - libav-tools
 
 
 install: pip -q install -e .[tests]
@@ -24,3 +24,4 @@ install: pip -q install -e .[tests]
 script: coverage run tests/Test.py -v
 
 after_success: coveralls
+
