@@ -1,5 +1,6 @@
 language: python
 fast_finish: true
+sudo: true
 
 python:
   - 3.6
@@ -13,10 +14,9 @@ group: edge
 git:
   depth: 3
   
-addons:
-  apt:
-    packages:
-    - ffmpeg
+before_install:
+  - sudo apt -qq update
+  - sudo apt install -y ffmpeg
 
 
 install: pip -q install -e .[tests]
