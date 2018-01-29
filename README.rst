@@ -41,8 +41,7 @@ Install
 Usage
 =====
 
-
-Secify your video/audio device if desired at the top of the script.
+Specify your video/audio device if desired at the top of the script.
 Find device names with commands like:
 
 * Windows: ``ffmpeg -list_devices true -f dshow -i dummy``
@@ -144,6 +143,7 @@ Periscope
 ---------
 
 1. create a new stream by EITHER:
+
    * from phone Periscope app, go to Profile -> Settings -> Periscope Producer and see your Stream Key. The "checking source" button will go to "preview stream" once you do step #2.
    * from computer web browser, go to `https://www.periscope.tv/account/producer <https://www.periscope.tv/account/producer>`_ and Create New Source.
 2. Run Python script for Periscope with chosen input
