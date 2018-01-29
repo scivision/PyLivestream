@@ -182,8 +182,17 @@ def _audiocomp(P:dict) -> list:
     """select audio codec
     https://trac.ffmpeg.org/wiki/Encode/AAC#FAQ
     """
+    
+    if 'site' in P and P['site'] == 'periscope':
+        abw = '64k'
+    else: # facebook live, youtube live
+        abw = '128k'  
+        # https://support.google.com/youtube/answer/2853702?hl=en
+        # https://www.facebook.com/facebookmedia/get-started/live
+            
+    
     return ['-c:a','aac',
-            '-b:a','64k',  # 64k for Periscope, good for others too
+            '-b:a',abw, 
             '-ar','44100' ]
 
 
