@@ -7,12 +7,8 @@ python:
 os:
   - linux
 
-dist: trusty
+dist: xenial
 group: edge
-  
-
-notifications:
-  email: false
 
 git:
   depth: 3
@@ -20,11 +16,11 @@ git:
 addons:
   apt:
     packages:
-    - libav-tools
+    - ffmpeg
 
 
 install: pip -q install -e .[tests]
 
-script: coverage run tests/test.py -v
+script: coverage run tests/Test.py -v
 
 after_success: coveralls
