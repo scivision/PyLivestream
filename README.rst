@@ -33,36 +33,40 @@ Should work on any OS (Mac, Linux, Windows).
 
 Install
 =======
-From PyPi::
-
-    python -m pip install YouTubeLiveFFmpeg
-
-Or for the latest copy from Github::
+::
 
     python -m pip install -e .
 
 
 Usage
 =====
-In all cases, you must first `configure YouTube Live <https://www.youtube.com/live_dashboard>`_.
-Then your chosen input will stream live on YouTube Live.
 
-In the non-file streaming scripts, you can specify your video/audio device if desired at the top of the script.
-You can find device names with commands like:
+
+Secify your video/audio device if desired at the top of the script.
+Find device names with commands like:
 
 * Windows: ``ffmpeg -list_devices true -f dshow -i dummy``
 * Mac: ``ffmpeg -f avfoundation -list_devices true -i ""``
 * Linux: ``v4l2-ctl --list-devices``
 
+I will describe usage for each of YouTube Live, Facebook Live, and Periscope.
+
+YouTube Live
+------------
+
+1. `configure  <https://www.youtube.com/live_dashboard>`_ YouTube Live.
+2. Run Python script and chosen input will stream on YouTube Live.
+
+
 Webcam
-------
+~~~~~~
 Audio is included::
 
     python Webcam2YouTubeLive.py
 
 
 Screen Share
-------------
+~~~~~~~~~~~~
 Audio is included::
 
     python Screenshare2YouTubeLive.py
@@ -72,8 +76,8 @@ Audio is included::
 -o        set origin (upper left)
 
 
-Several video files
--------------------
+several video files
+~~~~~~~~~~~~~~~~~~~
 Glob list of video files to stream::
 
     python FileGlob2YouTubeLive.py path pattern
@@ -81,22 +85,23 @@ Glob list of video files to stream::
 -loop       optionally loop endlessly the globbed file list
 
 
-stream all .avi in ``~/Videos``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-::
+stream all videos in directory
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Example: all AVI videos in directory ``~/Videos``::
 
     python FileGlob2YouTubeLive.py ~/Videos "*.avi"
 
-stream endlessly (repeating) all .avi in ``~/Videos``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-::
+stream endlessly looping videos
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Example: all AVI videos in ``~/Videos`` are endlessly looped::
 
     python FileGlob2YouTubeLive.py ~/Videos "*.avi" -loop
 
 
-Several audio files
--------------------
-Glob list of video files to stream. Note you must include a static image (could be your logo)::
+stream all audio files in directory
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Glob list of video files to stream. 
+Must include a static image (could be your logo)::
 
     python FileGlob2YouTubeLive.py path pattern -i image
 
@@ -104,13 +109,13 @@ path      path to where video files are
 pattern   e.g. "*.avi"  pattern matching video files
 -i        filename of image to use as stream background
 
-e.g. stream all .mp3 audio under ``~/Library`` directory::
+Example: stream all .mp3 audio under ``~/Library`` directory::
 
     python FileGlob2YouTubeLive.py ~/Library "*.mp3" -i mylogo.jpg
 
 
 Loop single video endlessly
----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ::
 
     FileLoop2YouTubeLive.py videofile
@@ -118,11 +123,35 @@ Loop single video endlessly
 
 Screen capture to disk
 ----------------------
-This is NOT streaming, just saves to a file on your disk, perhaps for upload as a standard non-live YouTube video::
+This is NOT streaming.
+This script saves your screen capture to a file on your disk::
 
     python ScreenCapture2disk.py myvid.avi
 
 
+Facebook Live
+-------------
+
+1. configure your Facebook Live stream, get stream ID from `https://www.facebook.com/live/create <https://www.facebook.com/live/create>`_
+2. Run Python script for Facebook with chosen input
+
+::
+
+    python Screenshare2FacebookLive.py
+    
+    
+Periscope
+---------
+
+1. create a new stream by EITHER:
+   * from phone Periscope app, go to Profile -> Settings -> Periscope Producer and see your Stream Key. The "checking source" button will go to "preview stream" once you do step #2.
+   * from computer web browser, go to `https://www.periscope.tv/account/producer <https://www.periscope.tv/account/producer>`_ and Create New Source.
+2. Run Python script for Periscope with chosen input
+
+::
+
+    python Screenshare2Periscope.py
+    
 
 Notes
 =====
