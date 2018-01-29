@@ -152,6 +152,8 @@ Periscope
 
     python Screenshare2Periscope.py
     
+    
+I prefer using the Phone method as then the phone is a "second screen" where I can see if the stream is lagging, and if I "leave broadcast" and come back in, I can comment from my phone etc.
 
 Notes
 =====
