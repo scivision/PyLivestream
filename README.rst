@@ -1,15 +1,15 @@
-.. image:: https://travis-ci.org/scivision/ffmpeg-youtube-live.svg?branch=master
-    :target: https://travis-ci.org/scivision/ffmpeg-youtube-live
+.. image:: https://travis-ci.org/scivision/PyLivestream?branch=master
+    :target: https://travis-ci.org/scivision/PyLivestream
 
-.. image:: https://coveralls.io/repos/github/scivision/ffmpeg-youtube-live/badge.svg?branch=master
-    :target: https://coveralls.io/github/scivision/ffmpeg-youtube-live?branch=master
+.. image:: https://coveralls.io/repos/github/scivision/PyLivestream/badge.svg?branch=master
+    :target: https://coveralls.io/github/scivision/PyLivestream?branch=master
 
-.. image:: https://img.shields.io/pypi/pyversions/youtubeliveffmpeg.svg
-  :target: https://pypi.python.org/pypi/youtubeliveffmpeg
+.. image:: https://img.shields.io/pypi/pyversions/PyLivestream.svg
+  :target: https://pypi.python.org/pypi/PyLivestream
   :alt: Python versions (PyPI)
 
-.. image::  https://img.shields.io/pypi/format/youtubeliveffmpeg.svg
-  :target: https://pypi.python.org/pypi/youtubeliveffmpeg
+.. image::  https://img.shields.io/pypi/format/PyLivestream.svg
+  :target: https://pypi.python.org/pypi/PyLivestream
   :alt: Distribution format (PyPI)
 
 .. image:: https://api.codeclimate.com/v1/badges/b6557d474ec050e74629/maintainability
