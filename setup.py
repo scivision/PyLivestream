@@ -4,10 +4,10 @@ from setuptools import setup,find_packages
 
 setup(name='PyLivestream',
       packages=find_packages(),
-      version = '1.2.0',
+      version = '1.2.1',
       author='Michael Hirsch, Ph.D.',
       url='https://github.com/scivision/PyLivestream',
-      description='Easy streaming using FFmpeg to YouTube Live, Periscope, Facebook Live.',
+      description='Easy streaming using FFmpeg to YouTube Live, Periscope, Facebook Live, Twitch, ...',
       long_description=open("README.rst").read(),
       python_requires='>=3.6',
       tests_require=tests_require,

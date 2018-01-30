@@ -22,7 +22,7 @@ if __name__ == '__main__':
     from argparse import ArgumentParser
     p = ArgumentParser()
     p.add_argument('ini',help='config file')
-    p.add_argument('site',help='site to stream to [youtube,periscope,facebook]')
+    p.add_argument('site',help='site to stream to [youtube,periscope,facebook,twitch]')
     p.add_argument('path',help='path to discover files from')
     p.add_argument('glob',help='file glob pattern to stream.')
     p.add_argument('-image',help='static image to display, typically used for audio-only files.')

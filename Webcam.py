@@ -37,7 +37,7 @@ if __name__ == '__main__':
     from argparse import ArgumentParser
     p = ArgumentParser()
     p.add_argument('ini',help='*.ini file with stream parameters')
-    p.add_argument('site',help='site to stream to [youtube,periscope,facebook]')
+    p.add_argument('site',help='site to stream to [youtube,periscope,facebook,twitch]')
     p = p.parse_args()
 
     PyLivestream.Webcam(p.ini, p.site)

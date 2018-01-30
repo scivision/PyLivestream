@@ -6,28 +6,22 @@ rdir = Path(__file__).parent
 
 inifn = rdir / 'test.ini'
 
+sites = ['periscope','youtube','facebook','twitch']
+
 def test_screenshare():
-    PyLivestream.Screenshare(inifn,'periscope')
+    for s in sites:
+        PyLivestream.Screenshare(inifn, s)
 
-    PyLivestream.Screenshare(inifn,'youtube')
-
-    PyLivestream.Screenshare(inifn,'facebook')
 
 
 def test_webcam():
-    PyLivestream.Webcam(inifn,'periscope')
-
-    PyLivestream.Webcam(inifn,'youtube')
-
-    PyLivestream.Webcam(inifn,'facebook')
+    for s in sites:
+        PyLivestream.Webcam(inifn, s)
 
 
 def test_loop():
-    PyLivestream.FileIn(inifn,'periscope','')
-
-    PyLivestream.FileIn(inifn,'youtube','')
-
-    PyLivestream.FileIn(inifn,'facebook','')
+    for s in sites:
+        PyLivestream.FileIn(inifn,s,'')
 
 
 

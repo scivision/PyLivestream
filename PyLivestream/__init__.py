@@ -257,6 +257,8 @@ class Livestream(Stream):
             self.youtubelive()
         elif self.site == 'facebook':
             self.facebooklive()
+        elif self.site == 'twitch':
+            self.twitch()
         else:
             raise ValueError('site {} unknown'.format(self.site))
 
@@ -315,6 +317,27 @@ class Livestream(Stream):
             return
 
         sp.check_call(cmd, stdout=sp.DEVNULL)
+
+    def twitch(self):
+        """LIVE STREAM to Twitch.TV
+        https://help.twitch.tv/customer/portal/articles/1253460-broadcast-requirements
+        http://bashtech.net/twitch/ingest.php
+        """
+
+        if isinstance(self.key, str):
+            streamid = self.key
+        else:
+            streamid = getpass('Twitch Stream ID: ')
+
+        cmd = self.cmd+['rtmp://live-jfk.twitch.tv/app/' + streamid]
+
+        if streamid == 'test':
+            print(' '.join(cmd))
+            return
+
+        sp.check_call(cmd, stdout=sp.DEVNULL)
+
+
 
 # %% operators
 class Screenshare(Livestream):

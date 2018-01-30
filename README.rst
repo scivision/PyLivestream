@@ -48,7 +48,7 @@ Find device names with commands like:
 * Mac: ``ffmpeg -f avfoundation -list_devices true -i ""``
 * Linux: ``v4l2-ctl --list-devices``
 
-I will describe usage for each of YouTube Live, Facebook Live, and Periscope.
+I will describe usage for each of YouTube Live, Facebook Live, Periscope and Twitch.
 
 YouTube Live
 ------------
@@ -86,6 +86,13 @@ Periscope
     python Screenshare.py stream.ini periscope
 
 I prefer using the Phone method as then the phone is a "second screen" where I can see if the stream is lagging, and if I "leave broadcast" and come back in, I can comment from my phone etc.
+
+
+Twitch
+------
+
+1. create stream from `Twitch Dashboard <http://www.twitch.tv/broadcast/dashboard>`_
+2. Run Python script for Twitch with chosen input
 
 
 Usage
