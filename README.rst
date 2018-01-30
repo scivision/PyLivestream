@@ -41,7 +41,7 @@ Install
 Usage
 =====
 
-Specify your video/audio device if desired at the top of the script.
+The ``.ini`` file contains parameters relevant to your stream.
 Find device names with commands like:
 
 * Windows: ``ffmpeg -list_devices true -f dshow -i dummy``
@@ -61,14 +61,14 @@ Webcam
 ~~~~~~
 Audio is included::
 
-    python Webcam2YouTubeLive.py
+    python Webcam2YouTubeLive.py stream.ini
 
 
 Screen Share
 ~~~~~~~~~~~~
 Audio is included::
 
-    python Screenshare2YouTubeLive.py
+    python Screenshare2YouTubeLive.py stream.ini
 
 -fps      set frames/second
 -res      set resolution XxY of your screen
@@ -79,7 +79,7 @@ several video files
 ~~~~~~~~~~~~~~~~~~~
 Glob list of video files to stream::
 
-    python FileGlob2YouTubeLive.py path pattern
+    python FileGlob2YouTubeLive.py stream.ini path pattern
 
 -loop       optionally loop endlessly the globbed file list
 
@@ -88,7 +88,7 @@ stream all videos in directory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Example: all AVI videos in directory ``~/Videos``::
 
-    python FileGlob2YouTubeLive.py ~/Videos "*.avi"
+    python FileGlob2YouTubeLive.py stream.ini ~/Videos "*.avi"
 
 stream endlessly looping videos
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -102,7 +102,7 @@ stream all audio files in directory
 Glob list of video files to stream. 
 Must include a static image (could be your logo)::
 
-    python FileGlob2YouTubeLive.py path pattern -i image
+    python FileGlob2YouTubeLive.py stream.ini  path pattern -i image
 
 path      path to where video files are
 pattern   e.g. "*.avi"  pattern matching video files
@@ -110,14 +110,14 @@ pattern   e.g. "*.avi"  pattern matching video files
 
 Example: stream all .mp3 audio under ``~/Library`` directory::
 
-    python FileGlob2YouTubeLive.py ~/Library "*.mp3" -i mylogo.jpg
+    python FileGlob2YouTubeLive.py stream.ini ~/Library "*.mp3" -i mylogo.jpg
 
 
 Loop single video endlessly
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ::
 
-    FileLoop2YouTubeLive.py videofile
+    FileLoop2YouTubeLive.py stream.ini videofile
 
 
 Screen capture to disk
@@ -125,7 +125,7 @@ Screen capture to disk
 This is NOT streaming.
 This script saves your screen capture to a file on your disk::
 
-    python ScreenCapture2disk.py myvid.avi
+    python ScreenCapture2disk.py stream.ini myvid.avi
 
 
 Facebook Live
@@ -136,7 +136,7 @@ Facebook Live
 
 ::
 
-    python Screenshare2FacebookLive.py
+    python Screenshare2FacebookLive.py stream.ini
     
     
 Periscope
@@ -150,7 +150,7 @@ Periscope
 
 ::
 
-    python Screenshare2Periscope.py
+    python Screenshare2Periscope.py stream.ini
     
     
 I prefer using the Phone method as then the phone is a "second screen" where I can see if the stream is lagging, and if I "leave broadcast" and come back in, I can comment from my phone etc.
