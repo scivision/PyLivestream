@@ -110,34 +110,45 @@ Audio is included::
     python Screenshare.py stream.ini site
 
 
+File Input
+----------
+
+
+Loop single video endlessly
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+::
+
+    FileLoop.py stream.ini site videofile
+
+
 several video files
--------------------
+~~~~~~~~~~~~~~~~~~~
 Glob list of video files to stream::
 
-    python FileGlob2YouTubeLive.py stream.ini path pattern
+    python FileGlob2YouTubeLive.py  path pattern
 
 -loop       optionally loop endlessly the globbed file list
 
 
 stream all videos in directory
-------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Example: all AVI videos in directory ``~/Videos``::
 
-    python FileGlob2YouTubeLive.py stream.ini ~/Videos "*.avi"
+    python FileGlob2YouTubeLive.py ~/Videos "*.avi"
 
 stream endlessly looping videos
--------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Example: all AVI videos in ``~/Videos`` are endlessly looped::
 
     python FileGlob2YouTubeLive.py ~/Videos "*.avi" -loop
 
 
 stream all audio files in directory
------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Glob list of video files to stream.
 Must include a static image (could be your logo)::
 
-    python FileGlob2YouTubeLive.py stream.ini  path pattern -i image
+    python FileGlob2YouTubeLive.py path pattern -i image
 
 path      path to where video files are
 pattern   e.g. "*.avi"  pattern matching video files
@@ -145,14 +156,7 @@ pattern   e.g. "*.avi"  pattern matching video files
 
 Example: stream all .mp3 audio under ``~/Library`` directory::
 
-    python FileGlob2YouTubeLive.py stream.ini ~/Library "*.mp3" -i mylogo.jpg
-
-
-Loop single video endlessly
----------------------------
-::
-
-    FileLoop2YouTubeLive.py stream.ini videofile
+    python FileGlob2YouTubeLive.py  ~/Library "*.mp3" -i mylogo.jpg
 
 
 Screen capture to disk

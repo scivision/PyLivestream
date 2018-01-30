@@ -187,8 +187,8 @@ class Stream:
 
 
     def filein(self) -> list:
-        """audio file input, streaming audio with static image"""
-        fn = Path(self.audiofn).expanduser()
+        """stream input file  (video, or audio + image)"""
+        fn = Path(self.loop).expanduser()
 
         if self.image:
             vid1 = ['-loop','1']
@@ -339,6 +339,21 @@ class Webcam(Livestream):
         ini=Path(ini).expanduser()
         image = False
         loop = False
+
+        stream = Livestream(ini,site,vidsource,image,loop)
+
+        stream.golive()
+
+
+class Loop(Livestream):
+
+    def __init__(self, ini:Path, site:str, infn:Path):
+
+        site = site.lower()
+        vidsource = 'file'
+        ini=Path(ini).expanduser()
+        image = False
+        loop = infn
 
         stream = Livestream(ini,site,vidsource,image,loop)
 
