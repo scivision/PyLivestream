@@ -2,10 +2,28 @@
 from pathlib import Path
 import PyLivestream
 
-rdir = Path(__file__).parents[1]
+rdir = Path(__file__).parent
 
-inifn = rdir / 'stream.ini'
+inifn = rdir / 'test.ini'
 
-P = {'ini': inifn, 'vidsource': 'file', 'site': 'file'}
+def test_screenshare():
+    PyLivestream.Screenshare(inifn,'periscope')
 
-PyLivestream.disksave(P)
+    PyLivestream.Screenshare(inifn,'youtube')
+
+    PyLivestream.Screenshare(inifn,'facebook')
+
+
+def test_webcam():
+    PyLivestream.Webcam(inifn,'periscope')
+
+    PyLivestream.Webcam(inifn,'youtube')
+
+    PyLivestream.Webcam(inifn,'facebook')
+
+
+
+if __name__ == '__main__':
+    test_screenshare()
+
+    test_webcam()

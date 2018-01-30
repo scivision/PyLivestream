@@ -42,11 +42,12 @@ def getexe() -> str:
 # %% top level
 class Stream:
 
-    def __init__(self,ini,site,vidsource,image):
+    def __init__(self,ini,site,vidsource,image,loop):
         self.ini = ini
         self.site = site
         self.vidsource = vidsource
         self.image = image
+        self.loop = loop
 
 
     def osparam(self):
@@ -70,6 +71,12 @@ class Stream:
         self.fps  = C.getint(self.site,'fps')
         self.res  = C.get(self.site,'res')
         self.origin = C.get(self.site,'origin').split(',')
+
+        keyfn = C.get(self.site,'key')
+        if not keyfn:
+            self.key = None
+        else:
+            self.key = Path(keyfn).expanduser().read_text()
 
 
     def videostream(self) -> tuple:
@@ -180,8 +187,8 @@ class Stream:
 
 
     def filein(self) -> list:
-        """file input"""
-        fn = Path(P['filein']).expanduser()
+        """audio file input, streaming audio with static image"""
+        fn = Path(self.audiofn).expanduser()
 
         if self.image:
             vid1 = ['-loop','1']
@@ -222,8 +229,8 @@ class Stream:
 
 class Livestream(Stream):
 
-    def __init__(self,ini,site,vidsource,image=False):
-        super().__init__(ini,site,vidsource,image)
+    def __init__(self,ini,site,vidsource,image=False,loop=False):
+        super().__init__(ini,site,vidsource,image,loop)
 
         self.site = site
 
@@ -258,38 +265,53 @@ class Livestream(Stream):
         https://www.facebook.com/live/create
         """
 
-        try: # for loop case
-            streamid = self.streamid
-        except AttributeError:
+        if isinstance(self.key, str):
+            streamid = self.key
+        else:
             streamid = getpass('Facebook Live Stream ID: ')
 
+        cmd = self.cmd+['rtmp://live-api.facebook.com:80/rtmp/' + streamid]
+
+        if streamid == 'test':
+            print(' '.join(cmd))
+            return
+
     #    sp.check_call(self.cmd+['rtmps://live-api.facebook.com:443/rtmp/' + streamid],
-        sp.check_call(self.cmd+['rtmp://live-api.facebook.com:80/rtmp/' + streamid],
-                    stdout=sp.DEVNULL)
+        sp.check_call(cmd, stdout=sp.DEVNULL)
 
 
     def periscope(self):
         """LIVE STREAM to Periscope"""
 
-        try: # for loop case
-            streamid = self.streamid
-        except AttributeError:
+        if isinstance(self.key, str):
+            streamid = self.key
+        else:
             streamid = getpass('Periscope Stream ID: ')
 
-        sp.check_call(self.cmd+['rtmp://va.pscp.tv:80/x/' + streamid],
-                    stdout=sp.DEVNULL)
+        cmd = self.cmd+['rtmp://va.pscp.tv:80/x/' + streamid]
+
+        if streamid == 'test':
+            print(' '.join(cmd))
+            return
+
+        sp.check_call(cmd, stdout=sp.DEVNULL)
 
 
     def youtubelive(self):
         """LIVE STREAM to YouTube Live"""
 
-        try: # for loop case
-            streamid = self.streamid
-        except AttributeError:
+        if isinstance(self.key, str):
+            streamid = self.key
+        else:
             streamid = getpass('YouTube Live Stream ID: ')
 
-        sp.check_call(self.cmd+['rtmp://a.rtmp.youtube.com/live2/' + streamid],
-                    stdout=sp.DEVNULL)
+        cmd = self.cmd+['rtmp://a.rtmp.youtube.com/live2/' + streamid]
+
+        if streamid == 'test':
+            print(' '.join(cmd))
+            return
+
+        sp.check_call(cmd, stdout=sp.DEVNULL)
 
 # %% operators
 class Screenshare(Livestream):
@@ -299,11 +321,10 @@ class Screenshare(Livestream):
         site = site.lower()
         vidsource = 'screen'
         ini=Path(ini).expanduser()
+        image = False
+        loop = False
 
-        self.image = False
-        self.loop = False
-
-        stream = Livestream(ini,site,vidsource)
+        stream = Livestream(ini,site,vidsource,image,loop)
 
         stream.golive()
 
@@ -316,11 +337,10 @@ class Webcam(Livestream):
         site = site.lower()
         vidsource = 'camera'
         ini=Path(ini).expanduser()
+        image = False
+        loop = False
 
-        self.image = False
-        self.loop = False
-
-        stream = Livestream(ini,site,vidsource)
+        stream = Livestream(ini,site,vidsource,image,loop)
 
         stream.golive()
 
