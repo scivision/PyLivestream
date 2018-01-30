@@ -72,7 +72,7 @@ class Stream:
         self.res  = C.get(self.site,'res')
         self.origin = C.get(self.site,'origin').split(',')
 
-        keyfn = C.get(self.site,'key')
+        keyfn = C.get(self.site,'key', fallback=None)
         if not keyfn:
             self.key = None
         else:
@@ -361,33 +361,39 @@ class Loop(Livestream):
 
 
 
-class Save(Stream):
+class SaveDisk(Stream):
 
-    def __init__(self):
-        pass
-
-    def disksave(self, outfn:Path=None):
+    def __init__(self,ini:Path, outfn:Path=None):
         """
         records to disk screen capture with audio for upload to YouTube
 
         if not outfn, just cite command that would have run
         """
+        site = vidsource = 'file'
+        ini=Path(ini).expanduser()
+        image = False
+        loop = False
+
+        super().__init__(ini,site,vidsource,image,loop)
+
         if outfn:
             outfn = Path(outfn).expanduser()
+
+        self.osparam()
 
         vid1 = self.screengrab()
 
         aud1 = self.audiostream()
         aud2 = self.audiocomp()
 
-        cmd = [getexe()] + vid1 + aud1 + aud2
+        cmd = [getexe()] + vid1 + aud1 + aud2 + [str(outfn)]
         if sys.platform == 'win32':
             cmd += ['-copy_ts']
 
         print('\n',' '.join(cmd),'\n')
 
         if outfn:
-            sp.check_call(cmd + [str(outfn)])
+            sp.check_call(cmd )
         else:
             print('specify filename to save screen capture with audio to disk.')
 
