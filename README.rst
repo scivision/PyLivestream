@@ -1,4 +1,4 @@
-.. image:: https://travis-ci.org/scivision/PyLivestream?branch=master
+.. image:: https://travis-ci.org/scivision/PyLivestream.svg?branch=master
     :target: https://travis-ci.org/scivision/PyLivestream
 
 .. image:: https://coveralls.io/repos/github/scivision/PyLivestream/badge.svg?branch=master
