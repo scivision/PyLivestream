@@ -91,11 +91,23 @@ I prefer using the Phone method as then the phone is a "second screen" where I c
 Use Cases
 =========
 
+* ``stream.ini`` is setup for your computer and desired parameters
+* ``site`` is ``facebook``, ``periscope`` or ``youtube``
+
+
+
 Webcam
 ------
 Audio is included::
 
-    python Webcam2YouTubeLive.py stream.ini
+    python Webcam.py stream.ini site
+
+
+Screen Share Livestream
+-----------------------
+Audio is included::
+
+    python Screenshare.py stream.ini site
 
 
 several video files
@@ -150,15 +162,6 @@ This script saves your screen capture to a file on your disk::
 
     python ScreenCapture2disk.py stream.ini myvid.avi
 
-
-Screen Share Livestream
------------------------
-Audio is included::
-
-    python Screenshare.py stream.ini site
-
-* ``stream.ini`` is setup for your computer and desired parameters
-* ``site`` is ``facebook``, ``periscope`` or ``youtube``
 
 
 
