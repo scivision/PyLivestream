@@ -225,6 +225,8 @@ class Livestream(Stream):
     def __init__(self,ini,site,vidsource,image=False):
         super().__init__(ini,site,vidsource,image)
 
+        self.site = site
+
         self.osparam()
 
         vid1,vid2,cvbr = self.videostream()
@@ -237,6 +239,17 @@ class Livestream(Stream):
         self.cmd = [getexe()] + vid1 + aud1 + vid2 + aud2 + buf
 
         print('\n',' '.join(self.cmd),'\n')
+
+    def golive(self):
+        if self.site == 'periscope':
+            self.periscope()
+        elif self.site == 'youtube':
+            self.youtubelive()
+        elif self.site == 'facebook':
+            self.facebooklive()
+        else:
+            raise ValueError('site {} unknown'.format(self.site))
+
 
 # %% sites
     def facebooklive(self):
@@ -292,14 +305,8 @@ class Screenshare(Livestream):
 
         stream = Livestream(ini,site,vidsource)
 
-        if site == 'periscope':
-            stream.periscope()
-        elif site == 'youtube':
-            stream.youtubelive()
-        elif site == 'facebook':
-            stream.facebooklive()
-        else:
-            raise ValueError('site {} unknown'.format(self.site))
+        stream.golive()
+
 
 
 class Webcam(Livestream):
@@ -315,14 +322,7 @@ class Webcam(Livestream):
 
         stream = Livestream(ini,site,vidsource)
 
-        if site == 'periscope':
-            stream.periscope()
-        elif site == 'youtube':
-            stream.youtubelive()
-        elif site == 'facebook':
-            stream.facebooklive()
-        else:
-            raise ValueError('site {} unknown'.format(self.site))
+        stream.golive()
 
 
 
