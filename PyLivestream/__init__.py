@@ -1,39 +1,8 @@
 from pathlib import Path
 from getpass import getpass
 import subprocess as sp
-from sys import platform
-import logging,os
-# %%
-try:
-    sp.check_call(('ffmpeg','-h'), stdout=sp.DEVNULL, stderr=sp.DEVNULL)
-    FFMPEG = 'ffmpeg'
-except FileNotFoundError:
-    try:
-        sp.check_call(('avconv','-h'), stdout=sp.DEVNULL, stderr=sp.DEVNULL)
-        FFMPEG = 'avconv'
-    except FileNotFoundError:
-        raise FileNotFoundError('FFmpeg program is not found. Is ffmpeg on your PATH?')
-# %% https://trac.ffmpeg.org/wiki/Capture/Desktop
-if platform.startswith('linux'):
-    if 'XDG_SESSION_TYPE' in os.environ and os.environ['XDG_SESSION_TYPE'] == 'wayland':
-        logging.error('Wayland may only give black output with cursor. Login with X11 desktop')
-    vcap = 'x11grab'
-    acap = 'pulse'
-# v4l2-ctl --list-devices
-    hcam = 'v4l2'
-elif platform.startswith('darwin'):
-    vcap = 'avfoundation'
-    acap = '0:0'  # determine from ffmpeg -f avfoundation -list_devices true -i ""
-  # ffmpeg -f avfoundation -list_devices true -i ""
-    hcam = 'avfoundation'
-elif platform.startswith('win'):
-    vcap = 'dshow'
-    acap = 'dshow'
-    # ffmpeg -list_devices true -f dshow -i dummy
-    hcam = 'dshow'
-else:
-    raise ValueError(f'not sure which operating system you are using {platform}')
-
+import logging,os,sys
+from configparser import ConfigParser
 # %% minimum bitrates specified by YouTube. Key is vertical pixels (height)
 br30 = {'2160':13000,
         '1440':6000,
@@ -53,6 +22,48 @@ br60 = {'2160':20000,
 
 
 COMPPRESET='veryfast'
+
+
+def getexe() -> str:
+    """checks that host streaming program is installed"""
+
+    try:
+        sp.check_call(('ffmpeg','-h'), stdout=sp.DEVNULL, stderr=sp.DEVNULL)
+        exe = 'ffmpeg'
+    except FileNotFoundError:
+        try:
+            sp.check_call(('avconv','-h'), stdout=sp.DEVNULL, stderr=sp.DEVNULL)
+            exe = 'avconv'
+        except FileNotFoundError:
+            raise FileNotFoundError('FFmpeg program is not found. Is ffmpeg on your PATH?')
+
+    return exe
+
+
+def osparam(P:dict) -> dict:
+    """load OS specific config"""
+
+    C = ConfigParser()
+    C.read(P['ini'])
+
+    if sys.platform.startswith('linux'):
+        if 'XDG_SESSION_TYPE' in os.environ and os.environ['XDG_SESSION_TYPE'] == 'wayland':
+            logging.error('Wayland may only give black output with cursor. Login with X11 desktop')
+
+    P['videochan'] = C.get(sys.platform,'videochan')
+    P['audiochan'] = C.get(sys.platform,'audiochan')
+    P['vcap'] = C.get(sys.platform,'vcap')
+    P['acap'] = C.get(sys.platform,'acap')
+    P['hcam'] = C.get(sys.platform,'hcam')
+
+    P['audiobw'] = C.get(P['site'],'audiobw')
+    P['audiofs'] = C.get(P['site'],'audiofs') # not getint
+    P['fps']  = C.getint(P['site'],'fps')
+    P['res']  = C.get(P['site'],'res')
+    P['origin'] = C.get(P['site'],'origin').split(',')
+
+    return P
+
 
 # %% video
 def _videostream(P:dict) -> tuple:
@@ -119,15 +130,15 @@ def _bitrate(P:dict) -> list:
 
 def _screengrab(P:dict) -> list:
     """choose to grab video from desktop. May not work for Wayland."""
-    vid1 = ['-f', vcap,
+    vid1 = ['-f', P['vcap'],
             '-r',str(P['fps']),
             '-s',P['res']]
 
-    if platform.startswith('linux'):
+    if sys.platform =='linux':
         vid1 += ['-i',f':0.0+{P["origin"][0]},{P["origin"][1]}']
-    elif platform.startswith('win'):
+    elif sys.platform =='win32':
         vid1 += ['-i',P['videochan']]
-    elif platform.startswith('darwin'):
+    elif sys.platform == 'darwin':
         pass  # FIXME: verify
 
     return vid1
@@ -135,7 +146,7 @@ def _screengrab(P:dict) -> list:
 
 def _webcam(P:dict) -> list:
     """configure webcam"""
-    vid1 = ['-f',hcam,
+    vid1 = ['-f',P['hcam'],
             '-r',str(P['fps']),
             '-i',P['videochan']]
 
@@ -173,7 +184,7 @@ def _audiostream(P:dict) -> list:
     -ac 2 NOT -ac 1 to avoid "non monotonous DTS in output stream" errors
     """
     if not P['vidsource'] == 'file':
-        return ['-f',acap, '-ac','2', '-i', P['audiochan']]
+        return ['-f',P['acap'], '-ac','2', '-i', P['audiochan']]
     else: #  file input
         return ['-ac','2']
 
@@ -181,19 +192,13 @@ def _audiostream(P:dict) -> list:
 def _audiocomp(P:dict) -> list:
     """select audio codec
     https://trac.ffmpeg.org/wiki/Encode/AAC#FAQ
+    https://support.google.com/youtube/answer/2853702?hl=en
+    https://www.facebook.com/facebookmedia/get-started/live
     """
-    
-    if 'site' in P and P['site'] == 'periscope':
-        abw = '64k'
-    else: # facebook live, youtube live
-        abw = '128k'  
-        # https://support.google.com/youtube/answer/2853702?hl=en
-        # https://www.facebook.com/facebookmedia/get-started/live
-            
-    
+
     return ['-c:a','aac',
-            '-b:a',abw, 
-            '-ar','44100' ]
+            '-b:a', P['audiobw'],
+            '-ar', P['audiofs']]
 
 
 def _buffer(P:dict, cvbr:int) -> list:
@@ -215,6 +220,8 @@ def facebooklive(P:dict):
     https://www.facebook.com/live/create
     """
 
+    P = osparam(P)
+
     vid1,vid2,cvbr = _videostream(P)
 
     aud1 = _audiostream(P)
@@ -222,7 +229,7 @@ def facebooklive(P:dict):
 
     buf = _buffer(P,cvbr)
 
-    cmd = [FFMPEG] + vid1 + aud1 + vid2 + aud2 + buf
+    cmd = [getexe()] + vid1 + aud1 + vid2 + aud2 + buf
 
     print('\n',' '.join(cmd),'\n')
 
@@ -239,10 +246,7 @@ def facebooklive(P:dict):
 def periscope(P:dict):
     """LIVE STREAM to Periscope"""
 
-    if P['res'].lower() == 'hd':
-        P['res'] = '1280x720'
-    elif P['res'].lower() == 'sd':
-        P['res'] = '960x540'
+    P = osparam(P)
 
     vid1,vid2,cvbr = _videostream(P)
 
@@ -251,7 +255,7 @@ def periscope(P:dict):
 
     buf = _buffer(P,cvbr)
 
-    cmd = [FFMPEG] + vid1 + aud1 + vid2 + aud2 + buf
+    cmd = [getexe()] + vid1 + aud1 + vid2 + aud2 + buf
 
     print('\n',' '.join(cmd),'\n')
 
@@ -267,6 +271,8 @@ def periscope(P:dict):
 def youtubelive(P:dict):
     """LIVE STREAM to YouTube Live"""
 
+    P = osparam(P)
+
     vid1,vid2,cvbr = _videostream(P)
 
     aud1 = _audiostream(P)
@@ -274,7 +280,7 @@ def youtubelive(P:dict):
 
     buf = _buffer(P,cvbr)
 
-    cmd = [FFMPEG] + vid1 + aud1 + vid2 + aud2 + buf
+    cmd = [getexe()] + vid1 + aud1 + vid2 + aud2 + buf
 
     print('\n',' '.join(cmd),'\n')
 
@@ -287,7 +293,7 @@ def youtubelive(P:dict):
                 stdout=sp.DEVNULL)
 
 
-def disksave4youtube(P:dict, outfn:Path=None):
+def disksave(P:dict, outfn:Path=None):
     """
     records to disk screen capture with audio for upload to YouTube
 
@@ -296,13 +302,15 @@ def disksave4youtube(P:dict, outfn:Path=None):
     if outfn:
         outfn = Path(outfn).expanduser()
 
+    P = osparam(P)
+
     vid1 = _screengrab(P)
 
     aud1 = _audiostream(P)
     aud2 = _audiocomp(P)
 
-    cmd = [FFMPEG] + vid1 + aud1 + aud2
-    if platform.startswith('win'):
+    cmd = [getexe()] + vid1 + aud1 + aud2
+    if sys.platform == 'win32':
         cmd += ['-copy_ts']
 
     print('\n',' '.join(cmd),'\n')

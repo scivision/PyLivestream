@@ -1,11 +1,11 @@
 #!/usr/bin/env python
-import youtubelive_ffmpeg as ytl
+from pathlib import Path
+import PyLivestream as ytl
 
-P = {'fps': 30,
-     'res': '1920x1080',
-     'origin': (0,0),
-     'audiochan': 'default',
-     'vidsource': 'file',
-    }
+rdir = Path(__file__).parents[1]
 
-ytl.disksave4youtube(P)
+inifn = rdir / 'stream.ini'
+
+P = {'ini': inifn, 'vidsource': 'file', 'site': 'file'}
+
+ytl.disksave(P)

@@ -5,7 +5,7 @@ LIVE STREAM TO YOUTUBE LIVE using FFMPEG -- Looping input file endlessly
 https://www.scivision.co/youtube-live-ffmpeg-livestream/
 https://support.google.com/youtube/answer/2853702
 """
-from youtubelive_ffmpeg import youtubelive
+from PyLivestream import youtubelive
 
 if __name__ == '__main__':
     import signal
@@ -13,12 +13,15 @@ if __name__ == '__main__':
 
     from argparse import ArgumentParser
     p = ArgumentParser()
+    p.add_argument('ini',help='config file')
     p.add_argument('filein',help='file to loop endlessly to YouTube Live.  Keep in mind copyright and TOS!')
     p = p.parse_args()
 
-    P = {'filein': p.filein,
+    P = {'ini':p.ini,
+         'filein': p.filein,
          'vidsource': 'file',
          'loop':True,
+         'site':'youtube',
             }
 
     youtubelive(P)
