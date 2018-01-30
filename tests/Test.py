@@ -23,13 +23,17 @@ def test_webcam():
 
 
 def test_loop():
-    PyLivestream.Loop(inifn,'periscope')
+    PyLivestream.FileIn(inifn,'periscope','')
 
-    PyLivestream.Loop(inifn,'youtube')
+    PyLivestream.FileIn(inifn,'youtube','')
 
-    PyLivestream.Loop(inifn,'facebook')
+    PyLivestream.FileIn(inifn,'facebook','')
+
+
 
 if __name__ == '__main__':
     test_screenshare()
 
     test_webcam()
+
+    test_loop()

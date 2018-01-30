@@ -19,4 +19,4 @@ if __name__ == '__main__':
     p = p.parse_args()
 
 
-    PyLivestream.Loop(p.ini,p.site,p.infn)
+    PyLivestream.FileIn(p.ini, p.site, p.infn, loop=True)

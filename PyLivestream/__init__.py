@@ -42,12 +42,13 @@ def getexe() -> str:
 # %% top level
 class Stream:
 
-    def __init__(self,ini,site,vidsource,image,loop):
+    def __init__(self,ini,site,vidsource,image,loop,infn):
         self.ini = ini
         self.site = site
         self.vidsource = vidsource
         self.image = image
         self.loop = loop
+        self.infn = infn
 
 
     def osparam(self):
@@ -188,7 +189,8 @@ class Stream:
 
     def filein(self) -> list:
         """stream input file  (video, or audio + image)"""
-        fn = Path(self.loop).expanduser()
+
+        fn = Path(self.infn).expanduser()
 
         if self.image:
             vid1 = ['-loop','1']
@@ -229,8 +231,8 @@ class Stream:
 
 class Livestream(Stream):
 
-    def __init__(self,ini,site,vidsource,image=False,loop=False):
-        super().__init__(ini,site,vidsource,image,loop)
+    def __init__(self,ini,site,vidsource,image=False,loop=False,infn=None):
+        super().__init__(ini,site,vidsource,image,loop,infn)
 
         self.site = site
 
@@ -245,7 +247,8 @@ class Livestream(Stream):
 
         self.cmd = [getexe()] + vid1 + aud1 + vid2 + aud2 + buf
 
-        print('\n',' '.join(self.cmd),'\n')
+        if not self.key:
+            print('\n',' '.join(self.cmd),'\n')
 
     def golive(self):
         if self.site == 'periscope':
@@ -321,10 +324,8 @@ class Screenshare(Livestream):
         site = site.lower()
         vidsource = 'screen'
         ini=Path(ini).expanduser()
-        image = False
-        loop = False
 
-        stream = Livestream(ini,site,vidsource,image,loop)
+        stream = Livestream(ini,site,vidsource)
 
         stream.golive()
 
@@ -337,25 +338,21 @@ class Webcam(Livestream):
         site = site.lower()
         vidsource = 'camera'
         ini=Path(ini).expanduser()
-        image = False
-        loop = False
 
-        stream = Livestream(ini,site,vidsource,image,loop)
+        stream = Livestream(ini,site,vidsource)
 
         stream.golive()
 
 
-class Loop(Livestream):
+class FileIn(Livestream):
 
-    def __init__(self, ini:Path, site:str, infn:Path):
+    def __init__(self, ini:Path, site:str, infn:Path, loop:bool=False, image:bool=False):
 
         site = site.lower()
         vidsource = 'file'
         ini=Path(ini).expanduser()
-        image = False
-        loop = infn
 
-        stream = Livestream(ini,site,vidsource,image,loop)
+        stream = Livestream(ini, site, vidsource, image, loop, infn)
 
         stream.golive()
 
@@ -363,7 +360,7 @@ class Loop(Livestream):
 
 class SaveDisk(Stream):
 
-    def __init__(self,ini:Path, outfn:Path=None):
+    def __init__(self, ini:Path, outfn:Path=None):
         """
         records to disk screen capture with audio for upload to YouTube
 
@@ -371,10 +368,8 @@ class SaveDisk(Stream):
         """
         site = vidsource = 'file'
         ini=Path(ini).expanduser()
-        image = False
-        loop = False
 
-        super().__init__(ini,site,vidsource,image,loop)
+        super().__init__(ini,site,vidsource)
 
         if outfn:
             outfn = Path(outfn).expanduser()
