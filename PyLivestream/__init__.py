@@ -73,6 +73,8 @@ class Stream:
         self.res  = C.get(self.site,'res')
         self.origin = C.get(self.site,'origin').split(',')
 
+        self.server = C.get(self.site,'server')
+
         keyfn = C.get(self.site,'key', fallback=None)
         if not keyfn:
             self.key = None
@@ -275,7 +277,7 @@ class Livestream(Stream):
         else:
             streamid = getpass('Facebook Live Stream ID: ')
 
-        cmd = self.cmd+['rtmp://live-api.facebook.com:80/rtmp/' + streamid]
+        cmd = self.cmd+[self.server + streamid]
 
         if streamid == 'test':
             print(' '.join(cmd))
@@ -293,7 +295,7 @@ class Livestream(Stream):
         else:
             streamid = getpass('Periscope Stream ID: ')
 
-        cmd = self.cmd+['rtmp://va.pscp.tv:80/x/' + streamid]
+        cmd = self.cmd+[self.server + streamid]
 
         if streamid == 'test':
             print(' '.join(cmd))
@@ -310,7 +312,7 @@ class Livestream(Stream):
         else:
             streamid = getpass('YouTube Live Stream ID: ')
 
-        cmd = self.cmd+['rtmp://a.rtmp.youtube.com/live2/' + streamid]
+        cmd = self.cmd+[self.server + streamid]
 
         if streamid == 'test':
             print(' '.join(cmd))
@@ -329,7 +331,7 @@ class Livestream(Stream):
         else:
             streamid = getpass('Twitch Stream ID: ')
 
-        cmd = self.cmd+['rtmp://live-jfk.twitch.tv/app/' + streamid]
+        cmd = self.cmd+[self.server + streamid]
 
         if streamid == 'test':
             print(' '.join(cmd))

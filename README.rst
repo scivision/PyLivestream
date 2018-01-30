@@ -94,6 +94,8 @@ Twitch
 1. create stream from `Twitch Dashboard <http://www.twitch.tv/broadcast/dashboard>`_
 2. Run Python script for Twitch with chosen input
 
+If you are not in the Northeast US, edit `stream.ini` to have the `closest server <http://bashtech.net/twitch/ingest.php>`_.
+
 
 Usage
 =========
