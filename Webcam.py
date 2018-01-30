@@ -1,14 +1,34 @@
 #!/usr/bin/env python
 """
-LIVE STREAM TO YOUTUBE LIVE using FFMPEG -- from webcam
+LIVE STREAM using FFmpeg -- webcam
 
 https://www.scivision.co/youtube-live-ffmpeg-livestream/
+
+Periscope::
+
+    python Webcam.py stream.ini periscope
+
+https://www.pscp.tv/help/external-encoders
+
+YouTube Live::
+
+    python Webcam.py stream.ini youtube
+
+
 https://support.google.com/youtube/answer/2853702
+
+Facebook::
+
+    python Webcam.py stream.ini facebook
+
+https://www.facebook.com/facebookmedia/get-started/live
+Facebook Stream Key:
+https://www.facebook.com/live/create
 
 Windows: get DirectShow device list from:
    ffmpeg -list_devices true -f dshow -i dummy
 """
-from PyLivestream import youtubelive
+import PyLivestream
 
 if __name__ == '__main__':
     import signal
@@ -16,9 +36,8 @@ if __name__ == '__main__':
 
     from argparse import ArgumentParser
     p = ArgumentParser()
-    p.add_argument('ini',help='config file')
+    p.add_argument('ini',help='*.ini file with stream parameters')
+    p.add_argument('site',help='site to stream to [youtube,periscope,facebook]')
     p = p.parse_args()
 
-    P = {'ini':p.ini, 'vidsource': 'camera', 'site': 'youtube'}
-
-    youtubelive(P)
+    PyLivestream.Webcam(p.ini, p.site)

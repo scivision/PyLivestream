@@ -278,13 +278,36 @@ class Livestream(Stream):
         sp.check_call(self.cmd+['rtmp://a.rtmp.youtube.com/live2/' + streamid],
                     stdout=sp.DEVNULL)
 
-
+# %% operators
 class Screenshare(Livestream):
 
-    def __init__(self,ini:Path, site:str):
+    def __init__(self, ini:Path, site:str):
 
         site = site.lower()
         vidsource = 'screen'
+        ini=Path(ini).expanduser()
+
+        self.image = False
+        self.loop = False
+
+        stream = Livestream(ini,site,vidsource)
+
+        if site == 'periscope':
+            stream.periscope()
+        elif site == 'youtube':
+            stream.youtubelive()
+        elif site == 'facebook':
+            stream.facebooklive()
+        else:
+            raise ValueError('site {} unknown'.format(self.site))
+
+
+class Webcam(Livestream):
+
+    def __init__(self, ini:Path, site:str):
+
+        site = site.lower()
+        vidsource = 'camera'
         ini=Path(ini).expanduser()
 
         self.image = False
