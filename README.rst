@@ -88,7 +88,7 @@ Periscope
 I prefer using the Phone method as then the phone is a "second screen" where I can see if the stream is lagging, and if I "leave broadcast" and come back in, I can comment from my phone etc.
 
 
-Use Cases
+Usage
 =========
 
 * ``stream.ini`` is setup for your computer and desired parameters
@@ -118,14 +118,14 @@ Loop single video endlessly
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ::
 
-    FileLoop.py stream.ini site videofile
+    python FileLoop.py stream.ini site videofile
 
 
 several video files
 ~~~~~~~~~~~~~~~~~~~
 Glob list of video files to stream::
 
-    python FileGlob2YouTubeLive.py  path pattern
+    python FileGlob.py stream.ini site path pattern
 
 -loop       optionally loop endlessly the globbed file list
 
@@ -134,13 +134,13 @@ stream all videos in directory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Example: all AVI videos in directory ``~/Videos``::
 
-    python FileGlob2YouTubeLive.py ~/Videos "*.avi"
+    python FileGlob.py stream.ini youtube ~/Videos "*.avi"
 
 stream endlessly looping videos
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Example: all AVI videos in ``~/Videos`` are endlessly looped::
 
-    python FileGlob2YouTubeLive.py ~/Videos "*.avi" -loop
+    python FileGlob.py stream.ini youtube ~/Videos "*.avi" -loop
 
 
 stream all audio files in directory
@@ -148,7 +148,7 @@ stream all audio files in directory
 Glob list of video files to stream.
 Must include a static image (could be your logo)::
 
-    python FileGlob2YouTubeLive.py path pattern -i image
+    python FileGlob.py stream.ini site path pattern -i image
 
 path      path to where video files are
 pattern   e.g. "*.avi"  pattern matching video files
@@ -156,7 +156,7 @@ pattern   e.g. "*.avi"  pattern matching video files
 
 Example: stream all .mp3 audio under ``~/Library`` directory::
 
-    python FileGlob2YouTubeLive.py  ~/Library "*.mp3" -i mylogo.jpg
+    python FileGlob.py stream.ini youtube ~/Library "*.mp3" -i mylogo.jpg
 
 
 Screen capture to disk
