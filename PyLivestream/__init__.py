@@ -39,284 +39,297 @@ def getexe() -> str:
 
     return exe
 
+# %% top level
+class Stream:
 
-def osparam(P:dict) -> dict:
-    """load OS specific config"""
-
-    C = ConfigParser()
-    C.read(P['ini'])
-
-    if sys.platform.startswith('linux'):
-        if 'XDG_SESSION_TYPE' in os.environ and os.environ['XDG_SESSION_TYPE'] == 'wayland':
-            logging.error('Wayland may only give black output with cursor. Login with X11 desktop')
-
-    P['videochan'] = C.get(sys.platform,'videochan')
-    P['audiochan'] = C.get(sys.platform,'audiochan')
-    P['vcap'] = C.get(sys.platform,'vcap')
-    P['acap'] = C.get(sys.platform,'acap')
-    P['hcam'] = C.get(sys.platform,'hcam')
-
-    P['audiobw'] = C.get(P['site'],'audiobw')
-    P['audiofs'] = C.get(P['site'],'audiofs') # not getint
-    P['fps']  = C.getint(P['site'],'fps')
-    P['res']  = C.get(P['site'],'res')
-    P['origin'] = C.get(P['site'],'origin').split(',')
-
-    return P
+    def __init__(self,ini,site,vidsource,image):
+        self.ini = ini
+        self.site = site
+        self.vidsource = vidsource
+        self.image = image
 
 
-# %% video
-def _videostream(P:dict) -> tuple:
-    """optimizes video settings for YouTube Live"""
+    def osparam(self):
+        """load OS specific config"""
+
+        C = ConfigParser()
+        C.read(self.ini)
+
+        if sys.platform.startswith('linux'):
+            if 'XDG_SESSION_TYPE' in os.environ and os.environ['XDG_SESSION_TYPE'] == 'wayland':
+                logging.error('Wayland may only give black output with cursor. Login with X11 desktop')
+
+        self.videochan = C.get(sys.platform,'videochan')
+        self.audiochan = C.get(sys.platform,'audiochan')
+        self.vcap = C.get(sys.platform,'vcap')
+        self.acap = C.get(sys.platform,'acap')
+        self.hcam = C.get(sys.platform,'hcam')
+
+        self.audiobw = C.get(self.site,'audiobw')
+        self.audiofs = C.get(self.site,'audiofs') # not getint
+        self.fps  = C.getint(self.site,'fps')
+        self.res  = C.get(self.site,'res')
+        self.origin = C.get(self.site,'origin').split(',')
+
+
+    def videostream(self) -> tuple:
+        """optimizes video settings for YouTube Live"""
 # %% configure video input
-    if P['vidsource'] == 'screen':
-        vid1 = _screengrab(P)
-    elif P['vidsource'].startswith('cam'):
-        vid1 = _webcam(P)
-    elif P['vidsource'] == 'file':
-        vid1 = _filein(P)
-    else:
-        raise ValueError(f'unknown vidsource {P["vidsource"]}')
+        if self.vidsource == 'screen':
+            vid1 = self.screengrab()
+        elif self.vidsource == 'camera':
+            vid1 = self.webcam()
+        elif self.vidsource == 'file':
+            vid1 = self.filein()
+        else:
+            raise ValueError('unknown vidsource {}'.format(self.vidsource))
 # %% configure video output
-    cvbr = _bitrate(P)
+        cvbr = self.bitrate()
 
-    vid2 = ['-c:v','libx264','-pix_fmt','yuv420p']
+        vid2 = ['-c:v','libx264','-pix_fmt','yuv420p']
 
-    if 'image' in P and P['image']:
-        vid2 += ['-tune','stillimage']
-    else:
-        vid2 += ['-preset',COMPPRESET,
-                '-b:v',str(cvbr)+'k',
-                '-g',_group(P)]
-
-
-    return vid1, vid2, cvbr
-
-
-def _group(P:dict) -> str:
-
-    if 'fps' in P:
-        g = str(2*P['fps'])
-    else: # TODO assume 30 fps
-        g = '60'
-
-    return g
-
-
-def _bitrate(P:dict) -> list:
-    if 'image' in P and P['image']:
-        return
-    elif P['vidsource'] == 'file': # TODO get from input file
-        return 3000
-    elif 'site' in P and P['site'] == 'periscope':
-        return 800  # same for HD and SD Periscope
-
-# %%
-    if 'res' in P:
-        y = P['res'].split('x')[1]
-
-        if P['fps'] <= 30:
-           cvbr = br30[y]
+        if self.image:
+            vid2 += ['-tune','stillimage']
         else:
-           cvbr = br60[y]
-    else:  # TODO assuming 720 webcam for now
-        if P['fps'] <= 30:
-            cvbr = br30['720']
+            vid2 += ['-preset',COMPPRESET,
+                    '-b:v',str(cvbr)+'k',
+                    '-g',self.group()]
+
+        return vid1,vid2,cvbr
+
+
+    def audiostream(self) -> list:
+        """
+        -ac 2 NOT -ac 1 to avoid "non monotonous DTS in output stream" errors
+        """
+        if not self.vidsource == 'file':
+            return ['-f', self.acap, '-ac','2', '-i', self.audiochan]
+        else: #  file input
+            return ['-ac','2']
+
+
+    def audiocomp(self) -> list:
+        """select audio codec
+        https://trac.ffmpeg.org/wiki/Encode/AAC#FAQ
+        https://support.google.com/youtube/answer/2853702?hl=en
+        https://www.facebook.com/facebookmedia/get-started/live
+        """
+
+        return ['-c:a','aac',
+                '-b:a', self.audiobw,
+                '-ar', self.audiofs]
+
+    def group(self) -> str:
+
+        if self.fps:
+            g = str(2*self.fps)
+        else: # TODO assume 30 fps
+            g = '60'
+
+        return g
+
+
+    def bitrate(self) -> list:
+        if self.image:
+            return
+        elif self.vidsource == 'file': # TODO get from input file
+            return 3000
+        elif self.site == 'periscope':
+            return 800  # same for HD and SD Periscope
+
+    # %%
+        if self.res:
+            y = self.res.split('x')[1]
+
+            if self.fps <= 30:
+               cvbr = br30[y]
+            else:
+               cvbr = br60[y]
+        else:  # TODO assuming 720 webcam for now
+            if self.fps <= 30:
+                cvbr = br30['720']
+            else:
+                cvbr = br60['720']
+
+        return cvbr
+
+
+    def screengrab(self) -> list:
+        """choose to grab video from desktop. May not work for Wayland."""
+        vid1 = ['-f', self.vcap,
+                '-r', str(self.fps),
+                '-s', self.res]
+
+        if sys.platform =='linux':
+            vid1 += ['-i',f':0.0+{self.origin[0]},{self.origin[1]}']
+        elif sys.platform =='win32':
+            vid1 += ['-i', self.videochan]
+        elif sys.platform == 'darwin':
+            pass  # FIXME: verify
+
+        return vid1
+
+
+    def webcam(self) -> list:
+        """configure webcam"""
+        vid1 = ['-f', self.hcam,
+                '-r', str(self.fps),
+                '-i', self.videochan]
+
+        return vid1
+
+
+    def filein(self) -> list:
+        """file input"""
+        fn = Path(P['filein']).expanduser()
+
+        if self.image:
+            vid1 = ['-loop','1']
         else:
-            cvbr = br60['720']
+            vid1 = ['-re']
 
-    return cvbr
 
 
-def _screengrab(P:dict) -> list:
-    """choose to grab video from desktop. May not work for Wayland."""
-    vid1 = ['-f', P['vcap'],
-            '-r',str(P['fps']),
-            '-s',P['res']]
+        if self.loop:
+            vid1 += ['-stream_loop','-1']  # FFmpeg >= 3
+        else:
+            vid1 += []
 
-    if sys.platform =='linux':
-        vid1 += ['-i',f':0.0+{P["origin"][0]},{P["origin"][1]}']
-    elif sys.platform =='win32':
-        vid1 += ['-i',P['videochan']]
-    elif sys.platform == 'darwin':
-        pass  # FIXME: verify
+        if self.image: # still image, typically used with audio-only input files
+            vid1 += ['-i',str(self.image)]
 
-    return vid1
 
+        vid1 += ['-i',str(fn)]
 
-def _webcam(P:dict) -> list:
-    """configure webcam"""
-    vid1 = ['-f',P['hcam'],
-            '-r',str(P['fps']),
-            '-i',P['videochan']]
+        return vid1
 
-    return vid1
 
 
-def _filein(P:dict) -> list:
-    """file input"""
-    fn = Path(P['filein']).expanduser()
 
-    if 'image' in P and P['image']:
-        vid1 = ['-loop','1']
-    else:
-        vid1 = ['-re']
+    def buffer(self, cvbr:int) -> list:
+        buf = ['-threads','0']
 
+        if not self.image:
+            buf += ['-maxrate','{}k'.format(cvbr),
+                      '-bufsize','{}k'.format(2*cvbr)]
+        else: # static image + audio
+            buf += ['-shortest']
 
+        buf += ['-f','flv']
 
-    if 'loop' in P and P['loop']:
-        vid1 += ['-stream_loop','-1']  # FFmpeg >= 3
-    else:
-        vid1 += []
+        return buf
 
-    if 'image' in P and P['image']: # still image, typically used with audio-only input files
-        vid1 += ['-i',str(P['image'])]
 
+class Livestream(Stream):
 
-    vid1 += ['-i',str(fn)]
+    def __init__(self,ini,site,vidsource,image=False):
+        super().__init__(ini,site,vidsource,image)
 
-    return vid1
+        self.osparam()
 
+        vid1,vid2,cvbr = self.videostream()
 
-# %% audio
-def _audiostream(P:dict) -> list:
-    """
-    -ac 2 NOT -ac 1 to avoid "non monotonous DTS in output stream" errors
-    """
-    if not P['vidsource'] == 'file':
-        return ['-f',P['acap'], '-ac','2', '-i', P['audiochan']]
-    else: #  file input
-        return ['-ac','2']
+        aud1 = self.audiostream()
+        aud2 = self.audiocomp()
 
+        buf = self.buffer(cvbr)
 
-def _audiocomp(P:dict) -> list:
-    """select audio codec
-    https://trac.ffmpeg.org/wiki/Encode/AAC#FAQ
-    https://support.google.com/youtube/answer/2853702?hl=en
-    https://www.facebook.com/facebookmedia/get-started/live
-    """
+        self.cmd = [getexe()] + vid1 + aud1 + vid2 + aud2 + buf
 
-    return ['-c:a','aac',
-            '-b:a', P['audiobw'],
-            '-ar', P['audiofs']]
+        print('\n',' '.join(self.cmd),'\n')
 
+# %% sites
+    def facebooklive(self):
+        """
+        LIVE STREAM to Facebook Live
+        https://www.facebook.com/live/create
+        """
 
-def _buffer(P:dict, cvbr:int) -> list:
-    buf = ['-threads','0']
+        try: # for loop case
+            streamid = self.streamid
+        except AttributeError:
+            streamid = getpass('Facebook Live Stream ID: ')
 
-    if not 'image' in P or not P['image']:
-        buf += ['-maxrate','{}k'.format(cvbr),
-                  '-bufsize','{}k'.format(2*cvbr)]
-    else: # static image + audio
-        buf += ['-shortest']
+    #    sp.check_call(self.cmd+['rtmps://live-api.facebook.com:443/rtmp/' + streamid],
+        sp.check_call(self.cmd+['rtmp://live-api.facebook.com:80/rtmp/' + streamid],
+                    stdout=sp.DEVNULL)
 
-    buf += ['-f','flv']
 
-    return buf
+    def periscope(self):
+        """LIVE STREAM to Periscope"""
 
-# %% top-level
-def facebooklive(P:dict):
-    """LIVE STREAM to Facebook Live
-    https://www.facebook.com/live/create
-    """
+        try: # for loop case
+            streamid = self.streamid
+        except AttributeError:
+            streamid = getpass('Periscope Stream ID: ')
 
-    P = osparam(P)
+        sp.check_call(self.cmd+['rtmp://va.pscp.tv:80/x/' + streamid],
+                    stdout=sp.DEVNULL)
 
-    vid1,vid2,cvbr = _videostream(P)
 
-    aud1 = _audiostream(P)
-    aud2 = _audiocomp(P)
+    def youtubelive(self):
+        """LIVE STREAM to YouTube Live"""
 
-    buf = _buffer(P,cvbr)
+        try: # for loop case
+            streamid = self.streamid
+        except AttributeError:
+            streamid = getpass('YouTube Live Stream ID: ')
 
-    cmd = [getexe()] + vid1 + aud1 + vid2 + aud2 + buf
+        sp.check_call(self.cmd+['rtmp://a.rtmp.youtube.com/live2/' + streamid],
+                    stdout=sp.DEVNULL)
 
-    print('\n',' '.join(cmd),'\n')
 
-    if 'streamid' in P: # for loop case
-        streamid = P['streamid']
-    else:
-        streamid = getpass('Facebook Live Stream ID: ')
+class Screenshare(Livestream):
 
-#    sp.check_call(cmd+['rtmps://live-api.facebook.com:443/rtmp/' + streamid],
-    sp.check_call(cmd+['rtmp://live-api.facebook.com:80/rtmp/' + streamid],
-                stdout=sp.DEVNULL)
+    def __init__(self,ini:Path, site:str):
 
+        site = site.lower()
+        vidsource = 'screen'
+        ini=Path(ini).expanduser()
 
-def periscope(P:dict):
-    """LIVE STREAM to Periscope"""
+        self.image = False
+        self.loop = False
 
-    P = osparam(P)
+        stream = Livestream(ini,site,vidsource)
 
-    vid1,vid2,cvbr = _videostream(P)
+        if site == 'periscope':
+            stream.periscope()
+        elif site == 'youtube':
+            stream.youtubelive()
+        elif site == 'facebook':
+            stream.facebooklive()
+        else:
+            raise ValueError('site {} unknown'.format(self.site))
 
-    aud1 = _audiostream(P)
-    aud2 = _audiocomp(P)
 
-    buf = _buffer(P,cvbr)
 
-    cmd = [getexe()] + vid1 + aud1 + vid2 + aud2 + buf
+class Save(Stream):
 
-    print('\n',' '.join(cmd),'\n')
+    def __init__(self):
+        pass
 
-    if 'streamid' in P: # for loop case
-        streamid = P['streamid']
-    else:
-        streamid = getpass('Periscope Stream ID: ')
+    def disksave(self, outfn:Path=None):
+        """
+        records to disk screen capture with audio for upload to YouTube
 
-    sp.check_call(cmd+['rtmp://va.pscp.tv:80/x/' + streamid],
-                stdout=sp.DEVNULL)
+        if not outfn, just cite command that would have run
+        """
+        if outfn:
+            outfn = Path(outfn).expanduser()
 
+        vid1 = self.screengrab()
 
-def youtubelive(P:dict):
-    """LIVE STREAM to YouTube Live"""
+        aud1 = self.audiostream()
+        aud2 = self.audiocomp()
 
-    P = osparam(P)
+        cmd = [getexe()] + vid1 + aud1 + aud2
+        if sys.platform == 'win32':
+            cmd += ['-copy_ts']
 
-    vid1,vid2,cvbr = _videostream(P)
+        print('\n',' '.join(cmd),'\n')
 
-    aud1 = _audiostream(P)
-    aud2 = _audiocomp(P)
-
-    buf = _buffer(P,cvbr)
-
-    cmd = [getexe()] + vid1 + aud1 + vid2 + aud2 + buf
-
-    print('\n',' '.join(cmd),'\n')
-
-    if 'streamid' in P: # for loop case
-        streamid = P['streamid']
-    else:
-        streamid = getpass('YouTube Live Stream ID: ')
-
-    sp.check_call(cmd+['rtmp://a.rtmp.youtube.com/live2/' + streamid],
-                stdout=sp.DEVNULL)
-
-
-def disksave(P:dict, outfn:Path=None):
-    """
-    records to disk screen capture with audio for upload to YouTube
-
-    if not outfn, just cite command that would have run
-    """
-    if outfn:
-        outfn = Path(outfn).expanduser()
-
-    P = osparam(P)
-
-    vid1 = _screengrab(P)
-
-    aud1 = _audiostream(P)
-    aud2 = _audiocomp(P)
-
-    cmd = [getexe()] + vid1 + aud1 + aud2
-    if sys.platform == 'win32':
-        cmd += ['-copy_ts']
-
-    print('\n',' '.join(cmd),'\n')
-
-    if outfn:
-        sp.check_call(cmd + [str(outfn)])
-    else:
-        print('specify filename to save screen capture with audio to disk.')
+        if outfn:
+            sp.check_call(cmd + [str(outfn)])
+        else:
+            print('specify filename to save screen capture with audio to disk.')
 

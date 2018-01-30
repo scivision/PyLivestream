@@ -38,8 +38,8 @@ Install
     python -m pip install -e .
 
 
-Usage
-=====
+Stream Setup
+============
 
 The ``.ini`` file contains parameters relevant to your stream.
 Find device names with commands like:
@@ -56,27 +56,50 @@ YouTube Live
 1. `configure  <https://www.youtube.com/live_dashboard>`_ YouTube Live.
 2. Run Python script and chosen input will stream on YouTube Live.
 
+::
+
+    python Screenshare.py stream.ini youtube
+
+
+Facebook Live
+-------------
+
+1. configure your Facebook Live stream, get stream ID from `https://www.facebook.com/live/create <https://www.facebook.com/live/create>`_
+2. Run Python script for Facebook with chosen input
+
+::
+
+    python Screenshare.py stream.ini facebook
+
+
+Periscope
+---------
+
+1. create a new stream by EITHER:
+
+   * from phone Periscope app, go to Profile -> Settings -> Periscope Producer and see your Stream Key. The "checking source" button will go to "preview stream" once you do step #2.
+   * from computer web browser, go to `https://www.periscope.tv/account/producer <https://www.periscope.tv/account/producer>`_ and Create New Source.
+2. Run Python script for Periscope with chosen input
+
+::
+
+    python Screenshare.py stream.ini periscope
+
+I prefer using the Phone method as then the phone is a "second screen" where I can see if the stream is lagging, and if I "leave broadcast" and come back in, I can comment from my phone etc.
+
+
+Use Cases
+=========
 
 Webcam
-~~~~~~
+------
 Audio is included::
 
     python Webcam2YouTubeLive.py stream.ini
 
 
-Screen Share
-~~~~~~~~~~~~
-Audio is included::
-
-    python Screenshare2YouTubeLive.py stream.ini
-
--fps      set frames/second
--res      set resolution XxY of your screen
--o        set origin (upper left)
-
-
 several video files
-~~~~~~~~~~~~~~~~~~~
+-------------------
 Glob list of video files to stream::
 
     python FileGlob2YouTubeLive.py stream.ini path pattern
@@ -85,21 +108,21 @@ Glob list of video files to stream::
 
 
 stream all videos in directory
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------
 Example: all AVI videos in directory ``~/Videos``::
 
     python FileGlob2YouTubeLive.py stream.ini ~/Videos "*.avi"
 
 stream endlessly looping videos
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------
 Example: all AVI videos in ``~/Videos`` are endlessly looped::
 
     python FileGlob2YouTubeLive.py ~/Videos "*.avi" -loop
 
 
 stream all audio files in directory
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Glob list of video files to stream. 
+-----------------------------------
+Glob list of video files to stream.
 Must include a static image (could be your logo)::
 
     python FileGlob2YouTubeLive.py stream.ini  path pattern -i image
@@ -114,7 +137,7 @@ Example: stream all .mp3 audio under ``~/Library`` directory::
 
 
 Loop single video endlessly
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------
 ::
 
     FileLoop2YouTubeLive.py stream.ini videofile
@@ -128,32 +151,16 @@ This script saves your screen capture to a file on your disk::
     python ScreenCapture2disk.py stream.ini myvid.avi
 
 
-Facebook Live
--------------
+Screen Share Livestream
+-----------------------
+Audio is included::
 
-1. configure your Facebook Live stream, get stream ID from `https://www.facebook.com/live/create <https://www.facebook.com/live/create>`_
-2. Run Python script for Facebook with chosen input
+    python Screenshare.py stream.ini site
 
-::
+* ``stream.ini`` is setup for your computer and desired parameters
+* ``site`` is ``facebook``, ``periscope`` or ``youtube``
 
-    python Screenshare2FacebookLive.py stream.ini
-    
-    
-Periscope
----------
 
-1. create a new stream by EITHER:
-
-   * from phone Periscope app, go to Profile -> Settings -> Periscope Producer and see your Stream Key. The "checking source" button will go to "preview stream" once you do step #2.
-   * from computer web browser, go to `https://www.periscope.tv/account/producer <https://www.periscope.tv/account/producer>`_ and Create New Source.
-2. Run Python script for Periscope with chosen input
-
-::
-
-    python Screenshare2Periscope.py stream.ini
-    
-    
-I prefer using the Phone method as then the phone is a "second screen" where I can see if the stream is lagging, and if I "leave broadcast" and come back in, I can comment from my phone etc.
 
 Notes
 =====
