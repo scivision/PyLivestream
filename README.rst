@@ -20,8 +20,9 @@
 Python scripted livestreaming using FFmpeg
 ==========================================
 
-FFmpeg can easily be used to stream to Facebook Live, YouTube Live, Periscope, Twitch, Mixer, Ustream, Vimeo and more for streaming broadcasts.
-These Python scripts compute the optimal parameters.
+Streams to one or **multiple** streaming sites simultaneously.
+FFmpeg is used from Python ``subprocess`` to stream to Facebook Live, YouTube Live, Periscope, Twitch, Mixer, Ustream, Vimeo and more for streaming broadcasts.
+The Python scripts compute good streaming parameters, and emit the command used so you can just copy and paste in the future if you wish.
 Works on any OS (Mac, Linux, Windows).
 Uses an ``.ini`` file to adjust all parameters.
 
@@ -116,7 +117,11 @@ Screen Share Livestream
 -----------------------
 Audio is included::
 
-    python Screenshare.py stream.ini site
+    python Screenshare.py stream.ini site(s)
+    
+Stream to multiple sites, in this example Periscope and YouTube Live simultaneously::
+
+    python Screenshare.py stream.ini youtube periscope
 
 
 File Input

@@ -39,6 +39,24 @@ def getexe() -> str:
 
     return exe
 
+
+def get_framerate(fn:Path) -> float:
+    """
+    get framerate of video file
+    https://askubuntu.com/a/468003
+    """
+    fn = Path(fn).expanduser()
+
+    fps = sp.check_output(['ffprobe','-v','0','-of','csv=p=0','-select_streams','0',
+                                   '-show_entries','stream=r_frame_rate',
+                                   str(fn)], universal_newlines=True)
+
+    fps = fps.strip().split('/')
+    fps = int(fps[0]) / int(fps[1])
+
+    return fps
+
+
 # %% top level
 class Stream:
 
