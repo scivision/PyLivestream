@@ -118,7 +118,7 @@ Screen Share Livestream
 Audio is included::
 
     python Screenshare.py stream.ini site(s)
-    
+
 Stream to multiple sites, in this example Periscope and YouTube Live simultaneously::
 
     python Screenshare.py stream.ini youtube periscope
@@ -180,6 +180,12 @@ This script saves your screen capture to a file on your disk::
     python ScreenCapture2disk.py stream.ini myvid.avi
 
 
+
+Utilities
+=========
+
+* ``PyLivestream.get_framerate(vidfn)`` gives the frames/sec of a video file.
+* ``PyLivestream.get_resolution(vidfn)`` gives the resolution (widthxheight) of video file.
 
 
 Notes

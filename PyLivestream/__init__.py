@@ -43,18 +43,39 @@ def getexe() -> str:
 def get_framerate(fn:Path) -> float:
     """
     get framerate of video file
-    https://askubuntu.com/a/468003
+    http://trac.ffmpeg.org/wiki/FFprobeTips#FrameRate
     """
     fn = Path(fn).expanduser()
 
-    fps = sp.check_output(['ffprobe','-v','0','-of','csv=p=0','-select_streams','0',
-                                   '-show_entries','stream=r_frame_rate',
-                                   str(fn)], universal_newlines=True)
+    fps = sp.check_output(['ffprobe','-v','error',
+                           '-select_streams','v:0','-show_entries','stream=avg_frame_rate',
+                           '-of','default=noprint_wrappers=1:nokey=1', str(fn)], universal_newlines=True)
 
     fps = fps.strip().split('/')
     fps = int(fps[0]) / int(fps[1])
 
     return fps
+
+
+def get_resolution(fn:Path) -> tuple:
+    """
+    get resolution (widthxheight) of video file
+    http://trac.ffmpeg.org/wiki/FFprobeTips#WidthxHeight
+    """
+    fn = Path(fn).expanduser()
+
+    res = sp.check_output(['ffprobe','-v','error',
+                           '-of','flat=s=_',
+                           '-select_streams','v:0',
+                           '-show_entries','stream=height,width', str(fn)], universal_newlines=True)
+
+    res = res.strip().split('\n')
+    res = (int(res[0].split('=')[-1]), int(res[1].split('=')[-1]))
+
+    print(res)
+
+    return res
+
 
 
 # %% top level
