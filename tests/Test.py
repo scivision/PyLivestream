@@ -6,7 +6,7 @@ rdir = Path(__file__).parent
 
 inifn = rdir / 'test.ini'
 
-sites = ['periscope','youtube','facebook','twitch','ustream']
+sites = ['periscope','youtube','facebook','twitch','ustream','vimeo']
 
 def test_screenshare():
     for s in sites:
