@@ -3,18 +3,18 @@ from getpass import getpass
 import subprocess as sp
 import logging,os,sys
 from configparser import ConfigParser
-# %% minimum bitrates specified by YouTube. Key is vertical pixels (height)
-br30 = {'2160':13000,
+# %% Key is vertical pixels (height)
+BR30 = {'2160':13000,
         '1440':6000,
         '1080':3000,
-        '720':1500,
+        '720':1800,
         '540':800,
         '480':500,
         '360':400,
         '240':300,
         }
 
-br60 = {'2160':20000,
+BR60 = {'2160':20000,
         '1440':9000,
         '1080':4500,
         '720':2250,
@@ -144,14 +144,14 @@ class Stream:
             y = self.res.split('x')[1]
 
             if self.fps <= 30:
-               cvbr = br30[y]
+               cvbr = BR30[y]
             else:
-               cvbr = br60[y]
+               cvbr = BR60[y]
         else:  # TODO assuming 720 webcam for now
             if self.fps <= 30:
-                cvbr = br30['720']
+                cvbr = BR30['720']
             else:
-                cvbr = br60['720']
+                cvbr = BR60['720']
 
         return cvbr
 
