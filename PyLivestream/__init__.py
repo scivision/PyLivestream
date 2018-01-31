@@ -268,8 +268,10 @@ class Livestream(Stream):
         if sinks is None: # single stream
             sp.check_call(self.cmd, stdout=sp.DEVNULL)
         else: # multi-stream output tee
-            print(sinks)
-            print(self.cmd)
+            cmdstem = self.cmd[:-3]
+            cmdstem += ['-f','tee','-map','0:v','-map','0:a']
+            cmdstem += ['[f=flv]'+'|[f=flv]'.join(sinks)]
+            print(' '.join(cmdstem))
 
 
 
