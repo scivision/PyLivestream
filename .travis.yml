@@ -2,13 +2,12 @@ language: python
 fast_finish: true
 
 python:
-  - 3.6
+  - 3.5
 
 os:
   - linux
 
-dist: trusty
-group: edge
+group: travis_latest
 
 git:
   depth: 3

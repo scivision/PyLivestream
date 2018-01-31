@@ -16,17 +16,17 @@
    :target: https://codeclimate.com/github/scivision/ffmpeg-youtube-live/maintainability
    :alt: Maintainability
 
-========================
-YouTube Live via FFmpeg
-========================
+==========================================
+Python scripted livestreaming using FFmpeg
+==========================================
 
-FFmpeg can easily be used to stream to YouTube Live for streaming broadcasts.
+FFmpeg can easily be used to stream to YouTube Live, Facebook Live, Periscope, Twitch and more for streaming broadcasts.
 These Python scripts compute the optimal parameters.
-Should work on any OS (Mac, Linux, Windows).
+Works on any OS (Mac, Linux, Windows).
+Uses an ``.ini`` file to adjust all parameters.
 
-:Linux: requires X11, not Wayland (choose at login)
 :FFmpeg: >= 3.0 required
-:Python: >= 3.6 required
+:Python: >= 3.5 required
 
 
 .. contents::
@@ -160,7 +160,7 @@ Must include a static image (could be your logo)::
     python FileGlob.py stream.ini site path pattern -i image
 
 path      path to where video files are
-pattern   e.g. "*.avi"  pattern matching video files
+pattern   e.g. ``*.avi``  pattern matching video files
 -i        filename of image to use as stream background
 
 Example: stream all .mp3 audio under ``~/Library`` directory::
@@ -170,7 +170,6 @@ Example: stream all .mp3 audio under ``~/Library`` directory::
 
 Screen capture to disk
 ----------------------
-This is NOT streaming.
 This script saves your screen capture to a file on your disk::
 
     python ScreenCapture2disk.py stream.ini myvid.avi
@@ -181,6 +180,7 @@ This script saves your screen capture to a file on your disk::
 Notes
 =====
 
+* Linux requires X11, not Wayland (choose at login)
 * FFmpeg Ubuntu `PPA <https://launchpad.net/~mc3man/+archive/ubuntu/trusty-media>`_
 * `Reference webpage <https://www.scivision.co/youtube-live-ffmpeg-livestream/>`_
 * `Test videos for looping/globbing <http://www.divx.com/en/devices/profiles/video>`_
@@ -195,3 +195,12 @@ Windows
 ~~~~~~~
 * `DirectShow <https://trac.ffmpeg.org/wiki/DirectShow>`_ device selection
 * DirectShow `examples <https://ffmpeg.org/ffmpeg-devices.html#Examples-4>`_
+
+Stream References
+-----------------
+
+* Twitch `parameters <https://help.twitch.tv/customer/portal/articles/1253460-broadcast-requirements>`_
+* Twitch `servers <http://bashtech.net/twitch/ingest.php>`_
+* Periscope `parameters <https://www.pscp.tv/help/external-encoders>`_
+* YouTube Live `parameters <https://support.google.com/youtube/answer/2853702>`_
+* Facebook Live `parameters <https://www.facebook.com/facebookmedia/get-started/live>`_

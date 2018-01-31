@@ -171,7 +171,7 @@ class Stream:
                 '-s', self.res]
 
         if sys.platform =='linux':
-            vid1 += ['-i',f':0.0+{self.origin[0]},{self.origin[1]}']
+            vid1 += ['-i', ':0.0+{},{}'.format(self.origin[0], self.origin[1])]
         elif sys.platform =='win32':
             vid1 += ['-i', self.videochan]
         elif sys.platform == 'darwin':
@@ -253,23 +253,8 @@ class Livestream(Stream):
             print('\n',' '.join(self.cmd),'\n')
 
     def golive(self):
-        if self.site == 'periscope':
-            self.periscope()
-        elif self.site == 'youtube':
-            self.youtubelive()
-        elif self.site == 'facebook':
-            self.facebooklive()
-        elif self.site == 'twitch':
-            self.twitch()
-        else:
-            raise ValueError('site {} unknown'.format(self.site))
-
-
-# %% sites
-    def facebooklive(self):
         """
-        LIVE STREAM to Facebook Live
-        https://www.facebook.com/live/create
+        live stream via FFmpeg subprocess
         """
 
         if isinstance(self.key, str):
@@ -284,59 +269,6 @@ class Livestream(Stream):
             return
 
     #    sp.check_call(self.cmd+['rtmps://live-api.facebook.com:443/rtmp/' + streamid],
-        sp.check_call(cmd, stdout=sp.DEVNULL)
-
-
-    def periscope(self):
-        """LIVE STREAM to Periscope"""
-
-        if isinstance(self.key, str):
-            streamid = self.key
-        else:
-            streamid = getpass('Periscope Stream ID: ')
-
-        cmd = self.cmd+[self.server + streamid]
-
-        if streamid == 'test':
-            print(' '.join(cmd))
-            return
-
-        sp.check_call(cmd, stdout=sp.DEVNULL)
-
-
-    def youtubelive(self):
-        """LIVE STREAM to YouTube Live"""
-
-        if isinstance(self.key, str):
-            streamid = self.key
-        else:
-            streamid = getpass('YouTube Live Stream ID: ')
-
-        cmd = self.cmd+[self.server + streamid]
-
-        if streamid == 'test':
-            print(' '.join(cmd))
-            return
-
-        sp.check_call(cmd, stdout=sp.DEVNULL)
-
-    def twitch(self):
-        """LIVE STREAM to Twitch.TV
-        https://help.twitch.tv/customer/portal/articles/1253460-broadcast-requirements
-        http://bashtech.net/twitch/ingest.php
-        """
-
-        if isinstance(self.key, str):
-            streamid = self.key
-        else:
-            streamid = getpass('Twitch Stream ID: ')
-
-        cmd = self.cmd+[self.server + streamid]
-
-        if streamid == 'test':
-            print(' '.join(cmd))
-            return
-
         sp.check_call(cmd, stdout=sp.DEVNULL)
 
 
