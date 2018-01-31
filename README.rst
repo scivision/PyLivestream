@@ -190,6 +190,7 @@ FFmpeg References
 
 * `streaming <https://trac.ffmpeg.org/wiki/EncodingForStreamingSites>`_
 * `webcam <https://trac.ffmpeg.org/wiki/Capture/Webcam>`_
+* `webcam overlay <https://trac.ffmpeg.org/wiki/EncodingForStreamingSites#Withwebcamoverlay>`_
 
 Windows
 ~~~~~~~

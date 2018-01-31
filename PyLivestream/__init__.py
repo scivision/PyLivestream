@@ -3,7 +3,7 @@ from getpass import getpass
 import subprocess as sp
 import logging,os,sys
 from configparser import ConfigParser
-# %% Key is vertical pixels (height)
+# %% Key is vertical pixels (height). Units kbps
 BR30 = {'2160':13000,
         '1440':6000,
         '1080':3000,
@@ -67,7 +67,8 @@ class Stream:
         self.acap = C.get(sys.platform,'acap')
         self.hcam = C.get(sys.platform,'hcam')
 
-        self.audiobw = C.get(self.site,'audiobw')
+        self.video_kbps = C.getint(self.site, 'video_kbps', fallback=None)
+        self.audio_bps = C.get(self.site,'audio_bps')
         self.audiofs = C.get(self.site,'audiofs') # not getint
         self.fps  = C.getint(self.site,'fps')
         self.keyframe_sec = C.getint(self.site,'keyframe_sec')
@@ -95,18 +96,16 @@ class Stream:
         else:
             raise ValueError('unknown vidsource {}'.format(self.vidsource))
 # %% configure video output
-        cvbr = self.bitrate()
-
         vid2 = ['-c:v','libx264','-pix_fmt','yuv420p']
 
         if self.image:
             vid2 += ['-tune','stillimage']
         else:
             vid2 += ['-preset',COMPPRESET,
-                    '-b:v',str(cvbr)+'k',
+                    '-b:v',str(self.video_kbps)+'k',
                     '-g', str(self.keyframe_sec*self.fps)]
 
-        return vid1,vid2,cvbr
+        return vid1,vid2
 
 
     def audiostream(self) -> list:
@@ -127,33 +126,26 @@ class Stream:
         """
 
         return ['-c:a','aac',
-                '-b:a', self.audiobw,
+                '-b:a', self.audio_bps,
                 '-ar', self.audiofs]
 
-
     def bitrate(self) -> list:
-        if self.image:
+        if self.video_kbps:
             return
-        elif self.vidsource == 'file': # TODO get from input file
-            return 3000
-        elif self.site == 'periscope':
-            return 800  # same for HD and SD Periscope
 
-    # %%
         if self.res:
             y = self.res.split('x')[1]
 
             if self.fps <= 30:
-               cvbr = BR30[y]
+               self.video_kbps = BR30[y]
             else:
-               cvbr = BR60[y]
+               self.video_kbps = BR60[y]
         else:  # TODO assuming 720 webcam for now
             if self.fps <= 30:
-                cvbr = BR30['720']
+                self.video_kbps = BR30['720']
             else:
-                cvbr = BR60['720']
+                self.video_kbps = BR60['720']
 
-        return cvbr
 
 
     def screengrab(self) -> list:
@@ -206,12 +198,12 @@ class Stream:
         return vid1
 
 
-    def buffer(self, cvbr:int) -> list:
+    def buffer(self) -> list:
         buf = ['-threads','0']
 
         if not self.image:
-            buf += ['-maxrate','{}k'.format(cvbr),
-                      '-bufsize','{}k'.format(2*cvbr)]
+            buf += ['-maxrate','{}k'.format(self.video_kbps),
+                      '-bufsize','{}k'.format(2*self.video_kbps)]
         else: # static image + audio
             buf += ['-shortest']
 
@@ -229,12 +221,14 @@ class Livestream(Stream):
 
         self.osparam()
 
-        vid1,vid2,cvbr = self.videostream()
+        self.bitrate()
+
+        vid1,vid2 = self.videostream()
 
         aud1 = self.audiostream()
         aud2 = self.audiocomp()
 
-        buf = self.buffer(cvbr)
+        buf = self.buffer()
 
         self.cmd = [getexe()] + vid1 + aud1 + vid2 + aud2 + buf
 
