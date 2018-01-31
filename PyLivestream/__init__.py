@@ -55,7 +55,7 @@ class Stream:
         """load OS specific config"""
 
         C = ConfigParser()
-        C.read(self.ini)
+        C.read(str(self.ini))
 
         if sys.platform.startswith('linux'):
             if 'XDG_SESSION_TYPE' in os.environ and os.environ['XDG_SESSION_TYPE'] == 'wayland':
@@ -145,7 +145,6 @@ class Stream:
                 self.video_kbps = BR30['720']
             else:
                 self.video_kbps = BR60['720']
-
 
 
     def screengrab(self) -> list:
