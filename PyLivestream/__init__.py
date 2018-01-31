@@ -42,7 +42,7 @@ def getexe() -> str:
 # %% top level
 class Stream:
 
-    def __init__(self,ini,site,vidsource,image,loop,infn):
+    def __init__(self,ini,site,vidsource,image=False,loop=False,infn=None):
         self.ini = ini
         self.site = site
         self.vidsource = vidsource
@@ -75,7 +75,7 @@ class Stream:
         self.res  = C.get(self.site,'res')
         self.origin = C.get(self.site,'origin').split(',')
 
-        self.server = C.get(self.site,'server')
+        self.server = C.get(self.site,'server', fallback=None)
 
         keyfn = C.get(self.site,'key', fallback=None)
         if not keyfn:
@@ -129,7 +129,9 @@ class Stream:
                 '-b:a', self.audio_bps,
                 '-ar', self.audiofs]
 
-    def bitrate(self) -> list:
+
+    def video_bitrate(self) -> list:
+        """get "best" video bitrate"""
         if self.video_kbps:
             return
 
@@ -198,6 +200,7 @@ class Stream:
 
 
     def buffer(self) -> list:
+        """configure network buffer. Tradeoff: latency vs. robustness"""
         buf = ['-threads','0']
 
         if not self.image:
@@ -211,6 +214,19 @@ class Stream:
         return buf
 
 
+    def unify_streams(self,streams:list) -> int:
+        """
+        find least common denominator stream settings so "tee" output can generate multiple streams.
+        First try: use stream with lowest video bitrate.
+
+        fast native Python argmin()
+        https://stackoverflow.com/a/11825864
+        """
+        vid_bw = [stream.video_kbps for stream in streams]
+
+        return min(range(len(vid_bw)), key=vid_bw.__getitem__)
+
+
 class Livestream(Stream):
 
     def __init__(self,ini,site,vidsource,image=False,loop=False,infn=None):
@@ -220,7 +236,7 @@ class Livestream(Stream):
 
         self.osparam()
 
-        self.bitrate()
+        self.video_bitrate()
 
         vid1,vid2 = self.videostream()
 
@@ -229,45 +245,58 @@ class Livestream(Stream):
 
         buf = self.buffer()
 
-        self.cmd = [getexe()] + vid1 + aud1 + vid2 + aud2 + buf
+        cmd = [getexe()] + vid1 + aud1 + vid2 + aud2 + buf
 
-        if not self.key:
-            print('\n',' '.join(self.cmd),'\n')
-
-
-    def golive(self):
-        """
-        live stream via FFmpeg subprocess
-        """
-
-        if isinstance(self.key, str):
+        if self.key:
             streamid = self.key
         else:
+            print('\n',' '.join(cmd),'\n')
             streamid = getpass('{} Live Stream ID: '.format(self.site))
 
-        cmd = self.cmd+[self.server + streamid]
+        self.sink = [self.server + streamid]
 
-        if streamid == 'test':
-            print(' '.join(cmd))
+        self.cmd = cmd + self.sink
+
+
+    def golive(self, sinks:list=None):
+        """finally start the stream(s)"""
+
+        if self.sink[0].endswith('test'):
+            print('\n',' '.join(self.cmd),'\n')
             return
 
-    #    sp.check_call(self.cmd+['rtmps://live-api.facebook.com:443/rtmp/' + streamid],
-        sp.check_call(cmd, stdout=sp.DEVNULL)
+        if sinks is None: # single stream
+            sp.check_call(self.cmd, stdout=sp.DEVNULL)
+        else: # multi-stream output tee
+            print(sinks)
+            print(self.cmd)
 
 
 
 # %% operators
 class Screenshare(Livestream):
 
-    def __init__(self, ini:Path, site:str):
+    def __init__(self, ini:Path, sites:list):
 
-        site = site.lower()
+        if isinstance(sites,str):
+            sites = [sites]
+
+        sites = [site.lower() for site in sites]
         vidsource = 'screen'
         ini=Path(ini).expanduser()
 
-        stream = Livestream(ini,site,vidsource)
+        streams = []
+        for site in sites:
+            print('Config',site)
+            streams.append(Livestream(ini,site,vidsource))
 
-        stream.golive()
+        if len(streams)==1:
+            streams[0].golive()
+            return
+
+        sinks = [stream.sink[0] for stream in streams]
+
+        streams[self.unify_streams(streams)].golive(sinks)
 
 
 class Webcam(Livestream):
@@ -298,13 +327,14 @@ class FileIn(Livestream):
 
 class SaveDisk(Stream):
 
-    def __init__(self, ini:Path, outfn:Path=None):
+    def __init__(self, ini:Path, outfn:Path=None, vidsource:str='screen'):
         """
-        records to disk screen capture with audio for upload to YouTube
+        records to disk screen capture with audio
 
         if not outfn, just cite command that would have run
         """
-        site = vidsource = 'file'
+        site = 'file'
+        vidsource = 'screen'
         ini=Path(ini).expanduser()
 
         super().__init__(ini,site,vidsource)

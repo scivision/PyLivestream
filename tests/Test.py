@@ -13,7 +13,6 @@ def test_screenshare():
         PyLivestream.Screenshare(inifn, s)
 
 
-
 def test_webcam():
     for s in sites:
         PyLivestream.Webcam(inifn, s)
@@ -22,7 +21,6 @@ def test_webcam():
 def test_loop():
     for s in sites:
         PyLivestream.FileIn(inifn,s,'')
-
 
 
 if __name__ == '__main__':
