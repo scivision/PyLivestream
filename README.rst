@@ -20,7 +20,7 @@
 Python scripted livestreaming using FFmpeg
 ==========================================
 
-FFmpeg can easily be used to stream to YouTube Live, Facebook Live, Periscope, Twitch, Ustream and more for streaming broadcasts.
+FFmpeg can easily be used to stream to YouTube Live, Facebook Live, Periscope, Twitch, Ustream, Vimeo and more for streaming broadcasts.
 These Python scripts compute the optimal parameters.
 Works on any OS (Mac, Linux, Windows).
 Uses an ``.ini`` file to adjust all parameters.
@@ -205,3 +205,5 @@ Stream References
 * YouTube Live `parameters <https://support.google.com/youtube/answer/2853702>`_
 * Facebook Live `parameters <https://www.facebook.com/facebookmedia/get-started/live>`_
 * Ustream `parameters <https://support.ustream.tv/hc/en-us/articles/207852117-Internet-connection-and-recommended-encoding-settings>`_
+* Vimeo `config <https://help.vimeo.com/hc/en-us/articles/115012811168>`_
+* Vimeo `parameters <https://help.vimeo.com/hc/en-us/articles/115012811208-Encoder-guides>`_
