@@ -70,6 +70,7 @@ class Stream:
         self.audiobw = C.get(self.site,'audiobw')
         self.audiofs = C.get(self.site,'audiofs') # not getint
         self.fps  = C.getint(self.site,'fps')
+        self.keyframe_sec = C.getint(self.site,'keyframe_sec')
         self.res  = C.get(self.site,'res')
         self.origin = C.get(self.site,'origin').split(',')
 
@@ -103,7 +104,7 @@ class Stream:
         else:
             vid2 += ['-preset',COMPPRESET,
                     '-b:v',str(cvbr)+'k',
-                    '-g',self.group()]
+                    '-g', str(self.keyframe_sec*self.fps)]
 
         return vid1,vid2,cvbr
 
@@ -128,15 +129,6 @@ class Stream:
         return ['-c:a','aac',
                 '-b:a', self.audiobw,
                 '-ar', self.audiofs]
-
-    def group(self) -> str:
-
-        if self.fps:
-            g = str(2*self.fps)
-        else: # TODO assume 30 fps
-            g = '60'
-
-        return g
 
 
     def bitrate(self) -> list:
@@ -200,7 +192,6 @@ class Stream:
             vid1 = ['-re']
 
 
-
         if self.loop:
             vid1 += ['-stream_loop','-1']  # FFmpeg >= 3
         else:
@@ -213,8 +204,6 @@ class Stream:
         vid1 += ['-i',str(fn)]
 
         return vid1
-
-
 
 
     def buffer(self, cvbr:int) -> list:
@@ -252,6 +241,7 @@ class Livestream(Stream):
         if not self.key:
             print('\n',' '.join(self.cmd),'\n')
 
+
     def golive(self):
         """
         live stream via FFmpeg subprocess
@@ -260,7 +250,7 @@ class Livestream(Stream):
         if isinstance(self.key, str):
             streamid = self.key
         else:
-            streamid = getpass('Facebook Live Stream ID: ')
+            streamid = getpass('{} Live Stream ID: '.format(self.site))
 
         cmd = self.cmd+[self.server + streamid]
 
@@ -287,7 +277,6 @@ class Screenshare(Livestream):
         stream.golive()
 
 
-
 class Webcam(Livestream):
 
     def __init__(self, ini:Path, site:str):
@@ -312,7 +301,6 @@ class FileIn(Livestream):
         stream = Livestream(ini, site, vidsource, image, loop, infn)
 
         stream.golive()
-
 
 
 class SaveDisk(Stream):
@@ -348,4 +336,3 @@ class SaveDisk(Stream):
             sp.check_call(cmd )
         else:
             print('specify filename to save screen capture with audio to disk.')
-
