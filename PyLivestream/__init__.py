@@ -81,7 +81,7 @@ class Stream:
         if not keyfn:
             self.key = None
         else:
-            self.key = Path(keyfn).expanduser().read_text()
+            self.key = Path(keyfn).expanduser().read_text().strip()
 
 
     def videostream(self) -> tuple:
@@ -266,12 +266,17 @@ class Livestream(Stream):
             return
 
         if sinks is None: # single stream
+            print('\n',' '.join(self.cmd))
             sp.check_call(self.cmd, stdout=sp.DEVNULL)
         else: # multi-stream output tee
             cmdstem = self.cmd[:-3]
-            cmdstem += ['-f','tee','-map','0:v','-map','0:a']
-            cmdstem += ['[f=flv]'+'|[f=flv]'.join(sinks)]
-            print(' '.join(cmdstem))
+            # +global_header is necessary to tee to Periscope (and other services at same time)
+            cmd = cmdstem + ['-flags:v','+global_header',
+                             '-f','tee','-map','0:v','-map','1:a']
+            cmd += ['[f=flv]'+'|[f=flv]'.join(sinks)] # no double quotes
+            print(' '.join(cmd))
+
+            sp.check_call(cmd, stdout=sp.DEVNULL)
 
 
 
