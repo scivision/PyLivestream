@@ -324,11 +324,12 @@ class Screenshare(Livestream):
 
     def __init__(self, ini:Path, sites:list):
 
+        vidsource = 'screen'
+
         if isinstance(sites,str):
             sites = [sites]
 
         sites = [site.lower() for site in sites]
-        vidsource = 'screen'
         ini=Path(ini).expanduser()
 
         streams = []
@@ -347,15 +348,28 @@ class Screenshare(Livestream):
 
 class Webcam(Livestream):
 
-    def __init__(self, ini:Path, site:str):
+    def __init__(self, ini:Path, sites:list):
 
-        site = site.lower()
         vidsource = 'camera'
+
+        if isinstance(sites,str):
+            sites = [sites]
+
+        sites = [site.lower() for site in sites]
         ini=Path(ini).expanduser()
 
-        stream = Livestream(ini,site,vidsource)
+        streams = []
+        for site in sites:
+            print('Config',site)
+            streams.append(Livestream(ini,site,vidsource))
 
-        stream.golive()
+        if len(streams)==1:
+            streams[0].golive()
+            return
+
+        sinks = [stream.sink[0] for stream in streams]
+
+        streams[self.unify_streams(streams)].golive(sinks)
 
 
 class FileIn(Livestream):
