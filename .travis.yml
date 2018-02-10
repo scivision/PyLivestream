@@ -19,5 +19,5 @@ install: pip -q install -e .[tests]
 script: coverage run tests/Test.py -v
 
 after_success:
-  - if [[ $TRAVIS_PYTHON_VERSION == 3.7* ]]; then coveralls; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.6* ]]; then coveralls; fi
 
