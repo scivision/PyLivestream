@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+install_requires=['numpy','scipy']
 tests_require=['nose','coveralls']
 from setuptools import setup,find_packages
 
@@ -10,6 +11,7 @@ setup(name='PyLivestream',
       description='Easy streaming using FFmpeg to YouTube Live, Periscope, Facebook Live, Twitch, ...',
       long_description=open("README.rst").read(),
       python_requires='>=3.5',
+      install_requires=install_requires,
       tests_require=tests_require,
       extras_require={'tests':tests_require},
       classifiers=[
