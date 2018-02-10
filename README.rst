@@ -26,6 +26,10 @@ The Python scripts compute good streaming parameters, and emit the command used 
 Works on any OS (Mac, Linux, Windows).
 Uses an ``.ini`` file to adjust all parameters.
 
+.. image:: doc/logo.png
+   :alt: PyLivestream diagram showing screen capture or webcam simultaneously livestreaming to multiple services.
+
+
 :FFmpeg: >= 3.0 required
 :Python: >= 3.5 required
 
@@ -39,17 +43,42 @@ Install
     python -m pip install -e .
 
 
-Stream Setup
-============
+Configuration
+=============
+You can skip past this section to "stream start" if it's confusing.
+The defaults might work to get you started.
 
-The ``.ini`` file contains parameters relevant to your stream.
-Find device names with commands like:
+
+The ``stream.ini`` file contains parameters relevant to your stream.
+The ``[DEFAULT]`` section has parameters that can be overriden for each site, if desired.
+
+* ``screencap_origin``: origin (upper left corner) of screen capture region in pixels.
+* ``screencap_res``: resolution of screen capture (area to capture, starting from origin)
+* ``screencap_fps``: frames/sec of screen capture
+* ``webcam_res``: webcam resolution -- find from ``v4l2-ctl --list-formats-ext`` or webcam spec sheet.
+* ``webcam_fps``: webcam fps -- found from command above or webcam spec sheet
+* ``audiofs``: audio sampling frequency. Typically 44100 Hz (CD quality).
+* ``preset``: ``veryfast`` or ``ultrafast`` if CPU not able to keep up.
+
+
+Next are ``sys.platform`` specific parameters.
+Find webcam name by:
 
 * Windows: ``ffmpeg -list_devices true -f dshow -i dummy``
 * Mac: ``ffmpeg -f avfoundation -list_devices true -i ""``
 * Linux: ``v4l2-ctl --list-devices``
 
-I will describe usage for each of YouTube Live, Facebook Live, Periscope and Twitch.
+Seek help in FFmpeg documentation, try capturing to a file first and then update ``stream.ini`` for your ``sys.platform``.
+
+* ``exe``: override path to desired FFmpeg executable. In case you have multiple FFmpeg versions installed (say, from Anaconda Python).
+
+Finally are the per-site parameters.
+The only thing you would possibly need to change here is the ``server`` for best performance for your geographic region.
+The included ``stream.ini`` is with default servers for the Northeastern USA.
+
+
+Stream Start
+============
 
 YouTube Live
 ------------
@@ -59,7 +88,7 @@ YouTube Live
 
 ::
 
-    python Screenshare.py stream.ini youtube
+    python ScreenshareLivestream.py stream.ini youtube
 
 
 Facebook Live
@@ -70,7 +99,7 @@ Facebook Live
 
 ::
 
-    python Screenshare.py stream.ini facebook
+    python ScreenshareLivestream.py stream.ini facebook
 
 
 Periscope
@@ -84,7 +113,7 @@ Periscope
 
 ::
 
-    python Screenshare.py stream.ini periscope
+    python ScreenshareLivestream.py stream.ini periscope
 
 I prefer using the Phone method as then the phone is a "second screen" where I can see if the stream is lagging, and if I "leave broadcast" and come back in, I can comment from my phone etc.
 
@@ -99,10 +128,15 @@ If you are not in the Northeast US, edit `stream.ini` to have the `closest serve
 
 
 Usage
-=========
+=====
+
+Due to the complexity of streaming and the non-specific error codes FFmpeg emits,
+the default behavior is that if FFmpeg detects one stream has failed, ALL streams will stop streaming and the program ends.
+
 
 * ``stream.ini`` is setup for your computer and desired parameters
-* ``site`` is ``facebook``, ``periscope`` or ``youtube``
+* ``site`` is ``facebook``, ``periscope``, ``youtube``, etc.
+* For ``Webcam.py`` and ``Screenshare.py``, more than one ``site`` can be specified for simultaneous multi-streaming
 
 
 
@@ -110,18 +144,23 @@ Webcam
 ------
 Audio is included::
 
-    python Webcam.py stream.ini site
+    python WebcamLivestream.py stream.ini site(s)
+
+Stream to multiple sites, in this example Periscope and YouTube Live simultaneously::
+
+    python WebcamLivestream.py stream.ini youtube periscope
+
 
 
 Screen Share Livestream
 -----------------------
 Audio is included::
 
-    python Screenshare.py stream.ini site(s)
+    python ScreenshareLivestream.py stream.ini site(s)
 
 Stream to multiple sites, in this example Periscope and YouTube Live simultaneously::
 
-    python Screenshare.py stream.ini youtube periscope
+    python ScreenshareLivestream.py stream.ini youtube periscope
 
 
 File Input
@@ -132,14 +171,14 @@ Loop single video endlessly
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ::
 
-    python FileLoop.py stream.ini site videofile
+    python FileLoopLivestream.py stream.ini site videofile
 
 
 several video files
 ~~~~~~~~~~~~~~~~~~~
 Glob list of video files to stream::
 
-    python FileGlob.py stream.ini site path pattern
+    python FileGlobLivestream.py stream.ini site path pattern
 
 -loop       optionally loop endlessly the globbed file list
 
@@ -148,13 +187,13 @@ stream all videos in directory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Example: all AVI videos in directory ``~/Videos``::
 
-    python FileGlob.py stream.ini youtube ~/Videos "*.avi"
+    python FileGlobLivestream.py stream.ini youtube ~/Videos "*.avi"
 
 stream endlessly looping videos
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Example: all AVI videos in ``~/Videos`` are endlessly looped::
 
-    python FileGlob.py stream.ini youtube ~/Videos "*.avi" -loop
+    python FileGlobLivestream.py stream.ini youtube ~/Videos "*.avi" -loop
 
 
 stream all audio files in directory
@@ -162,7 +201,7 @@ stream all audio files in directory
 Glob list of video files to stream.
 Must include a static image (could be your logo)::
 
-    python FileGlob.py stream.ini site path pattern -i image
+    python FileGlobLivestream.py stream.ini site path pattern -i image
 
 path      path to where video files are
 pattern   e.g. ``*.avi``  pattern matching video files
@@ -170,7 +209,7 @@ pattern   e.g. ``*.avi``  pattern matching video files
 
 Example: stream all .mp3 audio under ``~/Library`` directory::
 
-    python FileGlob.py stream.ini youtube ~/Library "*.mp3" -i mylogo.jpg
+    python FileGlobLivestream.py stream.ini youtube ~/Library "*.mp3" -i mylogo.jpg
 
 
 Screen capture to disk
@@ -192,16 +231,16 @@ Notes
 =====
 
 * Linux requires X11, not Wayland (choose at login)
-* FFmpeg Ubuntu `PPA <https://launchpad.net/~mc3man/+archive/ubuntu/trusty-media>`_
-* `Reference webpage <https://www.scivision.co/youtube-live-ffmpeg-livestream/>`_
-* `Test videos for looping/globbing <http://www.divx.com/en/devices/profiles/video>`_
+* ``x11grab`` was deprecated in FFmpeg 3.3, was previously replaced by ``xcbgrab``
+* Reference `webpage <https://www.scivision.co/youtube-live-ffmpeg-livestream/>`_
+* `Test videos <http://www.divx.com/en/devices/profiles/video>`_ for looping/globbing
 
 FFmpeg References
 -----------------
 
 * `streaming <https://trac.ffmpeg.org/wiki/EncodingForStreamingSites>`_
 * `webcam <https://trac.ffmpeg.org/wiki/Capture/Webcam>`_
-* `webcam overlay <https://trac.ffmpeg.org/wiki/EncodingForStreamingSites#Withwebcamoverlay>`_
+* webcam `overlay <https://trac.ffmpeg.org/wiki/EncodingForStreamingSites#Withwebcamoverlay>`_
 
 Windows
 ~~~~~~~
@@ -221,3 +260,11 @@ Stream References
 * Ustream `parameters <https://support.ustream.tv/hc/en-us/articles/207852117-Internet-connection-and-recommended-encoding-settings>`_
 * Vimeo `config <https://help.vimeo.com/hc/en-us/articles/115012811168>`_
 * Vimeo `parameters <https://help.vimeo.com/hc/en-us/articles/115012811208-Encoder-guides>`_
+
+
+Logo Credits:
+------------
+* Owl PC: Creative Commons no attrib. commercial
+* YouTube: YouTube Brand Resources
+* Facebook: Wikimedia Commons
+* `Periscope <periscope.tv/press>`_

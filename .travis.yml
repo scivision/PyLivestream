@@ -7,15 +7,16 @@ python:
 os:
   - linux
 
+dist: xenial
 group: travis_latest
 
 git:
   depth: 3
-  
+
 addons:
   apt:
     packages:
-    - libav-tools
+    - ffmpeg
 
 
 install: pip -q install -e .[tests]

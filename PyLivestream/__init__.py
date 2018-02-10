@@ -1,41 +1,38 @@
 from pathlib import Path
 from getpass import getpass
+import numpy as np
+from scipy.interpolate import interp1d
 import subprocess as sp
 import logging,os,sys
 from configparser import ConfigParser
-# %% Key is vertical pixels (height). Units kbps
-BR30 = {'2160':13000,
-        '1440':6000,
-        '1080':3000,
-        '720':1800,
-        '540':800,
-        '480':500,
-        '360':400,
-        '240':300,
-        }
+# %%  Col0: vertical pixels (height). Col1: video kbps. Interpolates between these resolutions.
+BR30 = np.array(
+        [[2160, 13000],
+         [1440,  6000],
+         [1080,  3000],
+         [720,   1800],
+         [540,    800],
+         [480,    500],
+         [360,    400],
+         [240,    300]])
 
-BR60 = {'2160':20000,
-        '1440':9000,
-        '1080':4500,
-        '720':2250,
-        }
-
-
-COMPPRESET='veryfast'
+BR60 = np.array(
+        [[2160, 20000],
+         [1440,  9000],
+         [1080,  4500],
+         [720,   2250]])
 
 
-def getexe() -> str:
+def getexe(exe:str=None) -> str:
     """checks that host streaming program is installed"""
 
-    try:
-        sp.check_call(('ffmpeg','-h'), stdout=sp.DEVNULL, stderr=sp.DEVNULL)
+    if not exe:
         exe = 'ffmpeg'
-    except FileNotFoundError:
-        try:
-            sp.check_call(('avconv','-h'), stdout=sp.DEVNULL, stderr=sp.DEVNULL)
-            exe = 'avconv'
-        except FileNotFoundError:
-            raise FileNotFoundError('FFmpeg program is not found. Is ffmpeg on your PATH?')
+
+    try:
+        sp.check_call((exe,'-h'), stdout=sp.DEVNULL, stderr=sp.DEVNULL)
+    except FileNotFoundError: # just return FFmpeg command line
+        logging.critical('FFmpeg not found at {}, will simply tell you what I would have done.'.format(exe))
 
     return exe
 
@@ -46,6 +43,8 @@ def get_framerate(fn:Path) -> float:
     http://trac.ffmpeg.org/wiki/FFprobeTips#FrameRate
     """
     fn = Path(fn).expanduser()
+
+    assert fn.is_file(), '{} is not a file'.format(fn)
 
     fps = sp.check_output(['ffprobe','-v','error',
                            '-select_streams','v:0','-show_entries','stream=avg_frame_rate',
@@ -64,6 +63,8 @@ def get_resolution(fn:Path) -> tuple:
     """
     fn = Path(fn).expanduser()
 
+    assert fn.is_file(), '{} is not a file'.format(fn)
+
     res = sp.check_output(['ffprobe','-v','error',
                            '-of','flat=s=_',
                            '-select_streams','v:0',
@@ -71,8 +72,6 @@ def get_resolution(fn:Path) -> tuple:
 
     res = res.strip().split('\n')
     res = (int(res[0].split('=')[-1]), int(res[1].split('=')[-1]))
-
-    print(res)
 
     return res
 
@@ -100,19 +99,33 @@ class Stream:
             if 'XDG_SESSION_TYPE' in os.environ and os.environ['XDG_SESSION_TYPE'] == 'wayland':
                 logging.error('Wayland may only give black output with cursor. Login with X11 desktop')
 
+        if self.vidsource == 'camera':
+            self.res = C.get(self.site,'webcam_res').split('x')
+            self.fps = C.getint(self.site,'webcam_fps')
+        elif self.vidsource == 'screen':
+            self.res = C.get(self.site,'screencap_res').split('x')
+            self.fps = C.getint(self.site,'screencap_fps')
+            self.origin = C.get(self.site,'screencap_origin').split(',')
+        elif self.vidsource == 'file':
+            self.res = get_resolution(self.infn)
+            self.fps = get_framerate(self.infn)
+        else:
+            raise ValueError('unknown video source {}'.format(self.vidsource))
+
+        self.audiofs = C.get(self.site,'audiofs') # not getint
+        self.preset = C.get(self.site,'preset')
+
         self.videochan = C.get(sys.platform,'videochan')
         self.audiochan = C.get(sys.platform,'audiochan')
         self.vcap = C.get(sys.platform,'vcap')
         self.acap = C.get(sys.platform,'acap')
         self.hcam = C.get(sys.platform,'hcam')
+        self.exe = C.get(sys.platform,'exe',fallback='ffmpeg')
 
         self.video_kbps = C.getint(self.site, 'video_kbps', fallback=None)
         self.audio_bps = C.get(self.site,'audio_bps')
-        self.audiofs = C.get(self.site,'audiofs') # not getint
-        self.fps  = C.getint(self.site,'fps')
+
         self.keyframe_sec = C.getint(self.site,'keyframe_sec')
-        self.res  = C.get(self.site,'res')
-        self.origin = C.get(self.site,'origin').split(',')
 
         self.server = C.get(self.site,'server', fallback=None)
 
@@ -120,7 +133,11 @@ class Stream:
         if not keyfn:
             self.key = None
         else:
-            self.key = Path(keyfn).expanduser().read_text().strip()
+            try:
+                self.key = Path(keyfn).expanduser().read_text().strip()
+            except FileNotFoundError:
+                logging.error('did not find {}'.format(keyfn))
+                self.key = None
 
 
     def videostream(self) -> tuple:
@@ -140,7 +157,7 @@ class Stream:
         if self.image:
             vid2 += ['-tune','stillimage']
         else:
-            vid2 += ['-preset',COMPPRESET,
+            vid2 += ['-preset',self.preset,
                     '-b:v',str(self.video_kbps)+'k',
                     '-g', str(self.keyframe_sec*self.fps)]
 
@@ -170,29 +187,27 @@ class Stream:
 
 
     def video_bitrate(self) -> list:
-        """get "best" video bitrate"""
-        if self.video_kbps:
+        """get "best" video bitrate.
+        Based on YouTube Live minimum specified stream rate."""
+        if self.video_kbps: # per-site override
             return
 
-        if self.res:
-            y = self.res.split('x')[1]
+        y = int(self.res[1])
 
-            if self.fps <= 30:
-               self.video_kbps = BR30[y]
-            else:
-               self.video_kbps = BR60[y]
-        else:  # TODO assuming 720 webcam for now
-            if self.fps <= 30:
-                self.video_kbps = BR30['720']
-            else:
-                self.video_kbps = BR60['720']
+        if self.fps <= 30:
+            f = interp1d(BR30[:,0], BR30[:,1])
+        else:
+            f = interp1d(BR60[:,0], BR60[:,1])
+
+        self.video_kbps = int(f(y))
+
 
 
     def screengrab(self) -> list:
         """choose to grab video from desktop. May not work for Wayland."""
         vid1 = ['-f', self.vcap,
                 '-r', str(self.fps),
-                '-s', self.res]
+                '-s', 'x'.join(self.res)]
 
         if sys.platform =='linux':
             vid1 += ['-i', ':0.0+{},{}'.format(self.origin[0], self.origin[1])]
@@ -284,7 +299,7 @@ class Livestream(Stream):
 
         buf = self.buffer()
 
-        cmd = [getexe()] + vid1 + aud1 + vid2 + aud2 + buf
+        cmd = [self.exe] + vid1 + aud1 + vid2 + aud2 + buf
 
         if self.key:
             streamid = self.key
@@ -306,7 +321,7 @@ class Livestream(Stream):
 
         if sinks is None: # single stream
             print('\n',' '.join(self.cmd))
-            sp.check_call(self.cmd, stdout=sp.DEVNULL)
+            sp.check_call(self.cmd)
         else: # multi-stream output tee
             cmdstem = self.cmd[:-3]
             # +global_header is necessary to tee to Periscope (and other services at same time)
@@ -315,7 +330,7 @@ class Livestream(Stream):
             cmd += ['[f=flv]'+'|[f=flv]'.join(sinks)] # no double quotes
             print(' '.join(cmd))
 
-            sp.check_call(cmd, stdout=sp.DEVNULL)
+            sp.check_call(cmd)
 
 
 
@@ -409,7 +424,7 @@ class SaveDisk(Stream):
         aud1 = self.audiostream()
         aud2 = self.audiocomp()
 
-        cmd = [getexe()] + vid1 + aud1 + aud2 + [str(outfn)]
+        cmd = [self.exe] + vid1 + aud1 + aud2 + [str(outfn)]
         if sys.platform == 'win32':
             cmd += ['-copy_ts']
 
