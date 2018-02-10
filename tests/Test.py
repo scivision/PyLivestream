@@ -4,7 +4,7 @@ import os
 import PyLivestream
 
 rdir = Path(__file__).parent
-os.chdir(rdir)
+os.chdir(str(rdir))
 
 inifn =  'test.ini'
 
