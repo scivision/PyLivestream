@@ -6,20 +6,20 @@ import logging,os,sys
 from configparser import ConfigParser
 # %%  Col0: vertical pixels (height). Col1: video kbps. Interpolates between these resolutions.
 BR30 = np.array(
-        [[2160, 13000],
-         [1440,  6000],
-         [1080,  3000],
-         [720,   1800],
-         [540,    800],
-         [480,    500],
+        [[240,    300],
          [360,    400],
-         [240,    300]])
+         [480,    500],
+         [540,    800],
+         [720,   1800],
+         [1080,  3000],
+         [1440,  6000],
+         [2160, 13000]])
 
 BR60 = np.array(
-        [[2160, 20000],
-         [1440,  9000],
+        [[720,   2250],
          [1080,  4500],
-         [720,   2250]])
+         [1440,  9000],
+         [2160, 20000]])
 
 
 def getexe(exe:str=None) -> str:
