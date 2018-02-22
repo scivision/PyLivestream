@@ -1,7 +1,6 @@
 from pathlib import Path
 from getpass import getpass
 import numpy as np
-from scipy.interpolate import interp1d
 import subprocess as sp
 import logging,os,sys
 from configparser import ConfigParser
@@ -192,15 +191,12 @@ class Stream:
         if self.video_kbps: # per-site override
             return
 
-        y = int(self.res[1])
+        x = int(self.res[1])
 
         if self.fps <= 30:
-            f = interp1d(BR30[:,0], BR30[:,1])
+            self.video_kbps = int(np.interp(x, BR30[:,0], BR30[:,1]))
         else:
-            f = interp1d(BR60[:,0], BR60[:,1])
-
-        self.video_kbps = int(f(y))
-
+            self.video_kbps = int(np.interp(x, BR60[:,0], BR60[:,1]))
 
 
     def screengrab(self) -> list:

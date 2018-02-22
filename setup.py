@@ -1,11 +1,11 @@
 #!/usr/bin/env python
-install_requires=['numpy','scipy']
+install_requires=['numpy']
 tests_require=['nose','coveralls']
 from setuptools import setup,find_packages
 
 setup(name='PyLivestream',
       packages=find_packages(),
-      version = '1.4.0',
+      version = '1.4.1',
       author='Michael Hirsch, Ph.D.',
       url='https://github.com/scivision/PyLivestream',
       description='Easy streaming using FFmpeg to YouTube Live, Periscope, Facebook Live, Twitch, ...',
