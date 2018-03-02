@@ -1,5 +1,4 @@
 from pathlib import Path
-from getpass import getpass
 import numpy as np
 import subprocess as sp
 import logging,os,sys
@@ -86,8 +85,8 @@ def get_resolution(fn:Path) -> tuple:
 # %% top level
 class Stream:
 
-    def __init__(self,ini,site,vidsource,image=False,loop=False,infn=None):
-        self.ini = ini
+    def __init__(self,ini:Path, site:str, vidsource:str, image:bool=False, loop:bool=False, infn:Path=None):
+        self.ini = Path(ini).expanduser()
         self.site = site
         self.vidsource = vidsource
         self.image = image
@@ -97,6 +96,8 @@ class Stream:
 
     def osparam(self):
         """load OS specific config"""
+
+        assert self.ini.is_file(),'{} not found.'.format(self.ini)
 
         C = ConfigParser()
         C.read(str(self.ini))
@@ -200,7 +201,7 @@ class Stream:
                 '-ar', self.audiofs]
 
 
-    def video_bitrate(self) -> list:
+    def video_bitrate(self):
         """get "best" video bitrate.
         Based on YouTube Live minimum specified stream rate."""
         if self.video_kbps: # per-site override
@@ -304,7 +305,7 @@ class Livestream(Stream):
     def __init__(self,ini,site,vidsource,image=False,loop=False,infn=None):
         super().__init__(ini,site,vidsource,image,loop,infn)
 
-        self.site = site
+        self.site = site.lower()
 
         self.osparam()
 
@@ -322,8 +323,7 @@ class Livestream(Stream):
         if self.key:
             streamid = self.key
         else:
-            print('\n',' '.join(cmd),'\n')
-            streamid = getpass('{} Live Stream ID: '.format(self.site))
+            streamid = ''
 
         self.sink = [self.server + streamid]
 
@@ -333,7 +333,7 @@ class Livestream(Stream):
     def golive(self, sinks:list=None):
         """finally start the stream(s)"""
 
-        if self.sink[0].endswith('test'):
+        if self.key is None:
             print('\n',' '.join(self.cmd),'\n')
             return
 
@@ -362,9 +362,6 @@ class Screenshare(Livestream):
         if isinstance(sites,str):
             sites = [sites]
 
-        sites = [site.lower() for site in sites]
-        ini=Path(ini).expanduser()
-
         streams = []
         for site in sites:
             print('Config',site)
@@ -388,9 +385,6 @@ class Webcam(Livestream):
         if isinstance(sites,str):
             sites = [sites]
 
-        sites = [site.lower() for site in sites]
-        ini=Path(ini).expanduser()
-
         streams = []
         for site in sites:
             print('Config',site)
@@ -409,9 +403,7 @@ class FileIn(Livestream):
 
     def __init__(self, ini:Path, site:str, infn:Path, loop:bool=False, image:bool=False):
 
-        site = site.lower()
         vidsource = 'file'
-        ini=Path(ini).expanduser()
 
         stream = Livestream(ini, site, vidsource, image, loop, infn)
 
@@ -428,7 +420,6 @@ class SaveDisk(Stream):
         """
         site = 'file'
         vidsource = 'screen'
-        ini=Path(ini).expanduser()
 
         super().__init__(ini,site,vidsource)
 
