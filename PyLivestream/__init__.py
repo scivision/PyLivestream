@@ -45,12 +45,16 @@ def get_framerate(fn:Path) -> float:
 
     assert fn.is_file(), '{} is not a file'.format(fn)
 
-    fps = sp.check_output(['ffprobe','-v','error',
-                           '-select_streams','v:0','-show_entries','stream=avg_frame_rate',
-                           '-of','default=noprint_wrappers=1:nokey=1', str(fn)], universal_newlines=True)
+    try:
+        fps = sp.check_output(['ffprobe','-v','error',
+                               '-select_streams','v:0','-show_entries','stream=avg_frame_rate',
+                               '-of','default=noprint_wrappers=1:nokey=1', str(fn)], universal_newlines=True)
 
-    fps = fps.strip().split('/')
-    fps = int(fps[0]) / int(fps[1])
+        fps = fps.strip().split('/')
+        fps = int(fps[0]) / int(fps[1])
+    except FileNotFoundError:
+        fps = 30.
+        logging.error('ffprobe not found, simply assuming {} is {fps} fps!  May give unexpected results.')
 
     return fps
 
