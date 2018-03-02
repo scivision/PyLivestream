@@ -54,7 +54,7 @@ def get_framerate(fn:Path) -> float:
         fps = int(fps[0]) / int(fps[1])
     except FileNotFoundError:
         fps = 30.
-        logging.error('ffprobe not found, simply assuming {} is {fps} fps!  May give unexpected results.')
+        logging.error('ffprobe not found, simply assuming {} is {} frames/sec!  May give unexpected results.'.format(fn,fps))
 
     return fps
 
