@@ -249,26 +249,27 @@ Windows
 * `gdigrab <https://ffmpeg.org/ffmpeg-devices.html#gdigrab>`_
 
 DirectShow didn't work for me on Windows 10, so I used gdigrab instead.
+
 * `DirectShow <https://trac.ffmpeg.org/wiki/DirectShow>`_ device selection
 * DirectShow `examples <https://ffmpeg.org/ffmpeg-devices.html#Examples-4>`_
 
 Stream References
 -----------------
 
-* Twitch `parameters <https://help.twitch.tv/customer/portal/articles/1253460-broadcast-requirements>`_
+* `Twitch parameters <https://help.twitch.tv/customer/portal/articles/1253460-broadcast-requirements>`_
 * Twitch `servers <http://bashtech.net/twitch/ingest.php>`_
-* Periscope `parameters <https://www.pscp.tv/help/external-encoders>`_
-* YouTube Live `parameters <https://support.google.com/youtube/answer/2853702>`_
-* Facebook Live `parameters <https://www.facebook.com/facebookmedia/get-started/live>`_
-* Mixer `parameters <https://watchbeam.zendesk.com/hc/en-us/articles/210090606-Stream-Settings-the-basics>`_
+* `Periscope parameters <https://www.pscp.tv/help/external-encoders>`_
+* `YouTube Live parameters <https://support.google.com/youtube/answer/2853702>`_
+* `Facebook Live parameters <https://www.facebook.com/facebookmedia/get-started/live>`_
+* `Mixer parameters <https://watchbeam.zendesk.com/hc/en-us/articles/210090606-Stream-Settings-the-basics>`_
 * Mixer `server list <https://watchbeam.zendesk.com/hc/en-us/articles/209659883-How-to-change-your-Ingest-Server>`_
-* Ustream `parameters <https://support.ustream.tv/hc/en-us/articles/207852117-Internet-connection-and-recommended-encoding-settings>`_
+* `Ustream parameters <https://support.ustream.tv/hc/en-us/articles/207852117-Internet-connection-and-recommended-encoding-settings>`_
 * Vimeo `config <https://help.vimeo.com/hc/en-us/articles/115012811168>`_
 * Vimeo `parameters <https://help.vimeo.com/hc/en-us/articles/115012811208-Encoder-guides>`_
 
 
-Logo Credits:
-------------
+Logo Credits
+-------------
 * Owl PC: Creative Commons no attrib. commercial
 * YouTube: YouTube Brand Resources
 * Facebook: Wikimedia Commons
