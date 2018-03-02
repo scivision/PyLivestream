@@ -167,6 +167,9 @@ class Stream:
         """
         -ac 2 NOT -ac 1 to avoid "non monotonous DTS in output stream" errors
         """
+        if not self.audio_bps:
+            return []
+
         if not self.vidsource == 'file':
             return ['-f', self.acap, '-ac','2', '-i', self.audiochan]
         else: #  file input
@@ -179,6 +182,9 @@ class Stream:
         https://support.google.com/youtube/answer/2853702?hl=en
         https://www.facebook.com/facebookmedia/get-started/live
         """
+
+        if not self.audio_bps:
+            return []
 
         return ['-c:a','aac',
                 '-b:a', self.audio_bps,

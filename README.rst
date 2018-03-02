@@ -58,6 +58,7 @@ The ``[DEFAULT]`` section has parameters that can be overriden for each site, if
 * ``webcam_res``: webcam resolution -- find from ``v4l2-ctl --list-formats-ext`` or webcam spec sheet.
 * ``webcam_fps``: webcam fps -- found from command above or webcam spec sheet
 * ``audiofs``: audio sampling frequency. Typically 44100 Hz (CD quality).
+* ``audio_bps``: audio data rate--**leave blank if you want no audio** (usually used for "file", to make an animated GIF in post-processing)
 * ``preset``: ``veryfast`` or ``ultrafast`` if CPU not able to keep up.
 
 
