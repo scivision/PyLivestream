@@ -27,4 +27,4 @@ def test_loop():
 
 def test_disk():
     for s in sites:
-        PyLivestream.SaveDisk(inifn, os.devnull, clobber=True)
+        PyLivestream.SaveDisk(inifn, None)
