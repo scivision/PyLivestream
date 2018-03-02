@@ -20,7 +20,8 @@ if __name__ == '__main__':
     p = ArgumentParser()
     p.add_argument('ini',help='*.ini file with stream parameters')
     p.add_argument('outfn',help='video file to save to disk.')
+    p.add_argument('-c','--clobber',help='overwrite file with same name',action='store_true')
     p = p.parse_args()
 
 
-    PyLivestream.SaveDisk(p.ini, p.outfn)
+    PyLivestream.SaveDisk(p.ini, p.outfn, p.clobber)

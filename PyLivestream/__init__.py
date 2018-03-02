@@ -68,13 +68,16 @@ def get_resolution(fn:Path) -> tuple:
 
     assert fn.is_file(), '{} is not a file'.format(fn)
 
-    res = sp.check_output(['ffprobe','-v','error',
-                           '-of','flat=s=_',
-                           '-select_streams','v:0',
-                           '-show_entries','stream=height,width', str(fn)], universal_newlines=True)
+    try:
+        res = sp.check_output(['ffprobe','-v','error',
+                               '-of','flat=s=_',
+                               '-select_streams','v:0',
+                               '-show_entries','stream=height,width', str(fn)], universal_newlines=True)
 
-    res = res.strip().split('\n')
-    res = (int(res[0].split('=')[-1]), int(res[1].split('=')[-1]))
+        res = res.strip().split('\n')
+        res = (int(res[0].split('=')[-1]), int(res[1].split('=')[-1]))
+    except FileNotFoundError:
+        return
 
     return res
 
@@ -201,7 +204,12 @@ class Stream:
         if self.video_kbps: # per-site override
             return
 
-        x = int(self.res[1])
+        if self.res is not None:
+            x = int(self.res[1])
+        elif self.vidsource == 'file':
+            logging.warning('assuming 720p input, since ffprobe was not available.')
+            x = 720
+
 
         if self.fps <= 30:
             self.video_kbps = int(np.interp(x, BR30[:,0], BR30[:,1]))
@@ -212,8 +220,10 @@ class Stream:
     def screengrab(self) -> list:
         """choose to grab video from desktop. May not work for Wayland."""
         vid1 = ['-f', self.vcap,
-                '-r', str(self.fps),
-                '-s', 'x'.join(self.res)]
+                '-r', str(self.fps)]
+
+        if self.res is not None:
+            vid1 += ['-s', 'x'.join(self.res)]
 
         if sys.platform =='linux':
             vid1 += ['-i', ':0.0+{},{}'.format(self.origin[0], self.origin[1])]
@@ -408,7 +418,7 @@ class FileIn(Livestream):
 
 class SaveDisk(Stream):
 
-    def __init__(self, ini:Path, outfn:Path=None, vidsource:str='screen'):
+    def __init__(self, ini:Path, outfn:Path=None, clobber:bool=False):
         """
         records to disk screen capture with audio
 
@@ -430,7 +440,16 @@ class SaveDisk(Stream):
         aud1 = self.audiostream()
         aud2 = self.audiocomp()
 
-        cmd = [self.exe] + vid1 + aud1 + aud2 + [str(outfn)]
+        cmd = [self.exe] + vid1 + aud1 + aud2
+
+        if outfn.samefile(os.devnull): # for self-test
+            cmd += ['-f','flv']
+
+        cmd += [str(outfn)]
+
+        if clobber:
+            cmd += ['-y']
+
         if sys.platform == 'win32':
             cmd += ['-copy_ts']
 
