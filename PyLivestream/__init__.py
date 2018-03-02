@@ -120,6 +120,7 @@ class Stream:
 
         self.audiofs = C.get(self.site,'audiofs') # not getint
         self.preset = C.get(self.site,'preset')
+        self.timelimit = C.get(self.site,'timelimit',fallback=None)
 
         self.videochan = C.get(sys.platform,'videochan')
         self.audiochan = C.get(sys.platform,'audiochan')
@@ -127,6 +128,7 @@ class Stream:
         self.acap = C.get(sys.platform,'acap')
         self.hcam = C.get(sys.platform,'hcam')
         self.exe = C.get(sys.platform,'exe',fallback='ffmpeg')
+
 
         self.video_kbps = C.getint(self.site, 'video_kbps', fallback=None)
         self.audio_bps = C.get(self.site,'audio_bps')
@@ -447,6 +449,9 @@ class SaveDisk(Stream):
 
         cmd += [str(outfn)]
 
+        if self.timelimit:
+            cmd += ['-timelimit',self.timelimit]
+
         if clobber:
             cmd += ['-y']
 
@@ -456,6 +461,7 @@ class SaveDisk(Stream):
         print('\n',' '.join(cmd),'\n')
 
         if outfn:
-            sp.check_call(cmd )
+            ret = sp.run(cmd).returncode
+            print('FFmpeg returncode',ret)
         else:
             print('specify filename to save screen capture with audio to disk.')
