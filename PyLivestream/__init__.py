@@ -150,7 +150,7 @@ class Stream:
 
 
     def videostream(self) -> tuple:
-        """optimizes video settings for YouTube Live"""
+        """optimizes video settings"""
 # %% configure video input
         if self.vidsource == 'screen':
             vid1 = self.screengrab()
@@ -428,14 +428,14 @@ class SaveDisk(Stream):
 
         self.osparam()
 
-        vid1 = self.screengrab()
+        vid1,vid2 = self.videostream()
 
         aud1 = self.audiostream()
         aud2 = self.audiocomp()
 
-        cmd = [self.exe] + vid1 + aud1 + aud2
+        cmd = [self.exe] + vid1 + vid2 + aud1 + aud2
 
-        if isinstance(outfn,Path) and outfn.samefile(os.devnull): # for testing/benchmarks
+        if not outfn.suffix:  # ffmpeg relies on suffix for container type, this is a fallback.
             cmd += ['-f','flv']
 
         cmd += [str(outfn)]
