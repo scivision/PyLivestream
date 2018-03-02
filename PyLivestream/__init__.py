@@ -124,11 +124,11 @@ class Stream:
         self.timelimit = C.get(self.site,'timelimit',fallback=None)
 
         self.videochan = C.get(sys.platform,'videochan')
-        self.audiochan = C.get(sys.platform,'audiochan')
+        self.audiochan = C.get(sys.platform,'audiochan', fallback=None)
         self.vcap = C.get(sys.platform,'vcap')
-        self.acap = C.get(sys.platform,'acap')
+        self.acap = C.get(sys.platform,'acap', fallback=None)
         self.hcam = C.get(sys.platform,'hcam')
-        self.exe = C.get(sys.platform,'exe',fallback='ffmpeg')
+        self.exe = getexe(C.get(sys.platform,'exe',fallback='ffmpeg'))
 
 
         self.video_kbps = C.getint(self.site, 'video_kbps', fallback=None)
@@ -175,15 +175,18 @@ class Stream:
 
     def audiostream(self) -> list:
         """
+        -ac * may not be needed, took out.
         -ac 2 NOT -ac 1 to avoid "non monotonous DTS in output stream" errors
         """
-        if not self.audio_bps:
+        if not self.audio_bps or not self.acap or not self.audiochan:
             return []
 
         if not self.vidsource == 'file':
-            return ['-f', self.acap, '-ac','2', '-i', self.audiochan]
-        else: #  file input
-            return ['-ac','2']
+            return ['-f', self.acap, '-i', self.audiochan]
+        else: # file input
+            return []
+#        else: #  file input
+#            return ['-ac','2']
 
 
     def audiocomp(self) -> list:
@@ -193,7 +196,7 @@ class Stream:
         https://www.facebook.com/facebookmedia/get-started/live
         """
 
-        if not self.audio_bps:
+        if not self.audio_bps or not self.acap or not self.audiochan:
             return []
 
         return ['-c:a','aac',
@@ -231,7 +234,8 @@ class Stream:
         if sys.platform =='linux':
             vid1 += ['-i', ':0.0+{},{}'.format(self.origin[0], self.origin[1])]
         elif sys.platform =='win32':
-            vid1 += ['-i', self.videochan]
+            vid1 += ['-offset_x',self.origin[0],'-offset_y',self.origin[1],
+                     '-i', self.videochan,]
         elif sys.platform == 'darwin':
             pass  # FIXME: verify
 
@@ -433,9 +437,9 @@ class SaveDisk(Stream):
         aud1 = self.audiostream()
         aud2 = self.audiocomp()
 
-        cmd = [self.exe] + vid1 + vid2 + aud1 + aud2
+        cmd = [self.exe] + vid1 + aud1 + vid2 + aud2
 
-        if not outfn.suffix:  # ffmpeg relies on suffix for container type, this is a fallback.
+        if outfn and not outfn.suffix:  # ffmpeg relies on suffix for container type, this is a fallback.
             cmd += ['-f','flv']
 
         cmd += [str(outfn)]
@@ -446,13 +450,16 @@ class SaveDisk(Stream):
         if clobber:
             cmd += ['-y']
 
-        if sys.platform == 'win32':
-            cmd += ['-copy_ts']
+#        if sys.platform == 'win32':
+#            cmd += ['-copy_ts']
 
         print('\n',' '.join(cmd),'\n')
 
         if outfn:
-            ret = sp.run(cmd).returncode
-            print('FFmpeg returncode',ret)
+            try:
+                ret = sp.run(cmd).returncode
+                print('FFmpeg returncode',ret)
+            except FileNotFoundError:
+                pass
         else:
             print('specify filename to save screen capture with audio to disk.')

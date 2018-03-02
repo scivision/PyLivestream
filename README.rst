@@ -245,6 +245,10 @@ FFmpeg References
 
 Windows
 ~~~~~~~
+
+* `gdigrab <https://ffmpeg.org/ffmpeg-devices.html#gdigrab>`_
+
+DirectShow didn't work for me on Windows 10, so I used gdigrab instead.
 * `DirectShow <https://trac.ffmpeg.org/wiki/DirectShow>`_ device selection
 * DirectShow `examples <https://ffmpeg.org/ffmpeg-devices.html#Examples-4>`_
 
