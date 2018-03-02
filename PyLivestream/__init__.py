@@ -444,7 +444,7 @@ class SaveDisk(Stream):
 
         cmd = [self.exe] + vid1 + aud1 + aud2
 
-        if outfn.samefile(os.devnull): # for self-test
+        if isinstance(outfn,Path) and outfn.samefile(os.devnull): # for testing/benchmarks
             cmd += ['-f','flv']
 
         cmd += [str(outfn)]
