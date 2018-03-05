@@ -18,9 +18,9 @@ if __name__ == '__main__':
 
     from argparse import ArgumentParser
     p = ArgumentParser()
-    p.add_argument('ini',help='*.ini file with stream parameters')
     p.add_argument('outfn',help='video file to save to disk.')
     p.add_argument('-c','--clobber',help='overwrite file with same name',action='store_true')
+    p.add_argument('-i','--ini',help='*.ini file with stream parameters',default='stream.ini')
     p = p.parse_args()
 
 

@@ -21,10 +21,10 @@ if __name__ == '__main__':
 
     from argparse import ArgumentParser
     p = ArgumentParser()
-    p.add_argument('ini',help='config file')
     p.add_argument('site',help='site to stream to [youtube,periscope,facebook,twitch]')
     p.add_argument('path',help='path to discover files from')
     p.add_argument('glob',help='file glob pattern to stream.')
+    p.add_argument('-i','--ini',help='*.ini file with stream parameters',default='stream.ini')
     p.add_argument('-image',help='static image to display, typically used for audio-only files.')
     p.add_argument('-loop',help='repeat the globbed file list endlessly',action='store_true')
     p = p.parse_args()
@@ -35,7 +35,7 @@ if __name__ == '__main__':
     if not flist:
         raise FileNotFoundError('did not find any video files with {} {}'.format(path,p.glob))
 
-    print('streaming to YouTube Live these files. Be sure list is correct! \n')
+    print('streaming these files. Be sure list is correct! \n')
     print('\n'.join([str(f) for f in flist]))
 
     if p.loop:

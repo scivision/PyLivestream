@@ -89,7 +89,7 @@ YouTube Live
 
 ::
 
-    python ScreenshareLivestream.py stream.ini youtube
+    python ScreenshareLivestream.py youtube
 
 
 Facebook Live
@@ -100,7 +100,7 @@ Facebook Live
 
 ::
 
-    python ScreenshareLivestream.py stream.ini facebook
+    python ScreenshareLivestream.py facebook
 
 
 Periscope
@@ -114,7 +114,7 @@ Periscope
 
 ::
 
-    python ScreenshareLivestream.py stream.ini periscope
+    python ScreenshareLivestream.py periscope
 
 I prefer using the Phone method as then the phone is a "second screen" where I can see if the stream is lagging, and if I "leave broadcast" and come back in, I can comment from my phone etc.
 
@@ -145,11 +145,11 @@ Webcam
 ------
 Audio is included::
 
-    python WebcamLivestream.py stream.ini site(s)
+    python WebcamLivestream.py site(s)
 
 Stream to multiple sites, in this example Periscope and YouTube Live simultaneously::
 
-    python WebcamLivestream.py stream.ini youtube periscope
+    python WebcamLivestream.py youtube periscope
 
 
 
@@ -157,11 +157,11 @@ Screen Share Livestream
 -----------------------
 Audio is included::
 
-    python ScreenshareLivestream.py stream.ini site(s)
+    python ScreenshareLivestream.py site(s)
 
 Stream to multiple sites, in this example Periscope and YouTube Live simultaneously::
 
-    python ScreenshareLivestream.py stream.ini youtube periscope
+    python ScreenshareLivestream.py youtube periscope
 
 
 File Input
@@ -172,14 +172,14 @@ Loop single video endlessly
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ::
 
-    python FileLoopLivestream.py stream.ini site videofile
+    python FileLoopLivestream.py site videofile
 
 
 several video files
 ~~~~~~~~~~~~~~~~~~~
 Glob list of video files to stream::
 
-    python FileGlobLivestream.py stream.ini site path pattern
+    python FileGlobLivestream.py site path pattern
 
 -loop       optionally loop endlessly the globbed file list
 
@@ -188,13 +188,13 @@ stream all videos in directory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Example: all AVI videos in directory ``~/Videos``::
 
-    python FileGlobLivestream.py stream.ini youtube ~/Videos "*.avi"
+    python FileGlobLivestream.py youtube ~/Videos "*.avi"
 
 stream endlessly looping videos
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Example: all AVI videos in ``~/Videos`` are endlessly looped::
 
-    python FileGlobLivestream.py stream.ini youtube ~/Videos "*.avi" -loop
+    python FileGlobLivestream.py youtube ~/Videos "*.avi" -loop
 
 
 stream all audio files in directory
@@ -202,7 +202,7 @@ stream all audio files in directory
 Glob list of video files to stream.
 Must include a static image (could be your logo)::
 
-    python FileGlobLivestream.py stream.ini site path pattern -i image
+    python FileGlobLivestream.py site path pattern -i image
 
 path      path to where video files are
 pattern   e.g. ``*.avi``  pattern matching video files
@@ -210,14 +210,14 @@ pattern   e.g. ``*.avi``  pattern matching video files
 
 Example: stream all .mp3 audio under ``~/Library`` directory::
 
-    python FileGlobLivestream.py stream.ini youtube ~/Library "*.mp3" -i mylogo.jpg
+    python FileGlobLivestream.py youtube ~/Library "*.mp3" -i mylogo.jpg
 
 
 Screen capture to disk
 ----------------------
 This script saves your screen capture to a file on your disk::
 
-    python ScreenCapture2disk.py stream.ini myvid.avi
+    python ScreenCapture2disk.py myvid.avi
 
 
 
