@@ -102,6 +102,8 @@ class Stream:
         C = ConfigParser()
         C.read(str(self.ini))
 
+        assert self.site in C,'Your site {} is not found in {}'.format(self.site,self.ini)
+
         if sys.platform.startswith('linux'):
             if 'XDG_SESSION_TYPE' in os.environ and os.environ['XDG_SESSION_TYPE'] == 'wayland':
                 logging.error('Wayland may only give black output with cursor. Login with X11 desktop')
