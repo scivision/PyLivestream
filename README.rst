@@ -4,6 +4,9 @@
 .. image:: https://coveralls.io/repos/github/scivision/PyLivestream/badge.svg?branch=master
     :target: https://coveralls.io/github/scivision/PyLivestream?branch=master
 
+.. image:: https://ci.appveyor.com/api/projects/status/uwhsko29b1g5c3no?svg=true
+    :target: https://ci.appveyor.com/project/scivision/pylivestream
+
 .. image:: https://img.shields.io/pypi/pyversions/PyLivestream.svg
   :target: https://pypi.python.org/pypi/PyLivestream
   :alt: Python versions (PyPI)
@@ -38,8 +41,14 @@ Uses an ``.ini`` file to adjust all parameters.
 
 Install
 =======
-::
 
+Latest release::
+
+    python -m pip install PyLivestream
+
+Development version: git clone, then::
+
+    
     python -m pip install -e .
 
 
@@ -125,7 +134,7 @@ Twitch
 1. create stream from `Twitch Dashboard <http://www.twitch.tv/broadcast/dashboard>`_
 2. Run Python script for Twitch with chosen input
 
-If you are not in the Northeast US, edit `stream.ini` to have the `closest server <http://bashtech.net/twitch/ingest.php>`_.
+If you are not in the Northeast US, edit ``stream.ini`` to have the `closest server <http://bashtech.net/twitch/ingest.php>`_.
 
 
 Usage

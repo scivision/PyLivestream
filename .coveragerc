@@ -1,0 +1,12 @@
+[run]
+omit =
+    /home/travis/virtualenv/*
+    
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    raise NotImplementedError
+    raise ImportError
+    raise ValueError
+    raise TypeError

@@ -36,7 +36,7 @@ if __name__ == '__main__':
         raise FileNotFoundError('did not find any video files with {} {}'.format(path,p.glob))
 
     print('streaming these files. Be sure list is correct! \n')
-    print('\n'.join([str(f) for f in flist]))
+    print('\n'.join(map(str,flist)))
 
     if p.loop:
         while True:

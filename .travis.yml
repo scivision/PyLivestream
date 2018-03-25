@@ -17,9 +17,11 @@ git:
 install: pip -q install -e .[tests]
 
 script:
-  - pytest
-  - if [[ $TRAVIS_PYTHON_VERSION == 3.6* ]]; then coverage run tests/test_all.py -v; fi
+  - pytest -v
 
 after_success:
-  - if [[ $TRAVIS_PYTHON_VERSION == 3.6* ]]; then coveralls; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.6* ]]; then 
+    coverage run tests/test_all.py;
+    coveralls; 
+    fi
 
