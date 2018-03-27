@@ -1,4 +1,5 @@
 [run]
+cover_pylib = false
 omit =
     /home/travis/virtualenv/*
     
@@ -6,7 +7,7 @@ omit =
 exclude_lines =
     pragma: no cover
     def __repr__
-    raise NotImplementedError
-    raise ImportError
-    raise ValueError
-    raise TypeError
+    RuntimeError
+    NotImplementedError
+    ImportError
+
