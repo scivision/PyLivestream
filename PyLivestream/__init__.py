@@ -146,7 +146,7 @@ class Stream:
         if not keyfn:  # '' or None
             self.key = None
         else:
-            key = Path(keyfn).expanduser().resolve()
+            key = Path(keyfn).expanduser()#  .resolve()  # Python >= 3.6 required for .resolve(strict=False)
             self.key = key.read_text().strip() if key.is_file() else keyfn
 
 
