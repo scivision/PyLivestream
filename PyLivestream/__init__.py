@@ -143,14 +143,11 @@ class Stream:
         self.server = C.get(self.site,'server', fallback=None)
 # %% Key (hexaecimal stream ID)
         keyfn = C.get(self.site,'key', fallback=None)
-        if not keyfn:
+        if not keyfn:  # '' or None
             self.key = None
         else:
-            try:
-                self.key = Path(keyfn).expanduser().read_text().strip()
-            except FileNotFoundError:
-                logging.error('did not find {}'.format(keyfn))
-                self.key = None
+            key = Path(keyfn).expanduser().resolve()
+            self.key = key.read_text().strip() if key.is_file() else keyfn
 
 
     def videostream(self) -> Tuple[list,list]:
@@ -299,6 +296,9 @@ class Stream:
         fast native Python argmin()
         https://stackoverflow.com/a/11825864
         """
+        if not streams:
+            return
+
         vid_bw = [stream.video_kbps for stream in streams]
 
         return min(range(len(vid_bw)), key=vid_bw.__getitem__)
@@ -338,7 +338,7 @@ class Livestream(Stream):
             print('\n',' '.join(self.cmd),'\n')
             return
 
-        if sinks is None: # single stream
+        if not sinks: # single stream
             print('\n',' '.join(self.cmd))
             sp.check_call(self.cmd)
         else: # multi-stream output tee
@@ -371,6 +371,9 @@ class Screenshare(Livestream):
                 self.streams.append(stream)
                 self.sites.append(site)
 
+        if not self.streams:
+            raise ValueError('No valid stream key files or keys were found in {}'.format(ini))
+
 
     def golive(self):
 
@@ -395,6 +398,9 @@ class Webcam(Livestream):
             if stream.key:
                 self.streams.append(stream)
                 self.sites.append(site)
+
+        if not self.streams:
+            raise ValueError('No valid stream key files or keys were found in {}'.format(ini))
 
 
     def golive(self):
