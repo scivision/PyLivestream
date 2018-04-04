@@ -9,26 +9,28 @@ sites = ['periscope','youtube','facebook','twitch','mixer','ustream','vimeo']
 
 
 def test_screenshare():
-    for s in sites:
-        p = PyLivestream.Screenshare(inifn, s)
-        if s == 'periscope':
-            assert p.streams[0].video_kbps == 800
-        elif p.streams:
-            assert p.streams[0].video_kbps == 1800
+
+    S = PyLivestream.Screenshare(inifn, sites)
+    for s in S.streams:
+        if s.site == 'periscope':
+            assert s.video_kbps == 800
+        else:
+            assert s.video_kbps == 1800
 
 
 
 
 def test_webcam():
-    for s in sites:
-        p = PyLivestream.Webcam(inifn, s)
-        if s == 'periscope':
-            assert p.streams[0].video_kbps == 800
-        elif p.streams:
-            if int(p.streams[0].res[1]) == 480:
-                assert p.streams[0].video_kbps == 500
-            elif int(p.streams[0].res[1]) == 720:
-                assert p.streams[0].video_kbps == 1800
+
+    S = PyLivestream.Webcam(inifn, sites)
+    for s in S.streams:
+        if s.site == 'periscope':
+            assert s.video_kbps == 800
+        else:
+            if int(s.res[1]) == 480:
+                assert s.video_kbps == 500
+            elif int(s.res[1]) == 720:
+                assert s.video_kbps == 1800
 
 
 def test_loop():
