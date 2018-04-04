@@ -40,6 +40,9 @@ def test_loop():
         if s == 'periscope':
             assert p.stream.video_kbps == 800
         else:
+            if p.stream.res is None:
+                continue
+
             if int(p.stream.res[1]) == 480:
                 assert p.stream.video_kbps == 500
             elif int(p.stream.res[1]) == 720:
