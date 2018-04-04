@@ -161,7 +161,7 @@ the default behavior is that if FFmpeg detects one stream has failed, ALL stream
 * ``stream.ini`` is setup for your computer and desired parameters
 * ``site`` is ``facebook``, ``periscope``, ``youtube``, etc.
 * For ``Webcam.py`` and ``Screenshare.py``, more than one ``site`` can be specified for simultaneous multi-streaming
-* remember to setup a ``*.key`` file with the hexadecimal stream key for EACH site first, OR input the stream key into the "key:" field of your *.ini file.
+* remember to setup a ``*.key`` file with the hexadecimal stream key for EACH site first, OR input the stream key into the "key:" field of your ``*.ini`` file.
 
 
 Webcam
