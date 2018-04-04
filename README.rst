@@ -46,8 +46,11 @@ Latest release::
 
     python -m pip install PyLivestream
 
-Development version: git clone, then::
+Development version::
 
+    git clone https://github.com/scivision/PyLivestream
+    
+    cd PyLivestream
     
     python -m pip install -e .
 
@@ -59,7 +62,7 @@ The defaults might work to get you started.
 
 
 The ``stream.ini`` file contains parameters relevant to your stream.
-The ``[DEFAULT]`` section has parameters that can be overriden for each site, if desired.
+The ``[DEFAULT]`` section has parameters that can be overridden for each site, if desired.
 
 * ``screencap_origin``: origin (upper left corner) of screen capture region in pixels.
 * ``screencap_res``: resolution of screen capture (area to capture, starting from origin)
@@ -90,11 +93,16 @@ The included ``stream.ini`` is with default servers for the Northeastern USA.
 Stream Start
 ============
 
+The program will load a ``*.key`` file according to the configuration file key for the website.
+For example, Periscope expects to see the stream hexadecimal key in ``periscope.key``, as obtained from the app.
+Likewise, YouTube expects a file ``youtube.key`` with the hexadecimal stream key and so on.
+
 YouTube Live
 ------------
 
 1. `configure  <https://www.youtube.com/live_dashboard>`_ YouTube Live.
-2. Run Python script and chosen input will stream on YouTube Live.
+2. Edit file ``youtube.key`` to have the YouTube hexadecimal stream key
+3. Run Python script and chosen input will stream on YouTube Live.
 
 ::
 
@@ -104,8 +112,9 @@ YouTube Live
 Facebook Live
 -------------
 
-1. configure your Facebook Live stream, get stream ID from `https://www.facebook.com/live/create <https://www.facebook.com/live/create>`_
-2. Run Python script for Facebook with chosen input
+1. configure your Facebook Live stream
+2. Put stream ID from `https://www.facebook.com/live/create <https://www.facebook.com/live/create>`_  into the file ``facebook.key``
+3. Run Python script for Facebook with chosen input
 
 ::
 
@@ -119,7 +128,8 @@ Periscope
 
    * from phone Periscope app, go to Profile -> Settings -> Periscope Producer and see your Stream Key. The "checking source" button will go to "preview stream" once you do step #2.
    * from computer web browser, go to `https://www.periscope.tv/account/producer <https://www.periscope.tv/account/producer>`_ and Create New Source.
-2. Run Python script for Periscope with chosen input
+2. Put the hexadecimal stream key into ``periscope.key``
+3. Run Python script for Periscope with chosen input
 
 ::
 
@@ -131,10 +141,14 @@ I prefer using the Phone method as then the phone is a "second screen" where I c
 Twitch
 ------
 
-1. create stream from `Twitch Dashboard <http://www.twitch.tv/broadcast/dashboard>`_
-2. Run Python script for Twitch with chosen input
+1. create stream from `Twitch Dashboard <http://www.twitch.tv/broadcast/dashboard>`_. If you are not in the Northeast US, edit ``stream.ini`` to have the `closest server <http://bashtech.net/twitch/ingest.php>`_.
+2. put Twitch stream key into file ``twitch.key``
+3. Run Python script for Twitch with chosen input
 
-If you are not in the Northeast US, edit ``stream.ini`` to have the `closest server <http://bashtech.net/twitch/ingest.php>`_.
+
+::
+
+    python ScreenshareLivestream.py twitch
 
 
 Usage
@@ -147,7 +161,7 @@ the default behavior is that if FFmpeg detects one stream has failed, ALL stream
 * ``stream.ini`` is setup for your computer and desired parameters
 * ``site`` is ``facebook``, ``periscope``, ``youtube``, etc.
 * For ``Webcam.py`` and ``Screenshare.py``, more than one ``site`` can be specified for simultaneous multi-streaming
-
+* remember to setup a ``*.key`` file with the hexadecimal stream key for EACH site first.
 
 
 Webcam

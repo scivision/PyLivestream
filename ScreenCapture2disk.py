@@ -21,7 +21,16 @@ if __name__ == '__main__':
     p.add_argument('outfn',help='video file to save to disk.')
     p.add_argument('-c','--clobber',help='overwrite file with same name',action='store_true')
     p.add_argument('-i','--ini',help='*.ini file with stream parameters',default='stream.ini')
+    p.add_argument('-y','--yes',help='no confirmation dialog',action='store_true')
     p = p.parse_args()
 
 
-    PyLivestream.SaveDisk(p.ini, p.outfn, p.clobber)
+    s = PyLivestream.SaveDisk(p.ini, p.outfn, p.clobber)
+# %%
+    if p.yes:
+        print('saving screen capture to',s.outfn)
+    else:
+        input("Press Enter to screen capture to file {}.    Or Ctrl C to abort.".format(s.outfn))
+
+
+    s.save()

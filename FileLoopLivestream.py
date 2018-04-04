@@ -16,7 +16,15 @@ if __name__ == '__main__':
     p.add_argument('infn',help='file to stream, looping endlessly.')
     p.add_argument('site',help='site to stream to [youtube,periscope,facebook,twitch]')
     p.add_argument('-i','--ini',help='*.ini file with stream parameters',default='stream.ini')
+    p.add_argument('-y','--yes',help='no confirmation dialog',action='store_true')
     p = p.parse_args()
 
 
-    PyLivestream.FileIn(p.ini, p.site, p.infn, loop=True)
+    s = PyLivestream.FileIn(p.ini, p.site, p.infn, loop=True)
+# %% Go live
+    if p.yes:
+        print('going live on',s.stream.site,'looping file',s.stream.infn)
+    else:
+        input("Press Enter to go live on {}, looping file {}.    Or Ctrl C to abort.".format(s.stream.site, s.stream.infn))
+
+    s.golive()

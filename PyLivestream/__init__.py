@@ -1,24 +1,26 @@
 from pathlib import Path
-import numpy as np
+from collections import OrderedDict # not needed python >= 3.6
+import bisect
 import subprocess as sp
 import logging,os,sys
 from configparser import ConfigParser
+from typing import Tuple
 # %%  Col0: vertical pixels (height). Col1: video kbps. Interpolates between these resolutions.
-BR30 = np.array(
-        [[240,    300],
-         [360,    400],
-         [480,    500],
-         [540,    800],
-         [720,   1800],
-         [1080,  3000],
-         [1440,  6000],
-         [2160, 13000]])
+BR30 = OrderedDict([
+        (240,300),
+        (360,400),
+        (480,500),
+        (540,800),
+        (720,1800),
+       (1080,3000),
+       (1440,6000),
+       (2160,13000)])
 
-BR60 = np.array(
-        [[720,   2250],
-         [1080,  4500],
-         [1440,  9000],
-         [2160, 20000]])
+BR60 = OrderedDict([
+       (720,2250),
+       (1080,4500),
+       (1440,9000),
+       (2160,20000)])
 
 
 def getexe(exe:str=None) -> str:
@@ -58,7 +60,7 @@ def get_framerate(fn:Path) -> float:
     return fps
 
 
-def get_resolution(fn:Path) -> tuple:
+def get_resolution(fn:Path) -> Tuple[int,int]:
     """
     get resolution (widthxheight) of video file
     http://trac.ffmpeg.org/wiki/FFprobeTips#WidthxHeight
@@ -139,7 +141,7 @@ class Stream:
         self.keyframe_sec = C.getint(self.site,'keyframe_sec')
 
         self.server = C.get(self.site,'server', fallback=None)
-
+# %% Key (hexaecimal stream ID)
         keyfn = C.get(self.site,'key', fallback=None)
         if not keyfn:
             self.key = None
@@ -151,7 +153,7 @@ class Stream:
                 self.key = None
 
 
-    def videostream(self) -> tuple:
+    def videostream(self) -> Tuple[list,list]:
         """optimizes video settings"""
 # %% configure video input
         if self.vidsource == 'screen':
@@ -220,9 +222,9 @@ class Stream:
 
 
         if self.fps <= 30:
-            self.video_kbps = int(np.interp(x, BR30[:,0], BR30[:,1]))
+            self.video_kbps = list(BR30.values())[bisect.bisect_left(list(BR30.keys()), x)]
         else:
-            self.video_kbps = int(np.interp(x, BR60[:,0], BR60[:,1]))
+            self.video_kbps = list(BR60.values())[bisect.bisect_left(list(BR60.keys()), x)]
 
 
     def screengrab(self) -> list:
@@ -258,11 +260,7 @@ class Stream:
 
         fn = Path(self.infn).expanduser()
 
-        if self.image:
-            vid1 = ['-loop','1']
-        else:
-            vid1 = ['-re']
-
+        vid1 = ['-loop','1'] if self.image else ['-re']
 
         if self.loop:
             vid1 += ['-stream_loop','-1']  # FFmpeg >= 3
@@ -293,7 +291,7 @@ class Stream:
         return buf
 
 
-    def unify_streams(self,streams:list) -> int:
+    def unify_streams(self, streams:list) -> int:
         """
         find least common denominator stream settings so "tee" output can generate multiple streams.
         First try: use stream with lowest video bitrate.
@@ -308,7 +306,7 @@ class Stream:
 
 class Livestream(Stream):
 
-    def __init__(self,ini,site,vidsource,image=False,loop=False,infn=None):
+    def __init__(self,ini:Path, site:str, vidsource:str, image:bool=False, loop:bool=False, infn:Path=None):
         super().__init__(ini,site,vidsource,image,loop,infn)
 
         self.site = site.lower()
@@ -326,10 +324,7 @@ class Livestream(Stream):
 
         cmd = [self.exe] + vid1 + aud1 + vid2 + aud2 + buf
 
-        if self.key:
-            streamid = self.key
-        else:
-            streamid = ''
+        streamid = self.key if self.key else ''
 
         self.sink = [self.server + streamid]
 
@@ -368,18 +363,20 @@ class Screenshare(Livestream):
         if isinstance(sites,str):
             sites = [sites]
 
-        streams = []
+        self.streams = []
+        self.sites = []
         for site in sites:
-            print('Config',site)
-            streams.append(Livestream(ini,site,vidsource))
+            stream = Livestream(ini,site,vidsource)
+            if stream.key:
+                self.streams.append(stream)
+                self.sites.append(site)
 
-        if len(streams)==1:
-            streams[0].golive()
-            return
 
-        sinks = [stream.sink[0] for stream in streams]
+    def golive(self):
 
-        streams[self.unify_streams(streams)].golive(sinks)
+        sinks = [stream.sink[0] for stream in self.streams]
+
+        self.streams[self.unify_streams(self.streams)].golive(sinks)
 
 
 class Webcam(Livestream):
@@ -391,18 +388,20 @@ class Webcam(Livestream):
         if isinstance(sites,str):
             sites = [sites]
 
-        streams = []
+        self.streams = []
+        self.sites = []
         for site in sites:
-            print('Config',site)
-            streams.append(Livestream(ini,site,vidsource))
+            stream = Livestream(ini,site,vidsource)
+            if stream.key:
+                self.streams.append(stream)
+                self.sites.append(site)
 
-        if len(streams)==1:
-            streams[0].golive()
-            return
 
-        sinks = [stream.sink[0] for stream in streams]
+    def golive(self):
 
-        streams[self.unify_streams(streams)].golive(sinks)
+        sinks = [stream.sink[0] for stream in self.streams]
+
+        self.streams[self.unify_streams(self.streams)].golive(sinks)
 
 
 class FileIn(Livestream):
@@ -411,9 +410,11 @@ class FileIn(Livestream):
 
         vidsource = 'file'
 
-        stream = Livestream(ini, site, vidsource, image, loop, infn)
+        self.stream = Livestream(ini, site, vidsource, image, loop, infn)
 
-        stream.golive()
+
+    def golive(self):
+        self.stream.golive()
 
 
 class SaveDisk(Stream):
@@ -429,8 +430,7 @@ class SaveDisk(Stream):
 
         super().__init__(ini,site,vidsource)
 
-        if outfn:
-            outfn = Path(outfn).expanduser()
+        self.outfn = Path(outfn).expanduser() if outfn else None
 
         self.osparam()
 
@@ -439,27 +439,29 @@ class SaveDisk(Stream):
         aud1 = self.audiostream()
         aud2 = self.audiocomp()
 
-        cmd = [self.exe] + vid1 + aud1 + vid2 + aud2
+        self.cmd = [self.exe] + vid1 + aud1 + vid2 + aud2
 
-        if outfn and not outfn.suffix:  # ffmpeg relies on suffix for container type, this is a fallback.
-            cmd += ['-f','flv']
+        if self.outfn and not self.outfn.suffix:  # ffmpeg relies on suffix for container type, this is a fallback.
+            self.cmd += ['-f','flv']
 
-        cmd += [str(outfn)]
+        self.cmd += [str(self.outfn)]
 
         if self.timelimit:
-            cmd += ['-timelimit',self.timelimit]
+            self.cmd += ['-timelimit',self.timelimit]
 
         if clobber:
-            cmd += ['-y']
+            self.cmd += ['-y']
 
 #        if sys.platform == 'win32':
 #            cmd += ['-copy_ts']
 
-        print('\n',' '.join(cmd),'\n')
+    def save(self):
 
-        if outfn:
+        print('\n',' '.join(self.cmd),'\n')
+
+        if self.outfn:
             try:
-                ret = sp.run(cmd).returncode
+                ret = sp.check_call(self.cmd)
                 print('FFmpeg returncode',ret)
             except FileNotFoundError:
                 pass
