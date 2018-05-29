@@ -51,6 +51,8 @@ class Stream:
             if os.environ['XDG_SESSION_TYPE'] == 'wayland':
                 logging.error('Wayland may only give black output with cursor. Login with X11 desktop')
 
+        self.exe, self.probeexe = sio.getexe(C.get(sys.platform,'exe',fallback='ffmpeg'))
+
         if self.vidsource == 'camera':
             self.res = C.get(self.site,'webcam_res').split('x')
             self.fps = C.getint(self.site,'webcam_fps')
@@ -59,8 +61,8 @@ class Stream:
             self.fps = C.getint(self.site,'screencap_fps')
             self.origin = C.get(self.site,'screencap_origin').split(',')
         elif self.vidsource == 'file':
-            self.res = sio.get_resolution(self.infn)
-            self.fps = sio.get_framerate(self.infn)
+            self.res = sio.get_resolution(self.infn, self.probeexe)
+            self.fps = sio.get_framerate(self.infn, self.probeexe)
         else:
             raise ValueError('unknown video source {}'.format(self.vidsource))
 
@@ -73,7 +75,6 @@ class Stream:
         self.vcap = C.get(sys.platform,'vcap')
         self.acap = C.get(sys.platform,'acap', fallback=None)
         self.hcam = C.get(sys.platform,'hcam')
-        self.exe = sio.getexe(C.get(sys.platform,'exe',fallback='ffmpeg'))
 
 
         self.video_kbps = C.getint(self.site, 'video_kbps', fallback=None)

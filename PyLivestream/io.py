@@ -1,6 +1,5 @@
 import json
 import io
-import logging
 import subprocess
 from pathlib import Path
 from typing import Tuple
@@ -8,27 +7,39 @@ from typing import Tuple
 DEVNULL = subprocess.DEVNULL
 
 
-def getexe(exe:str=None) -> str:
+def getexe(exe:Path=None) -> Tuple[Path,Path]:
     """checks that host streaming program is installed"""
 
     if not exe:
         exe = 'ffmpeg'
+        probeexe = 'ffprobe'
+    else:
+        probeexe = Path(exe).parent / 'ffprobe'
 
+    exe = Path(exe).expanduser()
+    probeexe = Path(probeexe).expanduser()
+# %% verify
     try:
         subprocess.check_call((exe,'-h'),
                               stdout=DEVNULL, stderr=DEVNULL)
-    except FileNotFoundError: # just return FFmpeg command line
-        logging.critical('FFmpeg not found at {}, will simply tell you what I would have done.'.format(exe))
+    except FileNotFoundError as e:
+        raise FileNotFoundError('FFmpeg not found at {}  {}.'.format(exe,e))
 
-    return exe
+    try:
+        subprocess.check_call((probeexe,'-h'),
+                              stdout=DEVNULL, stderr=DEVNULL)
+    except FileNotFoundError as e:
+        raise FileNotFoundError('FFprobe not found at {}  {}.'.format(probeexe,e))
+
+    return exe, probeexe
 
 
-def get_resolution(fn:Path) -> Tuple[int,int]:
+def get_resolution(fn:Path, exe:Path) -> Tuple[int,int]:
     """
     get resolution (widthxheight) of video file
     http://trac.ffmpeg.org/wiki/FFprobeTips#WidthxHeight
 
-    It takes resolution from the first video stream in the file it finds.
+    Uses FFprobe to take resolution from the first video stream in the file it finds.
 
     inputs:
     ------
@@ -44,7 +55,7 @@ def get_resolution(fn:Path) -> Tuple[int,int]:
 
     assert fn.is_file(), '{} is not a file'.format(fn)
 
-    cmd = ['ffprobe','-v','error', '-print_format','json',
+    cmd = [str(exe),'-v','error', '-print_format','json',
            '-show_streams', str(fn)]
 
     ret = subprocess.check_output(cmd, universal_newlines=True)
@@ -61,12 +72,12 @@ def get_resolution(fn:Path) -> Tuple[int,int]:
     return res
 
 
-def get_framerate(fn:Path) -> float:
+def get_framerate(fn:Path, exe:Path) -> float:
     """
     get framerate of video file
     http://trac.ffmpeg.org/wiki/FFprobeTips#FrameRate
 
-    It takes framerate from the first video stream in the file it finds.
+    uses FFprobe to take framerate from the first video stream in the file it finds.
 
     inputs:
     ------
@@ -82,7 +93,7 @@ def get_framerate(fn:Path) -> float:
 
     assert fn.is_file(), '{} is not a file'.format(fn)
 
-    cmd = ['ffprobe','-v','error', '-print_format','json',
+    cmd = [str(exe),'-v','error', '-print_format','json',
        '-show_streams', str(fn)]
 
     ret = subprocess.check_output(cmd, universal_newlines=True)
