@@ -33,9 +33,26 @@ def test_webcam():
                 assert s.video_kbps == 1800
 
 
-def test_loop():
+def test_filein_video():
     for s in sites:
         p = PyLivestream.FileIn(inifn,s, rdir/'star_collapse_out.avi')
+
+        if s == 'periscope':
+            assert p.stream.video_kbps == 800
+        else:
+            if p.stream.res is None:
+                continue
+
+            if int(p.stream.res[1]) == 480:
+                assert p.stream.video_kbps == 500
+            elif int(p.stream.res[1]) == 720:
+                assert p.stream.video_kbps == 1800
+
+def test_filein_audio():
+    flist = list(rdir.glob('*.ogg'))
+
+    for s in sites:
+        p = PyLivestream.FileIn(inifn,s, flist[0])
 
         if s == 'periscope':
             assert p.stream.video_kbps == 800
