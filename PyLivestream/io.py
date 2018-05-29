@@ -20,13 +20,13 @@ def getexe(exe:Path=None) -> Tuple[Path,Path]:
     probeexe = Path(probeexe).expanduser()
 # %% verify
     try:
-        subprocess.check_call((exe,'-h'),
+        subprocess.check_call((str(exe),'-h'),
                               stdout=DEVNULL, stderr=DEVNULL)
     except FileNotFoundError as e:
         raise FileNotFoundError('FFmpeg not found at {}  {}.'.format(exe,e))
 
     try:
-        subprocess.check_call((probeexe,'-h'),
+        subprocess.check_call((str(probeexe),'-h'),
                               stdout=DEVNULL, stderr=DEVNULL)
     except FileNotFoundError as e:
         raise FileNotFoundError('FFprobe not found at {}  {}.'.format(probeexe,e))
