@@ -5,7 +5,7 @@ from setuptools import setup,find_packages
 
 setup(name='PyLivestream',
       packages=find_packages(),
-      version = '1.6.1a',
+      version = '1.6.2',
       author='Michael Hirsch, Ph.D.',
       url='https://github.com/scivision/PyLivestream',
       description='Easy streaming using FFmpeg to YouTube Live, Periscope, Facebook Live, Twitch, ...',

@@ -1,27 +1,48 @@
-language: python
+language: generic
 fast_finish: true
 
-python:
-  - 3.5
-  - 3.6
+env:
+  - TRAVIS_PYTHON_VERSION=3.5
+  - TRAVIS_PYTHON_VERSION=3.6
 
 os:
-  - linux
+#  - linux  # need Ubuntu >= 16.04
+  - osx
 
 group: travis_latest
 
 git:
   depth: 3
 
+before_install:
+  - if [[ $TRAVIS_OS_NAME == osx ]]; then
+      wget https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh;
+    else
+      wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+    fi
+
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH=$HOME/miniconda/bin:$PATH
+  - hash -r
+
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+  - conda create -n test python=$TRAVIS_PYTHON_VERSION
+  - source activate test
+  
+  - if [[ $TRAVIS_OS_NAME == osx ]]; then
+    brew update > /dev/null;
+    brew install ffmpeg > /dev/null;
+    fi
 
 install: pip -q install -e .[tests]
 
 script:
-  - pytest -v
+  - pytest -sv
 
 after_success:
-  - if [[ $TRAVIS_PYTHON_VERSION == 3.6* ]]; then 
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.6* ]] && [[ $TRAVIS_OS_NAME == linux ]]; then
     coverage run tests/test_all.py;
-    coveralls; 
+    coveralls;
     fi
 

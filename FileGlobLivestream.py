@@ -2,6 +2,8 @@
 """
 LIVE STREAM using FFMPEG -- Globbed input file list
 
+NOTE: most video streaming sites REQUIRE you have to a video feed, so try the `-image` option with a favorite .JPG or whatever.
+
 https://www.scivision.co/youtube-live-ffmpeg-livestream/
 https://support.google.com/youtube/answer/2853702
 """

@@ -2,6 +2,8 @@
 """
 LIVE STREAM using FFMPEG -- Looping input file endlessly
 
+NOTE: for audio files, instead use FileGlob2Livestream.py with options `-image myimg.jpg -loop`
+
 https://www.scivision.co/youtube-live-ffmpeg-livestream/
 https://support.google.com/youtube/answer/2853702
 """
