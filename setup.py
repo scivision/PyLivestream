@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from setuptools import setup, find_packages
 install_requires = []
-tests_require = ['pytest', 'nose', 'coveralls']
+tests_require = ['pytest', 'nose', 'coveralls', 'flake8', 'mypy']
 
 
 setup(name='PyLivestream',

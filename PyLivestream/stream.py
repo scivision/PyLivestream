@@ -228,6 +228,10 @@ class Stream:
         else:  # static image + audio
             buf += ['-shortest']
 
+        # for very old versions of FFmpeg, such as Ubuntu 16.04
+        # still OK for current FFmpeg versions too
+        buf = ['-strict', 'experimental']
+
         if server == '-':  # /dev/null
             buf += ['-f', 'null']
         else:  # typical case
