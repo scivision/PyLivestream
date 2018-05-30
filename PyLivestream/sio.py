@@ -48,6 +48,9 @@ def get_resolution(fn: Path, exe: Path) -> Union[None, Tuple[int, int]]:
 
     if not a video file, None is returned.
     """
+    if not fn:  # audio-only
+        return None
+
     fn = Path(fn).expanduser()
 
     assert fn.is_file(), f'{fn} is not a file'
@@ -86,6 +89,9 @@ def get_framerate(fn: Path, exe: Path) -> Union[None, float]:
 
     if not a video file, None is returned.
     """
+    if not fn:  # audio-only
+        return None
+
     fn = Path(fn).expanduser()
 
     assert fn.is_file(), f'{fn} is not a file'

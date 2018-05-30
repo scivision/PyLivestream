@@ -27,20 +27,23 @@ BR60 = dict([
        (1440, 9000),
        (2160, 20000)])
 
+FPS = 30.  # default frames/sec if not defined otherwise
+
 
 # %% top level
 class Stream:
 
-    def __init__(self, ini: Path, site: str, vidsource: str, image: Path=None,
-                 loop: bool=False, infn: Path=None, yes: bool=False) -> None:
+    def __init__(self, ini: Path, site: str, vidsource: str=None,
+                 image: Path=None, loop: bool=False, infn: Path=None,
+                 yes: bool=False) -> None:
 
         self.ini: Path = Path(ini).expanduser()
         self.site: str = site
         self.vidsource = vidsource
-        self.image = image
+        self.image = Path(image).expanduser() if image else None
         self.loop = loop
-        if infn:
-            self.infn: Path = Path(infn).expanduser()
+
+        self.infn = Path(infn).expanduser() if infn else None
         self.yes = yes
 
     def osparam(self):
@@ -70,7 +73,7 @@ class Stream:
             self.fps: float = C.getint(self.site, 'screencap_fps')
             self.origin: Tuple[int, int] = C.get(self.site,
                                                  'screencap_origin').split(',')
-        elif self.vidsource == 'file':
+        elif self.vidsource is None or self.vidsource == 'file':
             self.res: Tuple[int, int] = sio.get_resolution(self.infn,
                                                            self.probeexe)
             self.fps: float = sio.get_framerate(self.infn, self.probeexe)
@@ -109,21 +112,26 @@ class Stream:
             vid1 = self.screengrab()
         elif self.vidsource == 'camera':
             vid1 = self.webcam()
-        elif self.vidsource == 'file':
+        elif self.vidsource is None or self.vidsource == 'file':
             vid1 = self.filein()
         else:
             raise ValueError(f'unknown vidsource {self.vidsource}')
 # %% configure video output
         vid2 = ['-c:v', 'libx264', '-pix_fmt', 'yuv420p']
+# %% set frames/sec, bitrate and keyframe interval
+        """
+         DON'T DO THIS.
+         It makes keyframes/bitrate far off from what streaming sites want
+         vid2 += ['-tune', 'stillimage']
 
-        if self.image:
-            vid2 += ['-tune', 'stillimage']
-        else:
-            fps = self.fps if self.fps is not None else 30.
+         The settings below still save video/data bandwidth for the still image
+         + audio case.
+        """
+        fps = self.fps if self.fps is not None else FPS
 
-            vid2 += ['-preset', self.preset,
-                     '-b:v', str(self.video_kbps) + 'k',
-                     '-g', str(self.keyframe_sec * fps)]
+        vid2 += ['-preset', self.preset,
+                 '-b:v', str(self.video_kbps) + 'k',
+                 '-g', str(self.keyframe_sec * fps)]
 
         return vid1, vid2
 
@@ -164,15 +172,18 @@ class Stream:
 
         if self.res is not None:
             x: int = int(self.res[1])
-        elif self.vidsource == 'file':
-            logging.warning('assuming 720p input.')
-            x = 720
+        elif self.vidsource is None or self.vidsource == 'file':
+            logging.info('assuming 480p input.')
+            x = 480
+        else:
+            raise ValueError('Unsure of your video resolution request.'
+                             'Try setting video_kpbs in the .ini file.')
 
         if self.fps is None or self.fps <= 30:
-            self.video_kbps = list(BR30.values())[
+            self.video_kbps: int = list(BR30.values())[
                                     bisect.bisect_left(list(BR30.keys()), x)]
         else:
-            self.video_kbps = list(BR60.values())[
+            self.video_kbps: int = list(BR60.values())[
                                     bisect.bisect_left(list(BR60.keys()), x)]
 
     def screengrab(self) -> List[str]:
@@ -203,21 +214,17 @@ class Stream:
 
     def filein(self) -> List[str]:
         """stream input file  (video, or audio + image)"""
-        assert isinstance(self.infn, Path)
-
-        fn: Path = self.infn.expanduser()
 
         vid1 = ['-loop', '1'] if self.image else ['-re']
 
         if self.loop:
             vid1 += ['-stream_loop', '-1']  # FFmpeg >= 3
-        else:
-            vid1 += []
 
         if self.image:  # still image, for audio-only input files
             vid1 += ['-i', str(self.image)]
 
-        vid1 += ['-i', str(fn)]
+        if self.infn:
+            vid1 += ['-i', str(self.infn)]
 
         return vid1
 

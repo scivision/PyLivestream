@@ -7,8 +7,9 @@ from . import stream
 
 class Livestream(stream.Stream):
 
-    def __init__(self, ini: Path, site: str, vidsource: str, image: Path=None,
-                 loop: bool=False, infn: Path=None, yes: bool=False) -> None:
+    def __init__(self, ini: Path, site: str, vidsource: str=None,
+                 image: Path=None, loop: bool=False, infn: Path=None,
+                 yes: bool=False) -> None:
         super().__init__(ini, site, vidsource, image, loop, infn, yes=yes)
 
         self.site = site.lower()
@@ -19,10 +20,10 @@ class Livestream(stream.Stream):
 
         vid1, vid2 = self.videostream()
 
-        aud1 = self.audiostream()
-        aud2 = self.audiocomp()
+        aud1: List[str] = self.audiostream()
+        aud2: List[str] = self.audiocomp()
 
-        buf = self.buffer(self.server)
+        buf: List[str] = self.buffer(self.server)
 # %% begin to setup command line
         cmd: List[str] = [str(self.exe)]
 
@@ -107,6 +108,29 @@ class Webcam(Livestream):
         self.streams[stream.unify_streams(self.streams)].golive(sinks)
 
 
+class Microphone(Livestream):
+
+    def __init__(self, ini: Path, sites: Union[str, List[str]], image: Path,
+                 yes: bool=False) -> None:
+
+        if isinstance(sites, str):
+            sites = [sites]
+
+        streams = {}
+        for site in sites:
+            streams[site] = Livestream(ini, site, image=image, yes=yes)
+
+        self.streams: Dict[str, Livestream] = streams
+
+    def golive(self):
+
+        sinks: List[str] = [self.streams[stream].sink[0]
+                            for stream in self.streams]
+
+        self.streams[stream.unify_streams(self.streams)].golive(sinks)
+
+
+# %% File-based inputs
 class FileIn(Livestream):
 
     def __init__(self, ini: Path, site: str, infn: Path,

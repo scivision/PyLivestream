@@ -42,9 +42,9 @@ class Tests(unittest.TestCase):
                     continue
 
                 if int(p.stream.res[1]) == 480:
-                    assert p.stream.video_kbps == 500
+                    self.assertEqual(p.stream.video_kbps, 500)
                 elif int(p.stream.res[1]) == 720:
-                    assert p.stream.video_kbps == 1800
+                    self.assertEqual(p.stream.video_kbps, 1800)
 
     def test_filein_audio(self):
         flist = list(rdir.glob('*.ogg'))
@@ -53,9 +53,9 @@ class Tests(unittest.TestCase):
             p = PyLivestream.FileIn(inifn, s, flist[0])
 
             if s == 'periscope':
-                assert p.stream.video_kbps == 800
+                self.assertEqual(p.stream.video_kbps, 800)
             else:
-                assert p.stream.video_kbps == 1800
+                self.assertEqual(p.stream.video_kbps, 500)
 
     def test_disk(self):
         for s in sites:
