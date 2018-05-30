@@ -49,9 +49,9 @@ Latest release::
 Development version::
 
     git clone https://github.com/scivision/PyLivestream
-    
+
     cd PyLivestream
-    
+
     python -m pip install -e .
 
 
@@ -226,15 +226,15 @@ stream all audio files in directory
 Glob list of video files to stream.
 Must include a static image (could be your logo)::
 
-    python FileGlobLivestream.py site path pattern -i image
+    python FileGlobLivestream.py site path pattern -image image
 
 path      path to where video files are
 pattern   e.g. ``*.avi``  pattern matching video files
--i        filename of image to use as stream background
+-image        filename of image to use as stream background (REQUIRED for most websites)
 
 Example: stream all .mp3 audio under ``~/Library`` directory::
 
-    python FileGlobLivestream.py youtube ~/Library "*.mp3" -i mylogo.jpg
+    python FileGlobLivestream.py youtube ~/Library "*.mp3" -image mylogo.jpg
 
 
 Screen capture to disk
