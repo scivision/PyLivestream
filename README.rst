@@ -34,7 +34,7 @@ Uses an ``.ini`` file to adjust all parameters.
 
 
 :FFmpeg: >= 3.0 required
-:Python: >= 3.5 required
+:Python: >= 3.6 required
 
 
 .. contents::

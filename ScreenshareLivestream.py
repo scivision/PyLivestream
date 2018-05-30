@@ -34,17 +34,20 @@ if __name__ == '__main__':
 
     from argparse import ArgumentParser
     p = ArgumentParser()
-    p.add_argument('site',help='site(s) to stream to [youtube,periscope,facebook,twitch]',nargs='+')
-    p.add_argument('-i','--ini',help='*.ini file with stream parameters',default='stream.ini')
-    p.add_argument('-y','--yes',help='no confirmation dialog',action='store_true')
-    p = p.parse_args()
+    p.add_argument('site',
+                   help='site to stream: [youtube,periscope,facebook,twitch]',
+                   nargs='+')
+    p.add_argument('-i', '--ini', help='*.ini file with stream parameters',
+                   default='stream.ini')
+    p.add_argument('-y', '--yes', help='no confirmation dialog',
+                   action='store_true')
+    P = p.parse_args()
 
-    s = PyLivestream.Screenshare(p.ini, p.site)
+    s = PyLivestream.Screenshare(P.ini, P.site)
 # %% Go live
-    if p.yes:
-        print('going live on',s.sites)
+    if P.yes:
+        print('going live on', s.sites)
     else:
-        input("Press Enter to go live on {}.    Or Ctrl C to abort.".format(s.sites))
+        input(f"Press Enter to go live on {s.sites}.    Or Ctrl C to abort.")
 
     s.golive()
-

@@ -15,22 +15,23 @@ if __name__ == '__main__':
     import signal
     signal.signal(signal.SIGINT, signal.SIG_DFL)
 
-
     from argparse import ArgumentParser
     p = ArgumentParser()
-    p.add_argument('outfn',help='video file to save to disk.')
-    p.add_argument('-c','--clobber',help='overwrite file with same name',action='store_true')
-    p.add_argument('-i','--ini',help='*.ini file with stream parameters',default='stream.ini')
-    p.add_argument('-y','--yes',help='no confirmation dialog',action='store_true')
-    p = p.parse_args()
+    p.add_argument('outfn', help='video file to save to disk.')
+    p.add_argument('-c', '--clobber', help='overwrite file with same name',
+                   action='store_true')
+    p.add_argument('-i', '--ini', help='*.ini file with stream parameters',
+                   default='stream.ini')
+    p.add_argument('-y', '--yes', help='no confirmation dialog',
+                   action='store_true')
+    P = p.parse_args()
 
-
-    s = PyLivestream.SaveDisk(p.ini, p.outfn, p.clobber)
+    s = PyLivestream.SaveDisk(P.ini, P.outfn, P.clobber)
 # %%
-    if p.yes:
-        print('saving screen capture to',s.outfn)
+    if P.yes:
+        print('saving screen capture to', s.outfn)
     else:
-        input("Press Enter to screen capture to file {}.    Or Ctrl C to abort.".format(s.outfn))
-
+        input(f"Press Enter to screen capture to file {s.outfn}."
+              "Or Ctrl C to abort.")
 
     s.save()
