@@ -41,11 +41,12 @@ if __name__ == '__main__':
                    action='store_true')
     P = p.parse_args()
 
-    s = PyLivestream.Webcam(P.ini, P.site)
+    s = PyLivestream.Webcam(P.ini, P.site, P.yes)
+    sites = list(s.streams.keys())
 # %% Go live
     if P.yes:
-        print('going live on', s.sites)
+        print('going live on', sites)
     else:
-        input(f"Press Enter to go live on {s.sites}.    Or Ctrl C to abort.")
+        input(f"Press Enter to go live on {sites}.    Or Ctrl C to abort.")
 
     s.golive()

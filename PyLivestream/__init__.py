@@ -1,6 +1,6 @@
 from pathlib import Path
 import subprocess as sp
-from typing import List, Union
+from typing import List, Union, Dict
 #
 from . import stream
 
@@ -8,8 +8,8 @@ from . import stream
 class Livestream(stream.Stream):
 
     def __init__(self, ini: Path, site: str, vidsource: str, image: Path=None,
-                 loop: bool=False, infn: Path=None) -> None:
-        super().__init__(ini, site, vidsource, image, loop, infn)
+                 loop: bool=False, infn: Path=None, yes: bool=False) -> None:
+        super().__init__(ini, site, vidsource, image, loop, infn, yes=yes)
 
         self.site = site.lower()
 
@@ -23,8 +23,13 @@ class Livestream(stream.Stream):
         aud2 = self.audiocomp()
 
         buf = self.buffer(self.server)
+# %% begin to setup command line
+        cmd: List[str] = [str(self.exe)]
 
-        cmd: List[str] = [str(self.exe)] + vid1 + aud1 + vid2 + aud2 + buf
+        if self.yes:
+            cmd += ['-y']
+
+        cmd += vid1 + aud1 + vid2 + aud2 + buf
 
         streamid: str = self.key if self.key else ''
 
@@ -35,7 +40,7 @@ class Livestream(stream.Stream):
     def golive(self, sinks: List[str]=None):
         """finally start the stream(s)"""
 
-        if self.key is None and self.server != '-':
+        if self.key is None and self.server not in ('-', 'NUL', '/dev/null'):
             print('\n', ' '.join(self.cmd), '\n')
             return
 
@@ -56,72 +61,61 @@ class Livestream(stream.Stream):
 # %% operators
 class Screenshare(Livestream):
 
-    def __init__(self, ini: Path, websites: Union[str, List[str]]) -> None:
+    def __init__(self, ini: Path, websites: Union[str, List[str]],
+                 yes: bool=False) -> None:
 
         vidsource = 'screen'
 
         if isinstance(websites, str):
             websites = [websites]
 
-        streams = []
-        sites = []
+        streams = {}
         for site in websites:
-            stream = Livestream(ini, site, vidsource)
-            if stream.key:
-                streams.append(stream)
-                sites.append(site)
+            streams[site] = Livestream(ini, site, vidsource, yes=yes)
 
-        self.streams = streams
-        self.sites = sites
-
-        if not self.streams:
-            raise ValueError('No stream key files or keys in {}'.format(ini))
+        self.streams: Dict[str, Livestream] = streams
 
     def golive(self):
 
-        sinks: List[str] = [stream.sink[0] for stream in self.streams]
+        sinks: List[str] = [self.streams[stream].sink[0]
+                            for stream in self.streams]
 
         self.streams[stream.unify_streams(self.streams)].golive(sinks)
 
 
 class Webcam(Livestream):
 
-    def __init__(self, ini: Path, websites: Union[str, List[str]]) -> None:
+    def __init__(self, ini: Path, websites: Union[str, List[str]],
+                 yes: bool=False) -> None:
 
         vidsource = 'camera'
 
         if isinstance(websites, str):
             websites = [websites]
 
-        streams = []
-        sites = []
+        streams = {}
         for site in websites:
-            stream = Livestream(ini, site, vidsource)
-            if stream.key:
-                streams.append(stream)
-                sites.append(site)
+            streams[site] = Livestream(ini, site, vidsource, yes=yes)
 
-        self.streams: List[Livestream] = streams
-        self.sites: List[str] = sites
-
-        if not self.streams:
-            raise ValueError('No stream key files or keys in {}'.format(ini))
+        self.streams: Dict[str, Livestream] = streams
 
     def golive(self):
 
-        sinks: List[str] = [stream.sink[0] for stream in self.streams]
+        sinks: List[str] = [self.streams[stream].sink[0]
+                            for stream in self.streams]
 
-        self.streams[self.unify_streams(self.streams)].golive(sinks)
+        self.streams[stream.unify_streams(self.streams)].golive(sinks)
 
 
 class FileIn(Livestream):
 
     def __init__(self, ini: Path, site: str, infn: Path,
-                 loop: bool=False, image: Path=None) -> None:
+                 loop: bool=False, image: Path=None, yes: bool=False) -> None:
 
         vidsource = 'file'
 
-        self.stream = Livestream(ini, site, vidsource, image, loop, infn)
+        self.stream = Livestream(ini, site, vidsource, image, loop, infn,
+                                 yes=yes)
 
     def golive(self):
         self.stream.golive()

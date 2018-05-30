@@ -6,8 +6,7 @@ import unittest
 rdir = Path(__file__).parent
 
 inifn = rdir/'test.ini'
-sites = ['periscope', 'youtube', 'facebook', 'twitch',
-         'mixer', 'ustream', 'vimeo']
+sites = ['periscope', 'youtube', 'facebook']
 
 
 class Tests(unittest.TestCase):
@@ -15,22 +14,22 @@ class Tests(unittest.TestCase):
 
         S = PyLivestream.Screenshare(inifn, sites)
         for s in S.streams:
-            if s.site == 'periscope':
-                assert s.video_kbps == 800
+            if s == 'periscope':
+                assert S.streams[s].video_kbps == 800
             else:
-                assert s.video_kbps == 1800
+                assert S.streams[s].video_kbps == 1800
 
     def test_webcam(self):
 
         S = PyLivestream.Webcam(inifn, sites)
         for s in S.streams:
-            if s.site == 'periscope':
-                assert s.video_kbps == 800
+            if s == 'periscope':
+                assert S.streams[s].video_kbps == 800
             else:
-                if int(s.res[1]) == 480:
-                    assert s.video_kbps == 500
-                elif int(s.res[1]) == 720:
-                    assert s.video_kbps == 1800
+                if int(S.streams[s].res[1]) == 480:
+                    assert S.streams[s].video_kbps == 500
+                elif int(S.streams[s].res[1]) == 720:
+                    assert S.streams[s].video_kbps == 1800
 
     def test_filein_video(self):
         for s in sites:
@@ -67,10 +66,10 @@ class Tests(unittest.TestCase):
     def test_stream(self):
         """stream to NUL"""
 
-        s = PyLivestream.FileIn(inifn, 'localhost', rdir / 'orch.ogg')
+        s = PyLivestream.FileIn(inifn, 'localhost',
+                                rdir / 'orch_short.ogg', yes=True)
         s.golive()
 
 
 if __name__ == '__main__':
-
     unittest.main()

@@ -1,16 +1,17 @@
-from collections import OrderedDict  # not needed python >= 3.6
 import bisect
 from pathlib import Path
 import logging
 import os
 import sys
 from configparser import ConfigParser
-from typing import Tuple, List, Union
+from typing import Tuple, List, Dict
 #
 from . import sio
 
 # %%  Col0: vertical pixels (height). Col1: video kbps. Interpolates.
-BR30 = OrderedDict([
+# NOTE: Python >= 3.6 has guaranteed dict() order.
+
+BR30 = dict([
         (240, 300),
         (360, 400),
         (480, 500),
@@ -20,7 +21,7 @@ BR30 = OrderedDict([
         (1440, 6000),
         (2160, 13000)])
 
-BR60 = OrderedDict([
+BR60 = dict([
        (720, 2250),
        (1080, 4500),
        (1440, 9000),
@@ -31,24 +32,26 @@ BR60 = OrderedDict([
 class Stream:
 
     def __init__(self, ini: Path, site: str, vidsource: str, image: Path=None,
-                 loop: bool=False, infn: Path=None) -> None:
+                 loop: bool=False, infn: Path=None, yes: bool=False) -> None:
 
         self.ini: Path = Path(ini).expanduser()
-        self.site = site
+        self.site: str = site
         self.vidsource = vidsource
         self.image = image
         self.loop = loop
-        self.infn = infn
+        if infn:
+            self.infn: Path = Path(infn).expanduser()
+        self.yes = yes
 
     def osparam(self):
         """load OS specific config"""
 
-        assert self.ini.is_file(), '{} not found.'.format(self.ini)
+        assert self.ini.is_file(), f'{self.ini} not found.'
 
-        C = ConfigParser()
+        C = ConfigParser(inline_comment_prefixes=('#', ';'))
         C.read(str(self.ini))
 
-        assert self.site in C, '{} not found: {}'.format(self.site, self.ini)
+        assert self.site in C, f'{self.site} not found: {self.ini}'
 
         if 'XDG_SESSION_TYPE' in os.environ:
             if os.environ['XDG_SESSION_TYPE'] == 'wayland':
@@ -72,7 +75,7 @@ class Stream:
                                                            self.probeexe)
             self.fps: float = sio.get_framerate(self.infn, self.probeexe)
         else:
-            raise ValueError('unknown video source {}'.format(self.vidsource))
+            raise ValueError(f'unknown video source {self.vidsource}')
 
         self.audiofs: int = C.get(self.site, 'audiofs')  # not getint
         self.preset: str = C.get(self.site, 'preset')
@@ -109,7 +112,7 @@ class Stream:
         elif self.vidsource == 'file':
             vid1 = self.filein()
         else:
-            raise ValueError('unknown vidsource {}'.format(self.vidsource))
+            raise ValueError(f'unknown vidsource {self.vidsource}')
 # %% configure video output
         vid2 = ['-c:v', 'libx264', '-pix_fmt', 'yuv420p']
 
@@ -181,7 +184,7 @@ class Stream:
             vid1 += ['-s', 'x'.join(map(str, self.res))]
 
         if sys.platform == 'linux':
-            vid1 += ['-i', ':0.0+{},{}'.format(self.origin[0], self.origin[1])]
+            vid1 += [f'-i', ':0.0+{self.origin[0]},{self.origin[1]}']
         elif sys.platform == 'win32':
             vid1 += ['-offset_x', self.origin[0], '-offset_y', self.origin[1],
                      '-i', self.videochan]
@@ -240,18 +243,21 @@ class Stream:
         return buf
 
 
-def unify_streams(self, streams: List[Stream]) -> Union[None, int]:
+def unify_streams(streams: Dict[str, Stream]) -> str:
     """
     find least common denominator stream settings,
         so "tee" output can generate multiple streams.
     First try: use stream with lowest video bitrate.
 
+    Exploits that Python >= 3.6 has guaranteed dict() ordering.
+
     fast native Python argmin()
     https://stackoverflow.com/a/11825864
     """
-    if not streams:
-        return None
+    vid_bw: List[int] = [streams[stream].video_kbps for stream in streams]
 
-    vid_bw = [stream.video_kbps for stream in streams]
+    argmin: int = min(range(len(vid_bw)), key=vid_bw.__getitem__)
 
-    return min(range(len(vid_bw)), key=vid_bw.__getitem__)
+    key: str = list(streams.keys())[argmin]
+
+    return key

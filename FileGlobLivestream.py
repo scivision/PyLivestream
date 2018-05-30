@@ -13,10 +13,12 @@ from typing import List
 import PyLivestream
 
 
-def playonce(flist: List[Path], image: Path, site: str, inifn: Path):
+def playonce(flist: List[Path], image: Path, site: str, inifn: Path,
+             yes: bool):
 
     for f in flist:
-        s = PyLivestream.FileIn(inifn, site, f, loop=False, image=image)
+        s = PyLivestream.FileIn(inifn, site, f, loop=False, image=image,
+                                yes=yes)
 
         s.golive()
 
@@ -60,6 +62,6 @@ if __name__ == '__main__':
 
     if P.loop:
         while True:
-            playonce(flist, P.image, P.site, inifn)
+            playonce(flist, P.image, P.site, inifn, P.yes)
     else:
-        playonce(flist, P.image, P.site, inifn)
+        playonce(flist, P.image, P.site, inifn, P.yes)

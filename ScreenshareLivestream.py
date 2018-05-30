@@ -44,10 +44,11 @@ if __name__ == '__main__':
     P = p.parse_args()
 
     s = PyLivestream.Screenshare(P.ini, P.site)
+    sites = list(s.streams.keys())
 # %% Go live
     if P.yes:
-        print('going live on', s.sites)
+        print('going live on', sites)
     else:
-        input(f"Press Enter to go live on {s.sites}.    Or Ctrl C to abort.")
+        input(f"Press Enter to go live on {sites}.    Or Ctrl C to abort.")
 
     s.golive()

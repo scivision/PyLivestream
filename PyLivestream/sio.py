@@ -20,13 +20,13 @@ def getexe(exein: Path=None) -> Tuple[str, str]:
         subprocess.check_call((exe, '-h'),
                               stdout=DEVNULL, stderr=DEVNULL)
     except FileNotFoundError as e:
-        raise FileNotFoundError('FFmpeg not found at {}  {}.'.format(exe, e))
+        raise FileNotFoundError(f'FFmpeg not found at {exe}  {e}.')
 
     try:
         subprocess.check_call((probeexe, '-h'),
                               stdout=DEVNULL, stderr=DEVNULL)
     except FileNotFoundError as e:
-        raise FileNotFoundError('FFprobe: {}  {}'.format(probeexe, e))
+        raise FileNotFoundError(f'FFprobe: {probeexe}  {e}')
 
     return exe, probeexe
 
@@ -50,7 +50,7 @@ def get_resolution(fn: Path, exe: Path) -> Union[None, Tuple[int, int]]:
     """
     fn = Path(fn).expanduser()
 
-    assert fn.is_file(), '{} is not a file'.format(fn)
+    assert fn.is_file(), f'{fn} is not a file'
 
     cmd = [str(exe), '-v', 'error', '-print_format', 'json',
            '-show_streams', str(fn)]
@@ -88,7 +88,7 @@ def get_framerate(fn: Path, exe: Path) -> Union[None, float]:
     """
     fn = Path(fn).expanduser()
 
-    assert fn.is_file(), '{} is not a file'.format(fn)
+    assert fn.is_file(), f'{fn} is not a file'
 
     cmd = [str(exe), '-v', 'error', '-print_format', 'json',
            '-show_streams', str(fn)]

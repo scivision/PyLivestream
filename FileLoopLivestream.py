@@ -25,13 +25,13 @@ if __name__ == '__main__':
                    action='store_true')
     P = p.parse_args()
 
-    s = PyLivestream.FileIn(P.ini, P.site, P.infn, loop=True)
+    s = PyLivestream.FileIn(P.ini, P.site, P.infn, loop=True, yes=P.yes)
 # %% Go live
     if P.yes:
         print('going live on', s.stream.site, 'looping file', s.stream.infn)
     else:
         input(f"Press Enter to go live on {s.stream.site},"
-              "looping file {s.stream.infn}.")
+              f"looping file {s.stream.infn}.")
         print('Or Ctrl C to abort.')
 
     s.golive()
