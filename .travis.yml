@@ -42,7 +42,7 @@ script:
   - mypy *[^setup].py tests/test_all.py
 
 after_success:
-  - if [[ $TRAVIS_PYTHON_VERSION == 3.6* ]] && [[ $TRAVIS_OS_NAME == linux ]]; then
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.6* ]]; then
     coverage run tests/test_all.py;
     coveralls;
     fi
