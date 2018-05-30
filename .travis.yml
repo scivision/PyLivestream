@@ -37,7 +37,7 @@ before_install:
 install: pip -q install -e .[tests]
 
 script:
-  - pytest -v
+  - pytest -sv
   - flake8
   - mypy *[^setup].py tests/test_all.py
 
