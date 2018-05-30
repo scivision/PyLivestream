@@ -58,18 +58,18 @@ class Stream:
                                                    fallback='ffmpeg'))
 
         if self.vidsource == 'camera':
-            self.res: Tuple[int,int] = C.get(self.site,
-                                             'webcam_res').split('x')
+            self.res: Tuple[int, int] = C.get(self.site,
+                                              'webcam_res').split('x')
             self.fps: float = C.getint(self.site, 'webcam_fps')
         elif self.vidsource == 'screen':
-            self.res: Tuple[int,int] = C.get(self.site,
-                                             'screencap_res').split('x')
+            self.res: Tuple[int, int] = C.get(self.site,
+                                              'screencap_res').split('x')
             self.fps: float = C.getint(self.site, 'screencap_fps')
-            self.origin: Tuple[int,int] = C.get(self.site,
-                                                'screencap_origin').split(',')
+            self.origin: Tuple[int, int] = C.get(self.site,
+                                                 'screencap_origin').split(',')
         elif self.vidsource == 'file':
-            self.res: Tuple[int,int] = sio.get_resolution(self.infn,
-                                                          self.probeexe)
+            self.res: Tuple[int, int] = sio.get_resolution(self.infn,
+                                                           self.probeexe)
             self.fps: float = sio.get_framerate(self.infn, self.probeexe)
         else:
             raise ValueError('unknown video source {}'.format(self.vidsource))
@@ -78,7 +78,7 @@ class Stream:
         self.preset: str = C.get(self.site, 'preset')
         self.timelimit: str = C.get(self.site, 'timelimit', fallback=None)
 
-        self.videochan:str = C.get(sys.platform, 'videochan')
+        self.videochan: str = C.get(sys.platform, 'videochan')
         self.audiochan: str = C.get(sys.platform, 'audiochan', fallback=None)
         self.vcap: str = C.get(sys.platform, 'vcap')
         self.acap: str = C.get(sys.platform, 'acap', fallback=None)
@@ -218,7 +218,7 @@ class Stream:
 
         return vid1
 
-    def buffer(self, server:str) -> List[str]:
+    def buffer(self, server: str) -> List[str]:
         """configure network buffer. Tradeoff: latency vs. robustness"""
         buf = ['-threads', '0']
 
