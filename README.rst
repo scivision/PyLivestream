@@ -26,7 +26,7 @@ Python scripted livestreaming using FFmpeg
 Streams to one or **multiple** streaming sites simultaneously.
 FFmpeg is used from Python ``subprocess`` to stream to Facebook Live, YouTube Live, Periscope, Twitch, Mixer, Ustream, Vimeo and more for streaming broadcasts.
 The Python scripts compute good streaming parameters, and emit the command used so you can just copy and paste in the future if you wish.
-Works on any OS (Mac, Linux, Windows).
+Works on any OS (Mac, Linux, Windows) and computing platform, including PC, Mac, and Raspberry Pi.
 Uses an ``.ini`` file to adjust all parameters.
 
 .. image:: doc/logo.png
