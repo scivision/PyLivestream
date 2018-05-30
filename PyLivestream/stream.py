@@ -33,7 +33,7 @@ class Stream:
     def __init__(self, ini: Path, site: str, vidsource: str, image: Path=None,
                  loop: bool=False, infn: Path=None) -> None:
 
-        self.ini = Path(ini).expanduser()
+        self.ini: Path = Path(ini).expanduser()
         self.site = site
         self.vidsource = vidsource
         self.image = image
@@ -58,34 +58,38 @@ class Stream:
                                                    fallback='ffmpeg'))
 
         if self.vidsource == 'camera':
-            self.res = C.get(self.site, 'webcam_res').split('x')
-            self.fps = C.getint(self.site, 'webcam_fps')
+            self.res: Tuple[int,int] = C.get(self.site,
+                                             'webcam_res').split('x')
+            self.fps: float = C.getint(self.site, 'webcam_fps')
         elif self.vidsource == 'screen':
-            self.res = C.get(self.site, 'screencap_res').split('x')
-            self.fps = C.getint(self.site, 'screencap_fps')
-            self.origin = C.get(self.site, 'screencap_origin').split(',')
+            self.res: Tuple[int,int] = C.get(self.site,
+                                             'screencap_res').split('x')
+            self.fps: float = C.getint(self.site, 'screencap_fps')
+            self.origin: Tuple[int,int] = C.get(self.site,
+                                                'screencap_origin').split(',')
         elif self.vidsource == 'file':
-            self.res = sio.get_resolution(self.infn, self.probeexe)
-            self.fps = sio.get_framerate(self.infn, self.probeexe)
+            self.res: Tuple[int,int] = sio.get_resolution(self.infn,
+                                                          self.probeexe)
+            self.fps: float = sio.get_framerate(self.infn, self.probeexe)
         else:
             raise ValueError('unknown video source {}'.format(self.vidsource))
 
-        self.audiofs = C.get(self.site, 'audiofs')  # not getint
-        self.preset = C.get(self.site, 'preset')
-        self.timelimit = C.get(self.site, 'timelimit', fallback=None)
+        self.audiofs: int = C.get(self.site, 'audiofs')  # not getint
+        self.preset: str = C.get(self.site, 'preset')
+        self.timelimit: str = C.get(self.site, 'timelimit', fallback=None)
 
-        self.videochan = C.get(sys.platform, 'videochan')
-        self.audiochan = C.get(sys.platform, 'audiochan', fallback=None)
-        self.vcap = C.get(sys.platform, 'vcap')
-        self.acap = C.get(sys.platform, 'acap', fallback=None)
-        self.hcam = C.get(sys.platform, 'hcam')
+        self.videochan:str = C.get(sys.platform, 'videochan')
+        self.audiochan: str = C.get(sys.platform, 'audiochan', fallback=None)
+        self.vcap: str = C.get(sys.platform, 'vcap')
+        self.acap: str = C.get(sys.platform, 'acap', fallback=None)
+        self.hcam: str = C.get(sys.platform, 'hcam')
 
-        self.video_kbps = C.getint(self.site, 'video_kbps', fallback=None)
-        self.audio_bps = C.get(self.site, 'audio_bps')
+        self.video_kbps: int = C.getint(self.site, 'video_kbps', fallback=None)
+        self.audio_bps: int = C.get(self.site, 'audio_bps')
 
-        self.keyframe_sec = C.getint(self.site, 'keyframe_sec')
+        self.keyframe_sec: int = C.getint(self.site, 'keyframe_sec')
 
-        self.server = C.get(self.site, 'server', fallback=None)
+        self.server: str = C.get(self.site, 'server', fallback=None)
 # %% Key (hexaecimal stream ID)
         keyfn = C.get(self.site, 'key', fallback=None)
         if not keyfn:  # '' or None
@@ -146,8 +150,8 @@ class Stream:
             return []
 
         return ['-c:a', 'aac',
-                '-b:a', self.audio_bps,
-                '-ar', self.audiofs]
+                '-b:a', str(self.audio_bps),
+                '-ar', str(self.audiofs)]
 
     def video_bitrate(self):
         """get "best" video bitrate.
@@ -156,7 +160,7 @@ class Stream:
             return
 
         if self.res is not None:
-            x = int(self.res[1])
+            x: int = int(self.res[1])
         elif self.vidsource == 'file':
             logging.warning('assuming 720p input.')
             x = 720
@@ -174,7 +178,7 @@ class Stream:
                 '-r', str(self.fps)]
 
         if self.res is not None:
-            vid1 += ['-s', 'x'.join(self.res)]
+            vid1 += ['-s', 'x'.join(map(str, self.res))]
 
         if sys.platform == 'linux':
             vid1 += ['-i', ':0.0+{},{}'.format(self.origin[0], self.origin[1])]
@@ -198,7 +202,7 @@ class Stream:
         """stream input file  (video, or audio + image)"""
         assert isinstance(self.infn, Path)
 
-        fn = self.infn.expanduser()
+        fn: Path = self.infn.expanduser()
 
         vid1 = ['-loop', '1'] if self.image else ['-re']
 
@@ -214,17 +218,20 @@ class Stream:
 
         return vid1
 
-    def buffer(self) -> List[str]:
+    def buffer(self, server:str) -> List[str]:
         """configure network buffer. Tradeoff: latency vs. robustness"""
         buf = ['-threads', '0']
 
         if not self.image:
-            buf += ['-maxrate', '{}k'.format(self.video_kbps),
-                    '-bufsize', '{}k'.format(2*self.video_kbps)]
+            buf += ['-maxrate', f'{self.video_kbps}k',
+                    '-bufsize', f'{2*self.video_kbps}k']
         else:  # static image + audio
             buf += ['-shortest']
 
-        buf += ['-f', 'flv']
+        if server == '-':  # /dev/null
+            buf += ['-f', 'null']
+        else:  # typical case
+            buf += ['-f', 'flv']
 
         return buf
 

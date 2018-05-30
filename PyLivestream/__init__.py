@@ -22,7 +22,7 @@ class Livestream(stream.Stream):
         aud1 = self.audiostream()
         aud2 = self.audiocomp()
 
-        buf = self.buffer()
+        buf = self.buffer(self.server)
 
         cmd: List[str] = [str(self.exe)] + vid1 + aud1 + vid2 + aud2 + buf
 
@@ -32,10 +32,10 @@ class Livestream(stream.Stream):
 
         self.cmd: List[str] = cmd + self.sink
 
-    def golive(self, sinks: list=None):
+    def golive(self, sinks: List[str]=None):
         """finally start the stream(s)"""
 
-        if self.key is None:
+        if self.key is None and self.server != '-':
             print('\n', ' '.join(self.cmd), '\n')
             return
 
@@ -79,7 +79,7 @@ class Screenshare(Livestream):
 
     def golive(self):
 
-        sinks = [stream.sink[0] for stream in self.streams]
+        sinks: List[str] = [stream.sink[0] for stream in self.streams]
 
         self.streams[stream.unify_streams(self.streams)].golive(sinks)
 

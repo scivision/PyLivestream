@@ -56,13 +56,7 @@ class Tests(unittest.TestCase):
             if s == 'periscope':
                 assert p.stream.video_kbps == 800
             else:
-                if p.stream.res is None:
-                    continue
-
-                if int(p.stream.res[1]) == 480:
-                    assert p.stream.video_kbps == 500
-                elif int(p.stream.res[1]) == 720:
-                    assert p.stream.video_kbps == 1800
+                assert p.stream.video_kbps == 1800
 
     def test_disk(self):
         for s in sites:
@@ -70,6 +64,13 @@ class Tests(unittest.TestCase):
             assert p.site == 'file'
             assert p.video_kbps == 3000
 
+    def test_stream(self):
+        """stream to NUL"""
+
+        s = PyLivestream.FileIn(inifn, 'localhost', rdir / 'orch.ogg')
+        s.golive()
+
 
 if __name__ == '__main__':
+
     unittest.main()
