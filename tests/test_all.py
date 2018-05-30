@@ -57,6 +57,17 @@ class Tests(unittest.TestCase):
             else:
                 self.assertEqual(p.stream.video_kbps, 500)
 
+    def test_microphone(self):
+        for s in sites:
+            S = PyLivestream.Microphone(inifn, s,
+                                        rdir.parent / 'doc' / 'logo.png')
+
+        for s in S.streams:
+            if s == 'periscope':
+                assert S.streams[s].video_kbps == 800
+            else:
+                assert S.streams[s].video_kbps == 500
+
     def test_disk(self):
         for s in sites:
             p = PyLivestream.SaveDisk(inifn, '')
