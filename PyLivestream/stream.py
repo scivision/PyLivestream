@@ -117,7 +117,7 @@ class Stream:
         else:
             raise ValueError(f'unknown vidsource {self.vidsource}')
 # %% configure video output
-        vid2 = ['-c:v', 'libx264', '-pix_fmt', 'yuv420p']
+        vid2: List[str] = ['-c:v', 'libx264', '-pix_fmt', 'yuv420p']
 # %% set frames/sec, bitrate and keyframe interval
         """
          DON'T DO THIS.
@@ -130,8 +130,12 @@ class Stream:
         fps = self.fps if self.fps is not None else FPS
 
         vid2 += ['-preset', self.preset,
-                 '-b:v', str(self.video_kbps) + 'k',
-                 '-g', str(self.keyframe_sec * fps)]
+                 '-b:v', str(self.video_kbps) + 'k']
+
+        if self.image:
+            vid2 += ['-r', str(fps)]
+
+        vid2 += ['-g', str(self.keyframe_sec * fps)]
 
         return vid1, vid2
 
@@ -215,7 +219,18 @@ class Stream:
     def filein(self) -> List[str]:
         """stream input file  (video, or audio + image)"""
 
-        vid1 = ['-loop', '1'] if self.image else ['-re']
+        vid1: List[str] = []
+
+        """
+        -re is NOT for actual streaming devices (webcam, microphone)
+        https://ffmpeg.org/ffmpeg.html
+        """
+
+        if self.image:
+            vid1 += ['-loop', '1', '-f', 'image2']
+
+        if self.image or self.vidsource == 'file':
+            vid1 += ['-re']
 
         if self.loop:
             vid1 += ['-stream_loop', '-1']  # FFmpeg >= 3
@@ -230,22 +245,21 @@ class Stream:
 
     def buffer(self, server: str) -> List[str]:
         """configure network buffer. Tradeoff: latency vs. robustness"""
-        buf = ['-threads', '0']
+        # constrain to single thread, default is multi-thread
+        # buf = ['-threads', '1']
 
-        if not self.image:
-            buf += ['-maxrate', f'{self.video_kbps}k',
-                    '-bufsize', f'{2*self.video_kbps}k']
-        else:  # static image + audio
+        buf = ['-maxrate', f'{self.video_kbps}k',
+               '-bufsize', f'{self.video_kbps//2}k']
+
+        if self.image:  # static image + audio
             buf += ['-shortest']
 
         # for very old versions of FFmpeg, such as Ubuntu 16.04
         # still OK for current FFmpeg versions too
         buf += ['-strict', 'experimental']
 
-        if server == '-':  # /dev/null
-            buf += ['-f', 'null']
-        else:  # typical case
-            buf += ['-f', 'flv']
+        # must manually specify container format when streaming to web.
+        buf += ['-f', 'flv']
 
         return buf
 

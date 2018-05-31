@@ -8,6 +8,7 @@ NOTE: for audio files,
 https://www.scivision.co/youtube-live-ffmpeg-livestream/
 https://support.google.com/youtube/answer/2853702
 """
+from typing import List
 import PyLivestream
 
 if __name__ == '__main__':
@@ -18,20 +19,23 @@ if __name__ == '__main__':
     p = ArgumentParser(description="Livestream a single looped input file")
     p.add_argument('infn', help='file to stream, looping endlessly.')
     p.add_argument('site',
-                   help='site to stream: [youtube,periscope,facebook,twitch]')
+                   help='site to stream: [youtube,periscope,facebook,twitch]',
+                   nargs='+')
     p.add_argument('-i', '--ini', help='*.ini file with stream parameters',
                    default='stream.ini')
     p.add_argument('-y', '--yes', help='no confirmation dialog',
                    action='store_true')
     P = p.parse_args()
 
-    s = PyLivestream.FileIn(P.ini, P.site, P.infn, loop=True, yes=P.yes)
+    S = PyLivestream.FileIn(P.ini, P.site, infn=P.infn,
+                            loop=True, yes=P.yes)
+    sites: List[str] = list(S.streams.keys())
 # %% Go live
     if P.yes:
-        print('going live on', s.stream.site, 'looping file', s.stream.infn)
+        print(f'going live on {sites} looping file {P.infn}')
     else:
-        input(f"Press Enter to go live on {s.stream.site},"
-              f"looping file {s.stream.infn}.")
+        input(f"Press Enter to go live on {sites},"
+              f"looping file {P.infn}")
         print('Or Ctrl C to abort.')
 
-    s.golive()
+    S.golive()

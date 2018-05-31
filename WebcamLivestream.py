@@ -23,6 +23,7 @@ Windows: get DirectShow device list from::
 
    ffmpeg -list_devices true -f dshow -i dummy
 """
+from typing import List
 import PyLivestream
 
 if __name__ == '__main__':
@@ -41,12 +42,13 @@ if __name__ == '__main__':
                    action='store_true')
     P = p.parse_args()
 
-    s = PyLivestream.Webcam(P.ini, P.site, P.yes)
-    sites = list(s.streams.keys())
+    S = PyLivestream.Webcam(P.ini, P.site,
+                            P.yes)
+    sites: List[str] = list(S.streams.keys())
 # %% Go live
     if P.yes:
         print('going live on', sites)
     else:
         input(f"Press Enter to go live on {sites}.    Or Ctrl C to abort.")
 
-    s.golive()
+    S.golive()

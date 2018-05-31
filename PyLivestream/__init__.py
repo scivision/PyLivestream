@@ -52,7 +52,13 @@ class Livestream(stream.Stream):
             cmdstem = self.cmd[:-3]
             # +global_header is necessary to tee to multiple services
             cmd = cmdstem + ['-flags:v', '+global_header',
-                             '-f', 'tee', '-map', '0:v', '-map', '1:a']
+                             '-f', 'tee']
+
+            if not self.vidsource == 'file':
+                cmd += ['-map', '0:v', '-map', '1:a']
+            else:
+                cmd += ['-map', '0:v', '-map', '0:a:0']
+
             cmd += ['[f=flv]' + '|[f=flv]'.join(sinks)]  # no double quotes
             print(' '.join(cmd))
 
@@ -133,16 +139,27 @@ class Microphone(Livestream):
 # %% File-based inputs
 class FileIn(Livestream):
 
-    def __init__(self, ini: Path, site: str, infn: Path,
+    def __init__(self, ini: Path, sites: Union[str, List[str]], infn: Path,
                  loop: bool=False, image: Path=None, yes: bool=False) -> None:
 
         vidsource = 'file'
 
-        self.stream = Livestream(ini, site, vidsource, image, loop, infn,
-                                 yes=yes)
+        if isinstance(sites, str):
+            sites = [sites]
+
+        streams = {}
+        for site in sites:
+            streams[site] = Livestream(ini, site, vidsource, image=image,
+                                       loop=loop, infn=infn, yes=yes)
+
+        self.streams: Dict[str, Livestream] = streams
 
     def golive(self):
-        self.stream.golive()
+
+        sinks: List[str] = [self.streams[stream].sink[0]
+                            for stream in self.streams]
+
+        self.streams[stream.unify_streams(self.streams)].golive(sinks)
 
 
 class SaveDisk(stream.Stream):
