@@ -54,10 +54,17 @@ class Livestream(stream.Stream):
             cmd = cmdstem + ['-flags:v', '+global_header',
                              '-f', 'tee']
 
-            if not self.vidsource == 'file':
+            if self.image:
+                #  connect image to video stream, audio file to audio stream
                 cmd += ['-map', '0:v', '-map', '1:a']
             else:
-                cmd += ['-map', '0:v', '-map', '0:a:0']
+                if self.vidsource == 'file':
+                    # picks first video and audio stream, often correct
+                    cmd += ['-map', '0:v', '-map', '0:a:0']
+                else:  # device (webcam)
+                    # connect video device to video stream,
+                    # audio device to audio stream
+                    cmd += ['-map', '0:v', '-map', '1:a']
 
             cmd += ['[f=flv]' + '|[f=flv]'.join(sinks)]  # no double quotes
             print(' '.join(cmd))

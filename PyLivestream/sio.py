@@ -32,6 +32,23 @@ def getexe(exein: Path=None) -> Tuple[str, str]:
     return exe, probeexe
 
 
+def get_streams(fn: Path, exe: Path) -> Union[None, dict]:
+    if not fn:  # audio-only
+        return None
+
+    fn = Path(fn).expanduser()
+
+    assert fn.is_file(), f'{fn} is not a file'
+
+    cmd = [str(exe), '-v', 'error', '-print_format', 'json',
+           '-show_streams', '-show_format', str(fn)]
+
+    ret = subprocess.check_output(cmd, universal_newlines=True)
+# %% decode JSON from FFprobe
+    js = json.loads(ret)
+    return js['streams']
+
+
 def get_resolution(fn: Path, exe: Path) -> Union[None, Tuple[int, int]]:
     """
     get resolution (widthxheight) of video file
@@ -49,20 +66,11 @@ def get_resolution(fn: Path, exe: Path) -> Union[None, Tuple[int, int]]:
 
     if not a video file, None is returned.
     """
-    if not fn:  # audio-only
+
+    streams = get_streams(fn, exe)
+    if streams is None:
         return None
 
-    fn = Path(fn).expanduser()
-
-    assert fn.is_file(), f'{fn} is not a file'
-
-    cmd = [str(exe), '-v', 'error', '-print_format', 'json',
-           '-show_streams', str(fn)]
-
-    ret = subprocess.check_output(cmd, universal_newlines=True)
-# %% decode JSON from FFprobe
-    js = json.loads(ret)
-    streams = js['streams']
     res = None
 
     for s in streams:
@@ -90,21 +98,11 @@ def get_framerate(fn: Path, exe: Path) -> Union[None, float]:
 
     if not a video file, None is returned.
     """
-    if not fn:  # audio-only
+
+    streams = get_streams(fn, exe)
+    if streams is None:
         return None
 
-    fn = Path(fn).expanduser()
-
-    assert fn.is_file(), f'{fn} is not a file'
-
-    cmd = [str(exe), '-v', 'error', '-print_format', 'json',
-           '-show_streams', str(fn)]
-
-    ret = subprocess.check_output(cmd, universal_newlines=True)
-
-# %% decode JSON from FFprobe
-    js = json.loads(ret)
-    streams = js['streams']
     fps = None
 
     for s in streams:

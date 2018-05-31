@@ -24,7 +24,7 @@ class Tests(unittest.TestCase):
         S = PyLivestream.Webcam(inifn, sites)
         for s in S.streams:
             if s == 'periscope':
-                assert S.streams[s].video_kbps == 800
+                self.assertEqual(S.streams[s].video_kbps, 800)
             else:
                 if int(S.streams[s].res[1]) == 480:
                     assert S.streams[s].video_kbps == 500
@@ -32,41 +32,35 @@ class Tests(unittest.TestCase):
                     assert S.streams[s].video_kbps == 1800
 
     def test_filein_video(self):
-        for s in sites:
-            p = PyLivestream.FileIn(inifn, s, rdir/'star_collapse_out.avi')
-
+        S = PyLivestream.FileIn(inifn, sites, rdir/'star_collapse_out.avi')
+        for s in S.streams:
             if s == 'periscope':
-                assert p.stream.video_kbps == 800
+                self.assertEqual(S.streams[s].video_kbps, 800)
             else:
-                if p.stream.res is None:
-                    continue
-
-                if int(p.stream.res[1]) == 480:
-                    self.assertEqual(p.stream.video_kbps, 500)
-                elif int(p.stream.res[1]) == 720:
-                    self.assertEqual(p.stream.video_kbps, 1800)
+                if int(S.streams[s].res[1]) == 480:
+                    self.assertEqual(S.streams[s].video_kbps, 500)
+                elif int(S.streams[s].res[1]) == 720:
+                    self.assertEqual(S.streams[s].video_kbps, 1800)
 
     def test_filein_audio(self):
         flist = list(rdir.glob('*.ogg'))
 
-        for s in sites:
-            p = PyLivestream.FileIn(inifn, s, flist[0])
-
+        S = PyLivestream.FileIn(inifn, sites, flist[0])
+        for s in S.streams:
             if s == 'periscope':
-                self.assertEqual(p.stream.video_kbps, 800)
+                self.assertEqual(S.streams[s].video_kbps, 800)
             else:
-                self.assertEqual(p.stream.video_kbps, 500)
+                self.assertEqual(S.streams[s].video_kbps, 500)
 
     def test_microphone(self):
-        for s in sites:
-            S = PyLivestream.Microphone(inifn, s,
-                                        rdir.parent / 'doc' / 'logo.png')
+        S = PyLivestream.Microphone(inifn, sites,
+                                    rdir.parent / 'doc' / 'logo.png')
 
         for s in S.streams:
             if s == 'periscope':
-                assert S.streams[s].video_kbps == 800
+                self.assertEqual(S.streams[s].video_kbps, 800)
             else:
-                assert S.streams[s].video_kbps == 500
+                self.assertEqual(S.streams[s].video_kbps, 500)
 
     def test_disk(self):
         for s in sites:
@@ -78,7 +72,9 @@ class Tests(unittest.TestCase):
         """stream to NUL"""
 
         s = PyLivestream.FileIn(inifn, 'localhost',
-                                rdir / 'orch_short.ogg', yes=True)
+                                rdir / 'orch_short.ogg',
+                                image=rdir.parent / 'doc' / 'logo.png',
+                                yes=True)
         s.golive()
 
 
