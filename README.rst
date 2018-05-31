@@ -9,11 +9,11 @@
 
 .. image:: https://img.shields.io/pypi/pyversions/PyLivestream.svg
   :target: https://pypi.python.org/pypi/PyLivestream
-  :alt: Python versions (PyPI)
+  :alt: Python versions (PyPi)
 
 .. image::  https://img.shields.io/pypi/format/PyLivestream.svg
   :target: https://pypi.python.org/pypi/PyLivestream
-  :alt: Distribution format (PyPI)
+  :alt: Distribution format (PyPi)
 
 .. image:: https://api.codeclimate.com/v1/badges/b6557d474ec050e74629/maintainability
    :target: https://codeclimate.com/github/scivision/ffmpeg-youtube-live/maintainability
@@ -36,6 +36,15 @@ Uses an ``.ini`` file to adjust all parameters.
 :FFmpeg: >= 3.0 required
 :Python: >= 3.6 required
 
+Caveats
+=======
+
+Comments on dropouts / lag for livestreaming in general (not just with this program):
+
+* live streaming takes full CPU power in general. Low CPU machines (like Raspberry Pi) will need to cut back on resolution. Try starting at 240p (320x240) and working your way up if you have dropouts.
+* live streaming takes an excellent quality (not necessarily high speed) Internet connection in general. Some DSL / wireless internet provider have really spotty performance. You might not notice this with HD Netflix due to deep buffering, but it will show up on livestreaming.
+* Do Skype / Duo / FaceTime work excellently for you on your network? If not, live streaming will not work well.
+* Try a wired (Ethernet) connection to the Internet. I have seen very expensive consumer WiFi APs that just had bad performance in real world strenuous use (like live streaming).
 
 .. contents::
 
@@ -249,7 +258,7 @@ Utilities
 =========
 
 * ``PyLivestream.get_framerate(vidfn)`` gives the frames/sec of a video file.
-* ``PyLivestream.get_resolution(vidfn)`` gives the resolution (widthxheight) of video file.
+* ``PyLivestream.get_resolution(vidfn)`` gives the resolution (width x height) of video file.
 
 
 Notes
