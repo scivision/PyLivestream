@@ -8,7 +8,7 @@ tests_require: List[str] = ['pytest', 'nose', 'coveralls', 'flake8', 'mypy']
 
 setup(name='PyLivestream',
       packages=find_packages(),
-      version='1.6.4',
+      version='1.6.5',
       author='Michael Hirsch, Ph.D.',
       url='https://github.com/scivision/PyLivestream',
       description=('Easy streaming using FFmpeg to '
