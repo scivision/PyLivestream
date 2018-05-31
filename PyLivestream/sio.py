@@ -1,4 +1,5 @@
 import json
+import logging
 import subprocess
 from pathlib import Path
 from typing import Tuple, Union
@@ -112,6 +113,10 @@ def get_framerate(fn: Path, exe: Path) -> Union[None, float]:
         # https://www.ffmpeg.org/faq.html#toc-AVStream_002er_005fframe_005
         fps = s['avg_frame_rate']
         fps = list(map(int, fps.split('/')))
-        fps = fps[0] / fps[1]
+        try:
+            fps = fps[0] / fps[1]
+        except ZeroDivisionError:
+            logging.error(f'FPS not available:{fn}. Is it a video/audio file?')
+            fps = None
 
     return fps
