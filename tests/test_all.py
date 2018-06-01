@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 from pathlib import Path
 import PyLivestream as pls
+import pytest
 import unittest
+import subprocess
+import logging
 
 rdir = Path(__file__).parent
 
@@ -9,7 +12,19 @@ inifn = rdir/'test.ini'
 sites = ['periscope', 'youtube', 'facebook']
 
 
+@pytest.fixture(scope='function')
+def listener():
+    """
+    no need to check return code, errors will show up in client.
+    """
+    print('starting RTMP listener')
+    subprocess.Popen(['ffmpeg','-timeout', '5',
+                          '-i', 'rtmp://localhost', '-f', 'null', '-'],
+                     stdout=subprocess.DEVNULL)
+
+
 class Tests(unittest.TestCase):
+
 
     def test_key(self):
         """tests reading of stream key"""
@@ -74,6 +89,7 @@ class Tests(unittest.TestCase):
             else:
                 self.assertEqual(S.streams[s].video_kbps, 500)
 
+    @pytest.mark.usefixtures("listener")
     def test_microphone(self):
         S = pls.Microphone(inifn, sites,
                            rdir.parent / 'doc' / 'logo.png')
@@ -86,6 +102,21 @@ class Tests(unittest.TestCase):
                 self.assertEqual(S.streams[s].video_kbps, 800)
             else:
                 self.assertEqual(S.streams[s].video_kbps, 500)
+# %% try to stream, XFAIL on CI because no hardware.
+        try:
+            S.golive()
+        except subprocess.CalledProcessError as e:
+            logging.warning(f'Microphone test skipped due to {e}')
+
+    @pytest.mark.usefixtures("listener")
+    def test_microphone_script(self):
+        try:
+            subprocess.check_call(['python', 'MicrophoneLivestream.py',
+                                   'localhost', '--yes'], timeout=5)
+        except subprocess.CalledProcessError as e:
+            logging.warning(f'Microphone test skipped due to {e}')
+        except subprocess.TimeoutExpired:
+            logging.info('Microphone script test seems to have passed.')
 
     def test_disk(self):
         for s in sites:
@@ -93,8 +124,9 @@ class Tests(unittest.TestCase):
             assert p.site == 'file'
             assert p.video_kbps == 3000
 
+    @pytest.mark.usefixtures("listener")
     def test_stream(self):
-        """stream to NUL"""
+        """stream to localhost"""
 
         s = pls.FileIn(inifn, 'localhost',
                        rdir / 'orch_short.ogg',

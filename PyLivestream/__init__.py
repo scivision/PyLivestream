@@ -43,7 +43,8 @@ class Livestream(stream.Stream):
     def startlive(self, sinks: List[str]=None):
         """finally start the stream(s)"""
 
-        if self.key is None and self.server not in ('NUL', '/dev/null'):
+        if self.key is None and self.server not in ('rtmp://localhost',
+                                                    'NUL', '/dev/null'):
             print('\n', ' '.join(self.cmd), '\n')
             return
 
