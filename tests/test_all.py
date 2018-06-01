@@ -7,7 +7,7 @@ import subprocess
 import logging
 import os
 
-CI = os.environ['CI'] if 'CI' in os.environ else False
+CI = bool(os.environ['CI']) if 'CI' in os.environ else False
 
 rdir = Path(__file__).resolve().parent  # .resolve() is necessary
 DEVNULL = subprocess.DEVNULL
