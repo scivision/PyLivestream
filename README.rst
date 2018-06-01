@@ -214,6 +214,7 @@ Glob list of video files to stream::
     python FileGlobLivestream.py site path pattern
 
 -loop       optionally loop endlessly the globbed file list
+-shuffle    optionally shuffle the globbed file list
 -image      if you have AUDIO files, you should normally set an image to display, as most/all streaming sites REQUIRE a video feed--even a static image.
 
 

@@ -11,10 +11,14 @@ https://support.google.com/youtube/answer/2853702
 from pathlib import Path
 from typing import List
 import PyLivestream
+import random
 
 
 def playonce(flist: List[Path], image: Path, site: str, inifn: Path,
-             yes: bool):
+             shuffle: bool, yes: bool):
+
+    if shuffle:
+        random.shuffle(flist)
 
     for f in flist:
         s = PyLivestream.FileIn(inifn, site, infn=f, loop=False, image=image,
@@ -38,6 +42,8 @@ if __name__ == '__main__':
                    default='stream.ini')
     p.add_argument('-image',
                    help='static image to display, for audio-only files.')
+    p.add_argument('-shuffle', help='shuffle the globbed file list',
+                   action='store_true')
     p.add_argument('-loop', help='repeat the globbed file list endlessly',
                    action='store_true')
     p.add_argument('-y', '--yes', help='no confirmation dialog',
@@ -63,6 +69,6 @@ if __name__ == '__main__':
 
     if P.loop:
         while True:
-            playonce(flist, P.image, P.site, inifn, P.yes)
+            playonce(flist, P.image, P.site, inifn, P.shuffle, P.yes)
     else:
-        playonce(flist, P.image, P.site, inifn, P.yes)
+        playonce(flist, P.image, P.site, inifn, P.shuffle, P.yes)

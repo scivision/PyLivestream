@@ -15,7 +15,14 @@ class Ffmpeg():
         self.QUEUE: List[str] = ['-thread_queue_size', '8']
 
     def timelimit(self, t: Union[None, str, int, float]) -> List[str]:
-        if isinstance(t, (str, int, float)):
+        if t is None:
+            return []
+
+        assert isinstance(t, (str, int, float))
+
+        t = str(t)
+
+        if len(t) > 0:
             return ['-t', str(t)]
         else:
             return []
