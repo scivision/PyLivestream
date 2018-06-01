@@ -4,7 +4,7 @@ import logging
 import os
 import sys
 from configparser import ConfigParser
-from typing import Tuple, List, Dict, Union
+from typing import Tuple, List, Dict
 #
 from . import sio
 
@@ -99,7 +99,6 @@ class Stream:
 # %% Key (hexaecimal stream ID)
         self.key: str = sio.getstreamkey(
                             C.get(self.site, 'key', fallback=None))
-
 
     def videostream(self) -> Tuple[List[str], List[str]]:
         """optimizes video settings"""
@@ -226,7 +225,8 @@ class Stream:
         if self.image:
             vid1 += ['-loop', '1', '-f', 'image2']
 
-        if self.image or self.vidsource == 'file':
+        if ((self.vidsource is not None and self.image) or
+           self.vidsource == 'file'):
             vid1 += ['-re']
 
         if self.loop:

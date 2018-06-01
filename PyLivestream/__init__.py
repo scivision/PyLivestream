@@ -40,7 +40,7 @@ class Livestream(stream.Stream):
 
         self.cmd: List[str] = cmd + self.sink
 
-    def golive(self, sinks: List[str]=None):
+    def startlive(self, sinks: List[str]=None):
         """finally start the stream(s)"""
 
         if self.key is None and self.server not in ('NUL', '/dev/null'):
@@ -96,7 +96,7 @@ class Screenshare(Livestream):
         sinks: List[str] = [self.streams[stream].sink[0]
                             for stream in self.streams]
 
-        self.streams[stream.unify_streams(self.streams)].golive(sinks)
+        self.streams[stream.unify_streams(self.streams)].startlive(sinks)
 
 
 class Webcam(Livestream):
@@ -120,7 +120,7 @@ class Webcam(Livestream):
         sinks: List[str] = [self.streams[stream].sink[0]
                             for stream in self.streams]
 
-        self.streams[stream.unify_streams(self.streams)].golive(sinks)
+        self.streams[stream.unify_streams(self.streams)].startlive(sinks)
 
 
 class Microphone(Livestream):
@@ -142,7 +142,7 @@ class Microphone(Livestream):
         sinks: List[str] = [self.streams[stream].sink[0]
                             for stream in self.streams]
 
-        self.streams[stream.unify_streams(self.streams)].golive(sinks)
+        self.streams[stream.unify_streams(self.streams)].startlive(sinks)
 
 
 # %% File-based inputs
@@ -168,7 +168,7 @@ class FileIn(Livestream):
         sinks: List[str] = [self.streams[stream].sink[0]
                             for stream in self.streams]
 
-        self.streams[stream.unify_streams(self.streams)].golive(sinks)
+        self.streams[stream.unify_streams(self.streams)].startlive(sinks)
 
 
 class SaveDisk(stream.Stream):

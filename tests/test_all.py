@@ -14,7 +14,8 @@ class Tests(unittest.TestCase):
     def test_key(self):
         """tests reading of stream key"""
         self.assertEqual(pls.sio.getstreamkey('abc123'), 'abc123')
-        self.assertEqual(pls.sio.getstreamkey(rdir/'periscope.key'), 'abcd1234')
+        self.assertEqual(pls.sio.getstreamkey(rdir / 'periscope.key'),
+                         'abcd1234')
         self.assertEqual(pls.sio.getstreamkey(''), None)
         self.assertEqual(pls.sio.getstreamkey(None), None)
         self.assertEqual(pls.sio.getstreamkey(rdir), None)
@@ -23,6 +24,7 @@ class Tests(unittest.TestCase):
 
         S = pls.Screenshare(inifn, sites)
         for s in S.streams:
+            assert '-re' not in S.streams[s].cmd
             self.assertEqual(S.streams[s].fps, 30.)
 
             if s == 'periscope':
@@ -34,6 +36,7 @@ class Tests(unittest.TestCase):
 
         S = pls.Webcam(inifn, sites)
         for s in S.streams:
+            assert '-re' not in S.streams[s].cmd
             self.assertEqual(S.streams[s].fps, 30.)
 
             if s == 'periscope':
@@ -47,6 +50,7 @@ class Tests(unittest.TestCase):
     def test_filein_video(self):
         S = pls.FileIn(inifn, sites, rdir/'star_collapse_out.avi')
         for s in S.streams:
+            assert '-re' in S.streams[s].cmd
             self.assertEqual(S.streams[s].fps, 25.)
 
             if s == 'periscope':
@@ -62,6 +66,7 @@ class Tests(unittest.TestCase):
 
         S = pls.FileIn(inifn, sites, flist[0])
         for s in S.streams:
+            assert '-re' in S.streams[s].cmd
             self.assertEqual(S.streams[s].fps, None)
 
             if s == 'periscope':
@@ -71,9 +76,10 @@ class Tests(unittest.TestCase):
 
     def test_microphone(self):
         S = pls.Microphone(inifn, sites,
-                                    rdir.parent / 'doc' / 'logo.png')
+                           rdir.parent / 'doc' / 'logo.png')
 
         for s in S.streams:
+            assert '-re' not in S.streams[s].cmd
             self.assertEqual(S.streams[s].fps, None)
 
             if s == 'periscope':
@@ -91,9 +97,9 @@ class Tests(unittest.TestCase):
         """stream to NUL"""
 
         s = pls.FileIn(inifn, 'localhost',
-                                rdir / 'orch_short.ogg',
-                                image=rdir.parent / 'doc' / 'logo.png',
-                                yes=True)
+                       rdir / 'orch_short.ogg',
+                       image=rdir.parent / 'doc' / 'logo.png',
+                       yes=True)
         s.golive()
 
 
