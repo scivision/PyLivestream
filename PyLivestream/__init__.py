@@ -4,6 +4,8 @@ from typing import List, Union, Dict
 #
 from . import stream
 
+__all__ = ['FileIn', 'Microphone', 'SaveDisk', 'Screenshare', 'Webcam']
+
 
 class Livestream(stream.Stream):
 

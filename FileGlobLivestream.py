@@ -30,7 +30,8 @@ if __name__ == '__main__':
     from argparse import ArgumentParser
     p = ArgumentParser(description="Livestream a globbed input file list")
     p.add_argument('site',
-                   help='site to stream: [youtube,periscope,facebook,twitch]')
+                   help='site to stream: [youtube,periscope,facebook,twitch]',
+                   nargs='+')
     p.add_argument('path', help='path to discover files from')
     p.add_argument('glob', help='file glob pattern to stream.')
     p.add_argument('-i', '--ini', help='*.ini file with stream parameters',

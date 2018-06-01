@@ -4,7 +4,7 @@ import logging
 import os
 import sys
 from configparser import ConfigParser
-from typing import Tuple, List, Dict
+from typing import Tuple, List, Dict, Union
 #
 from . import sio
 
@@ -27,7 +27,7 @@ BR60 = dict([
        (1440, 9000),
        (2160, 20000)])
 
-FPS = 30.  # default frames/sec if not defined otherwise
+FPS: float = 30.  # default frames/sec if not defined otherwise
 
 
 # %% top level
@@ -97,16 +97,13 @@ class Stream:
 
         self.server: str = C.get(self.site, 'server', fallback=None)
 # %% Key (hexaecimal stream ID)
-        keyfn = C.get(self.site, 'key', fallback=None)
-        if not keyfn:  # '' or None
-            self.key = None
-        else:
-            # .resolve()  # Python >= 3.6 required for .resolve(strict=False)
-            key = Path(keyfn).expanduser()
-            self.key = key.read_text().strip() if key.is_file() else keyfn
+        self.key: str = sio.getstreamkey(
+                            C.get(self.site, 'key', fallback=None))
+
 
     def videostream(self) -> Tuple[List[str], List[str]]:
         """optimizes video settings"""
+        vid1: List[str]
 # %% configure video input
         if self.vidsource == 'screen':
             vid1 = self.screengrab()
