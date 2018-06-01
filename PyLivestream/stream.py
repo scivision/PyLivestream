@@ -4,7 +4,7 @@ import logging
 import os
 import sys
 from configparser import ConfigParser
-from typing import Tuple, List, Dict
+from typing import Tuple, List
 #
 from . import sio
 
@@ -259,23 +259,3 @@ class Stream:
         buf += ['-f', 'flv']
 
         return buf
-
-
-def unify_streams(streams: Dict[str, Stream]) -> str:
-    """
-    find least common denominator stream settings,
-        so "tee" output can generate multiple streams.
-    First try: use stream with lowest video bitrate.
-
-    Exploits that Python >= 3.6 has guaranteed dict() ordering.
-
-    fast native Python argmin()
-    https://stackoverflow.com/a/11825864
-    """
-    vid_bw: List[int] = [streams[stream].video_kbps for stream in streams]
-
-    argmin: int = min(range(len(vid_bw)), key=vid_bw.__getitem__)
-
-    key: str = list(streams.keys())[argmin]
-
-    return key

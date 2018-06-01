@@ -96,7 +96,7 @@ class Screenshare(Livestream):
         sinks: List[str] = [self.streams[stream].sink[0]
                             for stream in self.streams]
 
-        self.streams[stream.unify_streams(self.streams)].startlive(sinks)
+        self.streams[unify_streams(self.streams)].startlive(sinks)
 
 
 class Webcam(Livestream):
@@ -120,7 +120,7 @@ class Webcam(Livestream):
         sinks: List[str] = [self.streams[stream].sink[0]
                             for stream in self.streams]
 
-        self.streams[stream.unify_streams(self.streams)].startlive(sinks)
+        self.streams[unify_streams(self.streams)].startlive(sinks)
 
 
 class Microphone(Livestream):
@@ -142,7 +142,7 @@ class Microphone(Livestream):
         sinks: List[str] = [self.streams[stream].sink[0]
                             for stream in self.streams]
 
-        self.streams[stream.unify_streams(self.streams)].startlive(sinks)
+        self.streams[unify_streams(self.streams)].startlive(sinks)
 
 
 # %% File-based inputs
@@ -168,7 +168,7 @@ class FileIn(Livestream):
         sinks: List[str] = [self.streams[stream].sink[0]
                             for stream in self.streams]
 
-        self.streams[stream.unify_streams(self.streams)].startlive(sinks)
+        self.streams[unify_streams(self.streams)].startlive(sinks)
 
 
 class SaveDisk(stream.Stream):
@@ -223,3 +223,23 @@ class SaveDisk(stream.Stream):
                 pass
         else:
             print('specify filename to save screen capture w/ audio to disk.')
+
+
+def unify_streams(streams: Dict[str, stream.Stream]) -> str:
+    """
+    find least common denominator stream settings,
+        so "tee" output can generate multiple streams.
+    First try: use stream with lowest video bitrate.
+
+    Exploits that Python >= 3.6 has guaranteed dict() ordering.
+
+    fast native Python argmin()
+    https://stackoverflow.com/a/11825864
+    """
+    vid_bw: List[int] = [streams[s].video_kbps for s in streams]
+
+    argmin: int = min(range(len(vid_bw)), key=vid_bw.__getitem__)
+
+    key: str = list(streams.keys())[argmin]
+
+    return key
