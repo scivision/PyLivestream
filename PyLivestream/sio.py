@@ -2,9 +2,15 @@ import json
 import logging
 import subprocess
 from pathlib import Path
-from typing import Tuple, Union
+from typing import Tuple, Union, List
 
 DEVNULL = subprocess.DEVNULL
+
+
+def run(cmd: List[str]):
+    print('\n', ' '.join(cmd), '\n')
+
+    subprocess.check_call(cmd)
 
 
 def getexe(exein: Path=None) -> Tuple[str, str]:
@@ -32,13 +38,16 @@ def getexe(exein: Path=None) -> Tuple[str, str]:
     return exe, probeexe
 
 
-def get_streams(fn: Path, exe: Path) -> Union[None, dict]:
+def get_streams(fn: Path, exein: Path=None) -> Union[None, dict]:
     if not fn:  # audio-only
         return None
 
     fn = Path(fn).expanduser()
 
-    assert fn.is_file(), f'{fn} is not a file'
+    if not fn.is_file():
+        raise FileNotFoundError(f'{fn} is not a file.')
+
+    exe = getexe()[1] if exein is None else exein
 
     cmd = [str(exe), '-v', 'error', '-print_format', 'json',
            '-show_streams', '-show_format', str(fn)]
@@ -46,10 +55,11 @@ def get_streams(fn: Path, exe: Path) -> Union[None, dict]:
     ret = subprocess.check_output(cmd, universal_newlines=True)
 # %% decode JSON from FFprobe
     js = json.loads(ret)
+
     return js['streams']
 
 
-def get_resolution(fn: Path, exe: Path) -> Union[None, Tuple[int, int]]:
+def get_resolution(fn: Path, exe: Path=None) -> Union[None, Tuple[int, int]]:
     """
     get resolution (widthxheight) of video file
     http://trac.ffmpeg.org/wiki/FFprobeTips#WidthxHeight
@@ -81,7 +91,7 @@ def get_resolution(fn: Path, exe: Path) -> Union[None, Tuple[int, int]]:
     return res
 
 
-def get_framerate(fn: Path, exe: Path) -> Union[None, float]:
+def get_framerate(fn: Path, exe: Path=None) -> Union[None, float]:
     """
     get framerate of video file
     http://trac.ffmpeg.org/wiki/FFprobeTips#FrameRate

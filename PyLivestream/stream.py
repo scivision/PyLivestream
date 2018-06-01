@@ -7,6 +7,7 @@ from configparser import ConfigParser
 from typing import Tuple, List
 #
 from . import sio
+from .ffmpeg import Ffmpeg
 
 # %%  Col0: vertical pixels (height). Col1: video kbps. Interpolates.
 # NOTE: Python >= 3.6 has guaranteed dict() order.
@@ -35,21 +36,28 @@ class Stream:
 
     def __init__(self, ini: Path, site: str, vidsource: str=None,
                  image: Path=None, loop: bool=False, infn: Path=None,
-                 yes: bool=False) -> None:
+                 yes: bool=False, verbose: bool=False) -> None:
+
+        self.F = Ffmpeg()
+
+        self.loglevel: List[str] = self.F.INFO if verbose else self.F.ERROR
 
         self.ini: Path = Path(ini).expanduser()
         self.site: str = site
         self.vidsource = vidsource
         self.image = Path(image).expanduser() if image else None
-        self.loop = loop
+        self.loop: bool = loop
 
         self.infn = Path(infn).expanduser() if infn else None
-        self.yes = yes
+        self.yes: List[str] = self.F.YES if yes else []
+
+        self.queue = self.F.QUEUE
 
     def osparam(self):
         """load OS specific config"""
 
-        assert self.ini.is_file(), f'{self.ini} not found.'
+        if not self.ini.is_file:
+            raise FileNotFoundError(f'{self.ini} is not a file.')
 
         C = ConfigParser(inline_comment_prefixes=('#', ';'))
         C.read(str(self.ini))
@@ -82,7 +90,9 @@ class Stream:
 
         self.audiofs: int = C.get(self.site, 'audiofs')  # not getint
         self.preset: str = C.get(self.site, 'preset')
-        self.timelimit: str = C.get(self.site, 'timelimit', fallback=None)
+        self.timelimit: List[str] = self.F.timelimit(C.get(self.site,
+                                                           'timelimit',
+                                                           fallback=None))
 
         self.videochan: str = C.get(sys.platform, 'videochan')
         self.audiochan: str = C.get(sys.platform, 'audiochan', fallback=None)

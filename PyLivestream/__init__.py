@@ -1,8 +1,8 @@
 from pathlib import Path
-import subprocess as sp
 from typing import List, Union, Dict
 #
 from . import stream
+from . import sio
 
 __all__ = ['FileIn', 'Microphone', 'SaveDisk', 'Screenshare', 'Webcam']
 
@@ -27,10 +27,13 @@ class Livestream(stream.Stream):
 
         buf: List[str] = self.buffer(self.server)
 # %% begin to setup command line
-        cmd: List[str] = [str(self.exe)]
+        cmd: List[str] = []
+        cmd.append(self.exe)
 
-        if self.yes:
-            cmd += ['-y']
+        cmd.extend(self.loglevel)
+        cmd.extend(self.yes)
+        cmd.extend(self.timelimit)
+        cmd.extend(self.queue)
 
         cmd += vid1 + aud1 + vid2 + aud2 + buf
 
@@ -49,8 +52,7 @@ class Livestream(stream.Stream):
             return
 
         if not sinks:  # single stream
-            print('\n', ' '.join(self.cmd))
-            sp.check_call(self.cmd)
+            sio.run(self.cmd)
         else:  # multi-stream output tee
             cmdstem = self.cmd[:-3]
             # +global_header is necessary to tee to multiple services
@@ -70,9 +72,8 @@ class Livestream(stream.Stream):
                     cmd += ['-map', '0:v', '-map', '1:a']
 
             cmd += ['[f=flv]' + '|[f=flv]'.join(sinks)]  # no double quotes
-            print(' '.join(cmd))
 
-            sp.check_call(cmd)
+            sio.run(cmd)
 
 
 # %% operators
@@ -203,9 +204,6 @@ class SaveDisk(stream.Stream):
 
         self.cmd += [str(self.outfn)]
 
-        if self.timelimit:
-            self.cmd += ['-timelimit', self.timelimit]
-
         if clobber:
             self.cmd += ['-y']
 
@@ -214,14 +212,9 @@ class SaveDisk(stream.Stream):
 
     def save(self):
 
-        print('\n', ' '.join(self.cmd), '\n')
-
         if self.outfn:
-            try:
-                ret = sp.check_call(self.cmd)
-                print('FFmpeg returncode', ret)
-            except FileNotFoundError:
-                pass
+            sio.run(self.cmd)
+
         else:
             print('specify filename to save screen capture w/ audio to disk.')
 
