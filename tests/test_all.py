@@ -5,6 +5,9 @@ import pytest
 import unittest
 import subprocess
 import logging
+import os
+
+CI = os.environ['CI'] if 'CI' in os.environ else False
 
 rdir = Path(__file__).resolve().parent  # .resolve() is necessary
 DEVNULL = subprocess.DEVNULL
@@ -130,6 +133,7 @@ class Tests(unittest.TestCase):
         except subprocess.CalledProcessError as e:
             logging.warning(f'Microphone test skipped due to {e}')
 
+    @pytest.mark.skipif(CI, reason="Many CI's don't have audio hardware")
     def test_microphone_script(self):
         subprocess.check_call(['python',
                                'MicrophoneLivestream.py',
@@ -144,9 +148,9 @@ class Tests(unittest.TestCase):
             self.assertEqual(p.site, 'file')
             self.assertEqual(p.video_kbps, 3000)
 
+    @pytest.mark.skipif(CI, reason="Many CI's don't allow opening ports")
     def test_stream(self):
         """stream to localhost"""
-
         s = pls.FileIn(inifn, 'localhost',
                        rdir / 'orch_short.ogg',
                        image=rdir.parent / 'doc' / 'logo.png',
