@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import List, Union, Dict
 #
 from . import stream
-from . import sio
+from . import utils
 
 __all__ = ['FileIn', 'Microphone', 'SaveDisk', 'Screenshare', 'Webcam']
 
@@ -11,8 +11,10 @@ class Livestream(stream.Stream):
 
     def __init__(self, ini: Path, site: str, vidsource: str=None,
                  image: Path=None, loop: bool=False, infn: Path=None,
+                 caption: str=None,
                  yes: bool=False) -> None:
-        super().__init__(ini, site, vidsource, image, loop, infn, yes=yes)
+        super().__init__(ini, site, vidsource, image, loop, infn,
+                         caption=caption, yes=yes)
 
         self.site = site.lower()
 
@@ -20,10 +22,11 @@ class Livestream(stream.Stream):
 
         self.video_bitrate()
 
-        vid1, vid2 = self.videostream()
+        vidIn: List[str] = self.videoIn()
+        vidOut: List[str] = self.videoOut()
 
-        aud1: List[str] = self.audiostream()
-        aud2: List[str] = self.audiocomp()
+        audIn: List[str] = self.audioIn()
+        audOut: List[str] = self.audioOut()
 
         buf: List[str] = self.buffer(self.server)
 # %% begin to setup command line
@@ -35,7 +38,12 @@ class Livestream(stream.Stream):
         cmd.extend(self.timelimit)
         cmd.extend(self.queue)
 
-        cmd += vid1 + aud1 + vid2 + aud2 + buf
+        cmd += vidIn + audIn
+
+        cmd += self.F.drawtext(self.caption)
+
+        cmd += vidOut + audOut
+        cmd += buf
 
         streamid: str = self.key if self.key else ''
 
@@ -52,7 +60,7 @@ class Livestream(stream.Stream):
             return
 
         if not sinks:  # single stream
-            sio.run(self.cmd)
+            utils.run(self.cmd)
         else:  # multi-stream output tee
             cmdstem = self.cmd[:-3]
             # +global_header is necessary to tee to multiple services
@@ -73,14 +81,14 @@ class Livestream(stream.Stream):
 
             cmd += ['[f=flv]' + '|[f=flv]'.join(sinks)]  # no double quotes
 
-            sio.run(cmd)
+            utils.run(cmd)
 
 
 # %% operators
 class Screenshare(Livestream):
 
     def __init__(self, ini: Path, websites: Union[str, List[str]],
-                 yes: bool=False) -> None:
+                 caption: str=None, yes: bool=False) -> None:
 
         vidsource = 'screen'
 
@@ -89,7 +97,8 @@ class Screenshare(Livestream):
 
         streams = {}
         for site in websites:
-            streams[site] = Livestream(ini, site, vidsource, yes=yes)
+            streams[site] = Livestream(ini, site, vidsource,
+                                       caption=caption, yes=yes)
 
         self.streams: Dict[str, Livestream] = streams
 
@@ -104,7 +113,7 @@ class Screenshare(Livestream):
 class Webcam(Livestream):
 
     def __init__(self, ini: Path, websites: Union[str, List[str]],
-                 yes: bool=False) -> None:
+                 caption: str=None, yes: bool=False) -> None:
 
         vidsource = 'camera'
 
@@ -113,7 +122,8 @@ class Webcam(Livestream):
 
         streams = {}
         for site in websites:
-            streams[site] = Livestream(ini, site, vidsource, yes=yes)
+            streams[site] = Livestream(ini, site, vidsource,
+                                       caption=caption,  yes=yes)
 
         self.streams: Dict[str, Livestream] = streams
 
@@ -128,14 +138,15 @@ class Webcam(Livestream):
 class Microphone(Livestream):
 
     def __init__(self, ini: Path, sites: Union[str, List[str]], image: Path,
-                 yes: bool=False) -> None:
+                 caption: str=None, yes: bool=False) -> None:
 
         if isinstance(sites, str):
             sites = [sites]
 
         streams = {}
         for site in sites:
-            streams[site] = Livestream(ini, site, image=image, yes=yes)
+            streams[site] = Livestream(ini, site, image=image,
+                                       caption=caption, yes=yes)
 
         self.streams: Dict[str, Livestream] = streams
 
@@ -151,7 +162,8 @@ class Microphone(Livestream):
 class FileIn(Livestream):
 
     def __init__(self, ini: Path, sites: Union[str, List[str]], infn: Path,
-                 loop: bool=False, image: Path=None, yes: bool=False) -> None:
+                 loop: bool=False, image: Path=None,
+                 caption: str=None, yes: bool=False) -> None:
 
         vidsource = 'file'
 
@@ -161,7 +173,8 @@ class FileIn(Livestream):
         streams = {}
         for site in sites:
             streams[site] = Livestream(ini, site, vidsource, image=image,
-                                       loop=loop, infn=infn, yes=yes)
+                                       loop=loop, infn=infn,
+                                       caption=caption, yes=yes)
 
         self.streams: Dict[str, Livestream] = streams
 
@@ -175,7 +188,8 @@ class FileIn(Livestream):
 
 class SaveDisk(stream.Stream):
 
-    def __init__(self, ini: Path, outfn: Path=None, yes: bool=False) -> None:
+    def __init__(self, ini: Path, outfn: Path=None,
+                 caption: str=None, yes: bool=False) -> None:
         """
         records to disk screen capture with audio
 
@@ -184,18 +198,21 @@ class SaveDisk(stream.Stream):
         site = 'file'
         vidsource = 'screen'
 
-        super().__init__(ini, site, vidsource)
+        super().__init__(ini, site, vidsource, caption=caption)
 
         self.outfn = Path(outfn).expanduser() if outfn else None
 
         self.osparam()
 
-        vid1, vid2 = self.videostream()
+        vidIn: List[str] = self.videoIn()
+        vidOut: List[str] = self.videoOut()
 
-        aud1 = self.audiostream()
-        aud2 = self.audiocomp()
+        audIn: List[str] = self.audioIn()
+        audOut: List[str] = self.audioOut()
 
-        self.cmd: List[str] = [str(self.exe)] + vid1 + aud1 + vid2 + aud2
+        self.cmd: List[str] = [str(self.exe)]
+        self.cmd += vidIn + audIn
+        self.cmd += vidOut + audOut
 
         # ffmpeg relies on suffix for container type, this is a fallback.
         if self.outfn and not self.outfn.suffix:
@@ -209,7 +226,7 @@ class SaveDisk(stream.Stream):
     def save(self):
 
         if self.outfn:
-            sio.run(self.cmd)
+            utils.run(self.cmd)
 
         else:
             print('specify filename to save screen capture w/ audio to disk.')

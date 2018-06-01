@@ -38,7 +38,7 @@ def getexe(exein: Path=None) -> Tuple[str, str]:
     return exe, probeexe
 
 
-def get_streams(fn: Path, exein: Path=None) -> Union[None, dict]:
+def get_meta(fn: Path, exein: Path=None) -> Union[None, dict]:
     if not fn:  # audio-only
         return None
 
@@ -50,13 +50,29 @@ def get_streams(fn: Path, exein: Path=None) -> Union[None, dict]:
     exe = getexe()[1] if exein is None else exein
 
     cmd = [str(exe), '-v', 'error', '-print_format', 'json',
-           '-show_streams', '-show_format', str(fn)]
+           '-show_streams',
+           '-show_format', str(fn)]
 
     ret = subprocess.check_output(cmd, universal_newlines=True)
 # %% decode JSON from FFprobe
-    js = json.loads(ret)
+    return json.loads(ret)
 
-    return js['streams']
+
+def meta_caption(meta) -> str:
+    """makes text from metadata for captioning video"""
+    caption = ''
+
+    try:
+        caption += meta.title + ' - '
+    except (TypeError, LookupError, AttributeError):
+        pass
+
+    try:
+        caption += meta.artist
+    except (TypeError, LookupError, AttributeError):
+        pass
+
+    return caption
 
 
 def get_resolution(fn: Path, exe: Path=None) -> Union[None, Tuple[int, int]]:
@@ -77,13 +93,13 @@ def get_resolution(fn: Path, exe: Path=None) -> Union[None, Tuple[int, int]]:
     if not a video file, None is returned.
     """
 
-    streams = get_streams(fn, exe)
-    if streams is None:
+    meta = get_meta(fn, exe)
+    if meta is None:
         return None
 
     res = None
 
-    for s in streams:
+    for s in meta['streams']:
         if s['codec_type'] != 'video':
             continue
         res = (s['width'], s['height'])
@@ -109,13 +125,13 @@ def get_framerate(fn: Path, exe: Path=None) -> Union[None, float]:
     if not a video file, None is returned.
     """
 
-    streams = get_streams(fn, exe)
-    if streams is None:
+    meta = get_meta(fn, exe)
+    if meta is None:
         return None
 
     fps = None
 
-    for s in streams:
+    for s in meta['streams']:
         if s['codec_type'] != 'video':
             continue
         # https://www.ffmpeg.org/faq.html#toc-AVStream_002er_005fframe_005

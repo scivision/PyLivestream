@@ -191,12 +191,15 @@ Stream to multiple sites, in this example Periscope and YouTube Live simultaneou
 File Input
 ----------
 
+Captions: if you have installed the optional ``tinytag`` Python module, the Title - Artist will be added automatically onto the video from the audio/video files.
+
 
 Loop single video endlessly
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ::
 
     python FileLoopLivestream.py site videofile
+    
 
 
 several video files
@@ -208,6 +211,7 @@ Glob list of video files to stream::
 -loop       optionally loop endlessly the globbed file list
 -shuffle    optionally shuffle the globbed file list
 -image      if you have AUDIO files, you should normally set an image to display, as most/all streaming sites REQUIRE a video feed--even a static image.
+-nometa     disable Title - Artist text overlay
 
 
 stream all videos in directory

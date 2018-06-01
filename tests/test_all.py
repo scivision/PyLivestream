@@ -37,29 +37,29 @@ class Tests(unittest.TestCase):
 
     def test_key(self):
         """tests reading of stream key"""
-        self.assertEqual(pls.sio.getstreamkey('abc123'), 'abc123')
-        self.assertEqual(pls.sio.getstreamkey(rdir / 'periscope.key'),
+        self.assertEqual(pls.utils.getstreamkey('abc123'), 'abc123')
+        self.assertEqual(pls.utils.getstreamkey(rdir / 'periscope.key'),
                          'abcd1234')
-        self.assertEqual(pls.sio.getstreamkey(''), None)
-        self.assertEqual(pls.sio.getstreamkey(None), None)
-        self.assertEqual(pls.sio.getstreamkey(rdir), None)
+        self.assertEqual(pls.utils.getstreamkey(''), None)
+        self.assertEqual(pls.utils.getstreamkey(None), None)
+        self.assertEqual(pls.utils.getstreamkey(rdir), None)
 
     def test_exe(self):
-        exe, pexe = pls.sio.getexe()
+        exe, pexe = pls.utils.getexe()
         self.assertIn('ffmpeg', exe)
         self.assertIn('ffprobe', pexe)
 
         for p in (None, '', 'ffmpeg'):
-            exe, pexe = pls.sio.getexe(p)
+            exe, pexe = pls.utils.getexe(p)
             self.assertIn('ffmpeg', exe)
             self.assertIn('ffprobe', pexe)
 
     def test_attrs(self):
         for p in (None, '',):
-            self.assertEqual(pls.sio.get_resolution(p), None)
+            self.assertEqual(pls.utils.get_resolution(p), None)
 
-        self.assertEqual(pls.sio.get_resolution(VIDFN), (720, 480))
-        self.assertEqual(pls.sio.get_framerate(VIDFN), 25.0)
+        self.assertEqual(pls.utils.get_resolution(VIDFN), (720, 480))
+        self.assertEqual(pls.utils.get_framerate(VIDFN), 25.0)
 
     def test_screenshare(self):
 

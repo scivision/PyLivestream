@@ -9,20 +9,35 @@ https://www.scivision.co/youtube-live-ffmpeg-livestream/
 https://support.google.com/youtube/answer/2853702
 """
 from pathlib import Path
-from typing import List
-import PyLivestream
+from typing import List, Union
+import PyLivestream as pls
 import random
+try:
+    from tinytag import TinyTag
+except ImportError:
+    TinyTag = None
 
 
 def playonce(flist: List[Path], image: Path, site: str, inifn: Path,
-             shuffle: bool, yes: bool):
+             shuffle: bool, usemeta: bool, yes: bool):
 
     if shuffle:
         random.shuffle(flist)
 
+    caption: Union[str, None]
+
     for f in flist:
-        s = PyLivestream.FileIn(inifn, site, infn=f, loop=False, image=image,
-                                yes=yes)
+        if usemeta and TinyTag:
+            try:
+                caption = pls.utils.meta_caption(TinyTag.get(str(f)))
+                print(caption)
+            except LookupError:
+                caption = None
+        else:
+            caption = None
+
+        s = pls.FileIn(inifn, site, infn=f, loop=False, image=image,
+                       caption=caption, yes=yes)
 
         s.golive()
 
@@ -48,6 +63,8 @@ if __name__ == '__main__':
                    action='store_true')
     p.add_argument('-y', '--yes', help='no confirmation dialog',
                    action='store_true')
+    p.add_argument('-nometa', help='do not add metadata caption to video',
+                   action='store_false')
     P = p.parse_args()
 
     path = Path(P.path).expanduser()
@@ -67,8 +84,10 @@ if __name__ == '__main__':
 
     inifn = Path(P.ini).expanduser()
 
+    usemeta = P.nometa
+
     if P.loop:
         while True:
-            playonce(flist, P.image, P.site, inifn, P.shuffle, P.yes)
+            playonce(flist, P.image, P.site, inifn, P.shuffle, usemeta, P.yes)
     else:
-        playonce(flist, P.image, P.site, inifn, P.shuffle, P.yes)
+        playonce(flist, P.image, P.site, inifn, P.shuffle, usemeta, P.yes)

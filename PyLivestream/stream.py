@@ -4,9 +4,9 @@ import logging
 import os
 import sys
 from configparser import ConfigParser
-from typing import Tuple, List
+from typing import Tuple, List, Union
 #
-from . import sio
+from . import utils
 from .ffmpeg import Ffmpeg
 
 # %%  Col0: vertical pixels (height). Col1: video kbps. Interpolates.
@@ -36,6 +36,7 @@ class Stream:
 
     def __init__(self, ini: Path, site: str, vidsource: str=None,
                  image: Path=None, loop: bool=False, infn: Path=None,
+                 caption: str=None,
                  yes: bool=False, verbose: bool=False) -> None:
 
         self.F = Ffmpeg()
@@ -53,6 +54,8 @@ class Stream:
 
         self.queue = self.F.QUEUE
 
+        self.caption: Union[str, None] = caption
+
     def osparam(self):
         """load OS specific config"""
 
@@ -68,8 +71,8 @@ class Stream:
             if os.environ['XDG_SESSION_TYPE'] == 'wayland':
                 logging.error('Wayland may only give black output. Try X11')
 
-        self.exe, self.probeexe = sio.getexe(C.get(sys.platform, 'exe',
-                                                   fallback='ffmpeg'))
+        self.exe, self.probeexe = utils.getexe(C.get(sys.platform, 'exe',
+                                                     fallback='ffmpeg'))
 
         if self.vidsource == 'camera':
             self.res: Tuple[int, int] = C.get(self.site,
@@ -82,9 +85,9 @@ class Stream:
             self.origin: Tuple[int, int] = C.get(self.site,
                                                  'screencap_origin').split(',')
         elif self.vidsource is None or self.vidsource == 'file':
-            self.res: Tuple[int, int] = sio.get_resolution(self.infn,
-                                                           self.probeexe)
-            self.fps: float = sio.get_framerate(self.infn, self.probeexe)
+            self.res: Tuple[int, int] = utils.get_resolution(self.infn,
+                                                             self.probeexe)
+            self.fps: float = utils.get_framerate(self.infn, self.probeexe)
         else:
             raise ValueError(f'unknown video source {self.vidsource}')
 
@@ -107,45 +110,49 @@ class Stream:
 
         self.server: str = C.get(self.site, 'server', fallback=None)
 # %% Key (hexaecimal stream ID)
-        self.key: str = sio.getstreamkey(
+        self.key: str = utils.getstreamkey(
                             C.get(self.site, 'key', fallback=None))
 
-    def videostream(self) -> Tuple[List[str], List[str]]:
-        """optimizes video settings"""
-        vid1: List[str]
+    def videoIn(self) -> List[str]:
+        """config video input"""
+        v: List[str]
 # %% configure video input
         if self.vidsource == 'screen':
-            vid1 = self.screengrab()
+            v = self.screengrab()
         elif self.vidsource == 'camera':
-            vid1 = self.webcam()
+            v = self.webcam()
         elif self.vidsource is None or self.vidsource == 'file':
-            vid1 = self.filein()
+            v = self.filein()
         else:
             raise ValueError(f'unknown vidsource {self.vidsource}')
-# %% configure video output
-        vid2: List[str] = ['-c:v', 'libx264', '-pix_fmt', 'yuv420p']
+
+        return v
+
+    def videoOut(self) -> List[str]:
+        """configure video output"""
+        v: List[str] = ['-c:v', 'libx264', '-pix_fmt', 'yuv420p']
 # %% set frames/sec, bitrate and keyframe interval
         """
          DON'T DO THIS.
          It makes keyframes/bitrate far off from what streaming sites want
-         vid2 += ['-tune', 'stillimage']
+         v += ['-tune', 'stillimage']
 
          The settings below still save video/data bandwidth for the still image
          + audio case.
         """
         fps = self.fps if self.fps is not None else FPS
 
-        vid2 += ['-preset', self.preset,
-                 '-b:v', str(self.video_kbps) + 'k']
+        v += ['-preset', self.preset,
+              '-b:v', str(self.video_kbps) + 'k']
 
         if self.image:
-            vid2 += ['-r', str(fps)]
+            v += ['-r', str(fps)]
 
-        vid2 += ['-g', str(self.keyframe_sec * fps)]
+        v += ['-g', str(self.keyframe_sec * fps)]
 
-        return vid1, vid2
+        return v
 
-    def audiostream(self) -> List[str]:
+    def audioIn(self) -> List[str]:
         """
         -ac * may not be needed, took out.
         -ac 2 NOT -ac 1 to avoid "non monotonous DTS in output stream" errors
@@ -160,7 +167,7 @@ class Stream:
 #        else: #  file input
 #            return ['-ac','2']
 
-    def audiocomp(self) -> List[str]:
+    def audioOut(self) -> List[str]:
         """select audio codec
         https://trac.ffmpeg.org/wiki/Encode/AAC#FAQ
         https://support.google.com/youtube/answer/2853702?hl=en

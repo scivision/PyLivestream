@@ -26,3 +26,19 @@ class Ffmpeg():
             return ['-t', str(t)]
         else:
             return []
+
+    def drawtext(self, text: Union[None, str]) -> List[str]:
+        # fontfile=/path/to/font.ttf:
+        if not text:  # None or '' or [] etc.
+            return []
+
+        fontcolor = 'fontcolor=white'
+        fontsize = 'fontsize=24'
+        box = 'box=1'
+        boxcolor = 'boxcolor=black@0.5'
+        border = 'boxborderw=5'
+        x = 'x=(w-text_w)/2'
+        y = 'y=(h-text_h)*3/4'
+
+        return ['-vf',
+                f"drawtext=text='{text}':{fontcolor}:{fontsize}:{box}:{boxcolor}:{border}:{x}:{y}"]

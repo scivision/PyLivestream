@@ -39,7 +39,7 @@ install: pip -q install -e .[tests]
 script:
   - pytest -sv
   - flake8
-  - mypy *[^setup].py
+  - mypy . --ignore-missing-imports
 
 after_success:
   - if [[ $TRAVIS_PYTHON_VERSION == 3.6* ]]; then

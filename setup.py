@@ -17,7 +17,7 @@ setup(name='PyLivestream',
       python_requires='>=3.6',
       install_requires=install_requires,
       tests_require=tests_require,
-      extras_require={'tests': tests_require},
+      extras_require={'tests': tests_require, 'captions': 'tinytag'},
       classifiers=[
           'Development Status :: 5 - Production/Stable',
           'Environment :: Console',
