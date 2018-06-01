@@ -175,8 +175,7 @@ class FileIn(Livestream):
 
 class SaveDisk(stream.Stream):
 
-    def __init__(self, ini: Path, outfn: Path=None,
-                 clobber: bool=False) -> None:
+    def __init__(self, ini: Path, outfn: Path=None, yes: bool=False) -> None:
         """
         records to disk screen capture with audio
 
@@ -204,10 +203,7 @@ class SaveDisk(stream.Stream):
 
         self.cmd += [str(self.outfn)]
 
-        if clobber:
-            self.cmd += ['-y']
-
-#        if sys.platform == 'win32':
+#        if sys.platform == 'win32':  # doesn't seem to be needed.
 #            cmd += ['-copy_ts']
 
     def save(self):

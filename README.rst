@@ -23,11 +23,13 @@
 Python scripted livestreaming using FFmpeg
 ==========================================
 
-Streams to one or **multiple** streaming sites simultaneously.
+Streams to one or **multiple** streaming sites simultaneously, using pure object-oriented Python (no extra packages) and FFmpeg.
+Tested with `flake8`, `mypy` type checking and `pytest`.
 FFmpeg is used from Python ``subprocess`` to stream to Facebook Live, YouTube Live, Periscope, Twitch, Mixer, Ustream, Vimeo and more for streaming broadcasts.
-The Python scripts compute good streaming parameters, and emit the command used so you can just copy and paste in the future if you wish.
-Works on any OS (Mac, Linux, Windows) and computing platform, including PC, Mac, and Raspberry Pi.
-Uses an ``.ini`` file to adjust all parameters.
+
+* Python scripts compute good streaming parameters, and emit the command used so you can just copy and paste in the future if you wish.
+* Works on any OS (Mac, Linux, Windows) and computing platform, including PC, Mac, and Raspberry Pi.
+* Uses an ``.ini`` file to adjust all parameters.
 
 .. image:: doc/logo.png
    :alt: PyLivestream diagram showing screen capture or webcam simultaneously livestreaming to multiple services.
@@ -35,16 +37,6 @@ Uses an ``.ini`` file to adjust all parameters.
 
 :FFmpeg: >= 3.0 required
 :Python: >= 3.6 required
-
-Caveats
-=======
-
-Comments on dropouts / lag for livestreaming in general (not just with this program):
-
-* live streaming takes full CPU power in general. Low CPU machines (like Raspberry Pi) will need to cut back on resolution. Try starting at 240p (320x240) and working your way up if you have dropouts.
-* live streaming takes an excellent quality (not necessarily high speed) Internet connection in general. Some DSL / wireless internet provider have really spotty performance. You might not notice this with HD Netflix due to deep buffering, but it will show up on livestreaming.
-* Do Skype / Duo / FaceTime work excellently for you on your network? If not, live streaming will not work well.
-* Try a wired (Ethernet) connection to the Internet. I have seen very expensive consumer WiFi APs that just had bad performance in real world strenuous use (like live streaming).
 
 .. contents::
 
@@ -269,6 +261,15 @@ Notes
 * ``x11grab`` was deprecated in FFmpeg 3.3, was previously replaced by ``xcbgrab``
 * Reference `webpage <https://www.scivision.co/youtube-live-ffmpeg-livestream/>`_
 * `Test videos <http://www.divx.com/en/devices/profiles/video>`_ for looping/globbing
+
+
+Comments on dropouts / lag for livestreaming in general (not just with this program):
+
+* Low CPU machines (like Raspberry Pi) may need to cut back on resolution.
+* live streaming takes an excellent quality (not necessarily high speed) Internet connection in general. Some DSL / wireless internet provider have really spotty performance. You might not notice this with HD Netflix due to deep buffering, but it will show up on livestreaming.
+* Do Skype / Duo / FaceTime work excellently for you on your network? If not, live streaming will not work well.
+* Try a wired (Ethernet) connection to the Internet. I have seen very expensive consumer WiFi APs that just had bad performance in real world strenuous use (like live streaming).
+
 
 FFmpeg References
 -----------------
