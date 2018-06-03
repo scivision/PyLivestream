@@ -207,21 +207,21 @@ class Stream:
 
     def screengrab(self) -> List[str]:
         """choose to grab video from desktop. May not work for Wayland."""
-        vid1 = ['-f', self.vcap,
-                '-r', str(self.fps)]
+        v: List[str] = ['-f', self.vcap,
+                        '-r', str(self.fps)]
 
         if self.res is not None:
-            vid1 += ['-s', 'x'.join(map(str, self.res))]
+            v += ['-s', 'x'.join(map(str, self.res))]
 
         if sys.platform == 'linux':
-            vid1 += [f'-i', ':0.0+{self.origin[0]},{self.origin[1]}']
+            v += [f'-i', ':0.0+{self.origin[0]},{self.origin[1]}']
         elif sys.platform == 'win32':
-            vid1 += ['-offset_x', self.origin[0], '-offset_y', self.origin[1],
-                     '-i', self.videochan]
+            v += ['-offset_x', self.origin[0], '-offset_y', self.origin[1],
+                  '-i', self.videochan]
         elif sys.platform == 'darwin':
-            vid1 += ['-i', "0:0"]
+            v += ['-i', "0:0"]
 
-        return vid1
+        return v
 
     def webcam(self) -> List[str]:
         """configure webcam"""

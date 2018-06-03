@@ -31,10 +31,6 @@ subprocess.check_call(['python', 'MicrophoneLivestream.py', '-y',  HOST, '-image
 print('1990s vector graphics with live microphone audio')
 subprocess.check_call(['python', 'MicrophoneLivestream.py', '-y',  HOST, '-image', str(MOVING)],
                       cwd=R)
-# %% Webcam
-print('Webcam test')
-subprocess.check_call(['python', 'WebcamLivestream.py', '-y', HOST],
-                      cwd=R)
 # %%  Music
 print('PyLivestream splash with orchestra music  (caption)')
 subprocess.check_call(['python', 'FileGlobLivestream.py', '-y',  '-image', str(STATIC),
@@ -59,3 +55,7 @@ subprocess.check_call(['python', 'ScreenshareLivestream.py', '-y',  HOST],
 print('Looping video')
 subprocess.check_call(['python', 'FileLoopLivestream.py', '-y',  str(VIDEO), HOST],
                       cwd=R)
+# %% Webcam
+print('Webcam test - will fail if no webcam present on your system')
+subprocess.run(['python', 'WebcamLivestream.py', '-y', HOST],
+               cwd=R)
