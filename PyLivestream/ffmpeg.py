@@ -1,4 +1,6 @@
+import subprocess
 from typing import List, Union
+from time import sleep
 
 
 class Ffmpeg():
@@ -13,6 +15,8 @@ class Ffmpeg():
 
         # default 8, increasing can help avoid warnings
         self.QUEUE: List[str] = ['-thread_queue_size', '8']
+
+        self.THROTTLE: str = '-re'
 
     def timelimit(self, t: Union[None, str, int, float]) -> List[str]:
         if t is None:
@@ -42,3 +46,18 @@ class Ffmpeg():
 
         return ['-vf',
                 f"drawtext=text='{text}':{fontcolor}:{fontsize}:{box}:{boxcolor}:{border}:{x}:{y}"]
+
+    def listener(self):
+        """
+        no need to check return code, errors will show up in client.
+        """
+        print('starting RTMP listener')
+        proc = subprocess.Popen(['ffplay', '-v', 'fatal', '-timeout', '5',
+                                 '-autoexit', 'rtmp://localhost'],
+                                stdout=subprocess.DEVNULL)
+#        proc = subprocess.Popen(['ffmpeg', '-v', 'fatal', '-timeout', '5',
+#                                 '-i', 'rtmp://localhost', '-f', 'null', '-'],
+#                                stdout=subprocess.DEVNULL)
+
+        sleep(0.5)  # 0.2 not long enough. 0.3 worked, so set 0.5 for some margin.
+        return proc

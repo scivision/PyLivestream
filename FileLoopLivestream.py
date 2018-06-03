@@ -9,7 +9,10 @@ https://www.scivision.co/youtube-live-ffmpeg-livestream/
 https://support.google.com/youtube/answer/2853702
 """
 from typing import List
+from pathlib import Path
 import PyLivestream
+
+R = Path(__file__).parent
 
 if __name__ == '__main__':
     import signal
@@ -20,14 +23,16 @@ if __name__ == '__main__':
     p.add_argument('infn', help='file to stream, looping endlessly.')
     p.add_argument('site',
                    help='site to stream: [youtube,periscope,facebook,twitch]',
-                   nargs='+')
+                   nargs='?', default='localhost')
     p.add_argument('-i', '--ini', help='*.ini file with stream parameters',
-                   default='stream.ini')
+                   default=R/'stream.ini')
     p.add_argument('-y', '--yes', help='no confirmation dialog',
                    action='store_true')
     P = p.parse_args()
 
-    S = PyLivestream.FileIn(P.ini, P.site, infn=P.infn,
+    site = P.site.split()
+
+    S = PyLivestream.FileIn(P.ini, site, infn=P.infn,
                             loop=True, yes=P.yes)
     sites: List[str] = list(S.streams.keys())
 # %% Go live

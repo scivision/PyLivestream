@@ -15,7 +15,7 @@ DEVNULL = subprocess.DEVNULL
 inifn = rdir/'test.ini'
 sites = ['periscope', 'youtube', 'facebook']
 
-VIDFN = rdir / 'star_collapse_out.avi'
+VIDFN = rdir / 'bunny.avi'
 
 
 @pytest.fixture(scope='function')
@@ -58,8 +58,8 @@ class Tests(unittest.TestCase):
         for p in (None, '',):
             self.assertEqual(pls.utils.get_resolution(p), None)
 
-        self.assertEqual(pls.utils.get_resolution(VIDFN), (720, 480))
-        self.assertEqual(pls.utils.get_framerate(VIDFN), 25.0)
+        self.assertEqual(pls.utils.get_resolution(VIDFN), (426, 240))
+        self.assertEqual(pls.utils.get_framerate(VIDFN), 24.0)
 
     def test_screenshare(self):
 
@@ -92,7 +92,7 @@ class Tests(unittest.TestCase):
         S = pls.FileIn(inifn, sites, VIDFN)
         for s in S.streams:
             self.assertIn('-re', S.streams[s].cmd)
-            self.assertEqual(S.streams[s].fps, 25.)
+            self.assertEqual(S.streams[s].fps, 24.)
 
             if s == 'periscope':
                 self.assertEqual(S.streams[s].video_kbps, 800)
@@ -114,6 +114,14 @@ class Tests(unittest.TestCase):
                 self.assertEqual(S.streams[s].video_kbps, 800)
             else:
                 self.assertEqual(S.streams[s].video_kbps, 500)
+
+    def test_filein_script(self):
+        subprocess.check_call(['python',
+                               'FileGlobLivestream.py',
+                               '-i', str(inifn),
+                               'localhost-test', rdir, VIDFN.name, '--yes'],
+                              stdout=DEVNULL, timeout=8,
+                              cwd=rdir.parent)
 
     def test_microphone(self):
         S = pls.Microphone(inifn, sites,
@@ -138,7 +146,7 @@ class Tests(unittest.TestCase):
         subprocess.check_call(['python',
                                'MicrophoneLivestream.py',
                                '-i', str(inifn),
-                               'localhost', '--yes'],
+                               'localhost-test', '--yes'],
                               stdout=DEVNULL, timeout=8,
                               cwd=rdir.parent)
 
@@ -151,7 +159,7 @@ class Tests(unittest.TestCase):
     @pytest.mark.skipif(CI, reason="Many CI's don't allow opening ports")
     def test_stream(self):
         """stream to localhost"""
-        s = pls.FileIn(inifn, 'localhost',
+        s = pls.FileIn(inifn, 'localhost-test',
                        rdir / 'orch_short.ogg',
                        image=rdir.parent / 'doc' / 'logo.png',
                        yes=True)

@@ -1,4 +1,5 @@
 image:
+- Visual Studio 2017
 - Ubuntu
 
 stack: python 3
@@ -10,6 +11,10 @@ clone_depth: 3
 
 before_build:
 - cmd: set PATH=%PY_DIR%;%PY_DIR%\Scripts;%PATH%
+# FFmpeg 4.0 binary for AppVeyor Windows 
+- cmd: curl -fsSL -o ffmpeg.zip https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-4.0-win64-static.zip
+- cmd: 7z x ffmpeg.zip
+- cmd: set PATH=%APPVEYOR_BUILD_FOLDER%\ffmpeg-4.0-win64-static\bin;%PATH%
 
 - sh: sudo apt-get -yq update > /dev/null
 - sh: sudo apt-get install -yq --no-install-suggests --no-install-recommends ffmpeg > /dev/null

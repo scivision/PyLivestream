@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import List, Union, Dict
+import logging
 #
 from . import stream
 from . import utils
@@ -9,8 +10,12 @@ __all__ = ['FileIn', 'Microphone', 'SaveDisk', 'Screenshare', 'Webcam']
 
 class Livestream(stream.Stream):
 
-    def __init__(self, ini: Path, site: str, vidsource: str=None,
-                 image: Path=None, loop: bool=False, infn: Path=None,
+    def __init__(self,
+                 ini: Path,
+                 site: str, vidsource: str=None,
+                 image: Path=None,
+                 loop: bool=False,
+                 infn: Path=None,
                  caption: str=None,
                  yes: bool=False) -> None:
         super().__init__(ini, site, vidsource, image, loop, infn,
@@ -36,11 +41,13 @@ class Livestream(stream.Stream):
         cmd.extend(self.loglevel)
         cmd.extend(self.yes)
         cmd.extend(self.timelimit)
+
         cmd.extend(self.queue)
 
         cmd += vidIn + audIn
 
-        cmd += self.F.drawtext(self.caption)
+        if not self.movingimage:  # FIXME: need a different filter chain to caption moving images
+            cmd += self.F.drawtext(self.caption)
 
         cmd += vidOut + audOut
         cmd += buf
@@ -53,16 +60,25 @@ class Livestream(stream.Stream):
 
     def startlive(self, sinks: List[str]=None):
         """finally start the stream(s)"""
-
-        if self.key is None and self.server not in ('rtmp://localhost',
-                                                    'NUL', '/dev/null'):
-            print('\n', ' '.join(self.cmd), '\n')
-            return
-
+        proc = None
+# %% special cases for localhost tests
+        if self.key is None:
+            if self.site == 'localhost':
+                proc = self.F.listener()  # start own RTMP server
+            else:
+                print('\n', ' '.join(self.cmd), '\n')
+                return
+# %% RUN STREAM
+        cmd: List[str]
         if not sinks:  # single stream
             utils.run(self.cmd)
+        elif self.movingimage:
+            if len(sinks) > 1:
+                logging.warning(f'streaming only to {sinks[0]}')
+
+            utils.run(self.cmd)
         else:  # multi-stream output tee
-            cmdstem = self.cmd[:-3]
+            cmdstem: List[str] = self.cmd[:-3]
             # +global_header is necessary to tee to multiple services
             cmd = cmdstem + ['-flags:v', '+global_header',
                              '-f', 'tee']
@@ -83,12 +99,20 @@ class Livestream(stream.Stream):
 
             utils.run(cmd)
 
+# %% this kill the listener before starting the next process, or upon final process closing.
+        if proc is not None:
+            proc.terminate()
+        yield
+
 
 # %% operators
 class Screenshare(Livestream):
 
-    def __init__(self, ini: Path, websites: Union[str, List[str]],
-                 caption: str=None, yes: bool=False) -> None:
+    def __init__(self,
+                 ini: Path,
+                 websites: Union[str, List[str]],
+                 caption: str=None,
+                 yes: bool=False) -> None:
 
         vidsource = 'screen'
 
@@ -107,13 +131,19 @@ class Screenshare(Livestream):
         sinks: List[str] = [self.streams[stream].sink[0]
                             for stream in self.streams]
 
-        self.streams[unify_streams(self.streams)].startlive(sinks)
+        try:
+            next(self.streams[unify_streams(self.streams)].startlive(sinks))
+        except StopIteration:
+            pass
 
 
 class Webcam(Livestream):
 
-    def __init__(self, ini: Path, websites: Union[str, List[str]],
-                 caption: str=None, yes: bool=False) -> None:
+    def __init__(self,
+                 ini: Path,
+                 websites: Union[str, List[str]],
+                 caption: str=None,
+                 yes: bool=False) -> None:
 
         vidsource = 'camera'
 
@@ -132,13 +162,20 @@ class Webcam(Livestream):
         sinks: List[str] = [self.streams[stream].sink[0]
                             for stream in self.streams]
 
-        self.streams[unify_streams(self.streams)].startlive(sinks)
+        try:
+            next(self.streams[unify_streams(self.streams)].startlive(sinks))
+        except StopIteration:
+            pass
 
 
 class Microphone(Livestream):
 
-    def __init__(self, ini: Path, sites: Union[str, List[str]], image: Path,
-                 caption: str=None, yes: bool=False) -> None:
+    def __init__(self,
+                 ini: Path,
+                 sites: Union[str, List[str]],
+                 image: Path,
+                 caption: str=None,
+                 yes: bool=False) -> None:
 
         if isinstance(sites, str):
             sites = [sites]
@@ -146,6 +183,7 @@ class Microphone(Livestream):
         streams = {}
         for site in sites:
             streams[site] = Livestream(ini, site, image=image,
+                                       loop=True,
                                        caption=caption, yes=yes)
 
         self.streams: Dict[str, Livestream] = streams
@@ -155,15 +193,23 @@ class Microphone(Livestream):
         sinks: List[str] = [self.streams[stream].sink[0]
                             for stream in self.streams]
 
-        self.streams[unify_streams(self.streams)].startlive(sinks)
+        try:
+            next(self.streams[unify_streams(self.streams)].startlive(sinks))
+        except StopIteration:
+            pass
 
 
 # %% File-based inputs
 class FileIn(Livestream):
 
-    def __init__(self, ini: Path, sites: Union[str, List[str]], infn: Path,
-                 loop: bool=False, image: Path=None,
-                 caption: str=None, yes: bool=False) -> None:
+    def __init__(self,
+                 ini: Path,
+                 sites: Union[str, List[str]],
+                 infn: Path,
+                 loop: bool=False,
+                 image: Path=None,
+                 caption: str=None,
+                 yes: bool=False) -> None:
 
         vidsource = 'file'
 
@@ -183,13 +229,18 @@ class FileIn(Livestream):
         sinks: List[str] = [self.streams[stream].sink[0]
                             for stream in self.streams]
 
-        self.streams[unify_streams(self.streams)].startlive(sinks)
+        try:
+            next(self.streams[unify_streams(self.streams)].startlive(sinks))
+        except StopIteration:
+            pass
 
 
 class SaveDisk(stream.Stream):
 
-    def __init__(self, ini: Path, outfn: Path=None,
-                 caption: str=None, yes: bool=False) -> None:
+    def __init__(self,
+                 ini: Path, outfn: Path=None,
+                 caption: str=None,
+                 yes: bool=False) -> None:
         """
         records to disk screen capture with audio
 

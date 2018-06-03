@@ -52,7 +52,7 @@ class Stream:
         self.infn = Path(infn).expanduser() if infn else None
         self.yes: List[str] = self.F.YES if yes else []
 
-        self.queue = self.F.QUEUE
+        self.queue: List[str] = []  # self.F.QUEUE
 
         self.caption: Union[str, None] = caption
 
@@ -78,12 +78,14 @@ class Stream:
             self.res: Tuple[int, int] = C.get(self.site,
                                               'webcam_res').split('x')
             self.fps: float = C.getint(self.site, 'webcam_fps')
+            self.movingimage = self.staticimage = False
         elif self.vidsource == 'screen':
             self.res: Tuple[int, int] = C.get(self.site,
                                               'screencap_res').split('x')
             self.fps: float = C.getint(self.site, 'screencap_fps')
             self.origin: Tuple[int, int] = C.get(self.site,
                                                  'screencap_origin').split(',')
+            self.movingimage = self.staticimage = False
         elif self.vidsource is None or self.vidsource == 'file':
             self.res: Tuple[int, int] = utils.get_resolution(self.infn,
                                                              self.probeexe)
@@ -223,39 +225,47 @@ class Stream:
 
     def webcam(self) -> List[str]:
         """configure webcam"""
-        vid1 = ['-f', self.hcam,
-                '-r', str(self.fps),
-                '-i', self.videochan]
+        v: List[str] = ['-f', self.hcam,
+                        '-i', self.videochan]
+        #  '-r', str(self.fps),  # -r causes bad dropouts
 
-        return vid1
+        return v
 
     def filein(self) -> List[str]:
-        """stream input file  (video, or audio + image)"""
+        """
+        used for:
 
-        vid1: List[str] = []
+        * stream input file  (video, or audio + image)
+        * microphone-only
+        """
+
+        v: List[str] = []
 
         """
         -re is NOT for actual streaming devices (webcam, microphone)
         https://ffmpeg.org/ffmpeg.html
         """
-
-        if self.image:
-            vid1 += ['-loop', '1', '-f', 'image2']
-
-        if ((self.vidsource is not None and self.image) or
-           self.vidsource == 'file'):
-            vid1 += ['-re']
-
-        if self.loop:
-            vid1 += ['-stream_loop', '-1']  # FFmpeg >= 3
-
-        if self.image:  # still image, for audio-only input files
-            vid1 += ['-i', str(self.image)]
-
+        # assumes GIF is animated
+        if isinstance(self.image, Path):
+            self.movingimage: bool = self.image.suffix in ('.gif', '.avi', '.ogv', '.mp4')
+            self.staticimage: bool = not self.movingimage
+        else:
+            self.movingimage = self.staticimage = False
+# %% throttle software-only sources
+        if ((self.vidsource is not None and self.image) or self.vidsource == 'file'):
+            v.append(self.F.THROTTLE)
+# %% image /  audio / vidoe cases
+        if self.staticimage:
+            v.extend(['-loop', '1', '-f', 'image2', '-i', str(self.image)])
+        elif self.movingimage:
+            v.extend(['-filter_complex', f'movie={self.image}:loop=0,setpts=N/FRAME_RATE/TB'])
+        elif self.loop and not self.image:  # loop for traditional video
+            v.extend(['-stream_loop', '-1'])  # FFmpeg >= 3
+# %% audio (for image+audio) or video
         if self.infn:
-            vid1 += ['-i', str(self.infn)]
+            v.extend(['-i', str(self.infn)])
 
-        return vid1
+        return v
 
     def buffer(self, server: str) -> List[str]:
         """configure network buffer. Tradeoff: latency vs. robustness"""
@@ -265,7 +275,7 @@ class Stream:
         buf = ['-maxrate', f'{self.video_kbps}k',
                '-bufsize', f'{self.video_kbps//2}k']
 
-        if self.image:  # static image + audio
+        if self.staticimage:  # static image + audio
             buf += ['-shortest']
 
         # for very old versions of FFmpeg, such as Ubuntu 16.04

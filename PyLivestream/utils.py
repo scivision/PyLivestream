@@ -159,7 +159,7 @@ def getstreamkey(keyfn: str) -> Union[None, str]:
     try:
         keyp: Path = Path(keyfn).expanduser().resolve(strict=True)
         key = keyp.read_text().strip() if keyp.is_file() else None
-    except FileNotFoundError:  # not a file, must be the key itself.
-        key = keyfn
+    except FileNotFoundError:  # not a file, might be the key itself, if not a .key filename
+        key = None if keyfn.endswith('.key') else keyfn
 
     return key
