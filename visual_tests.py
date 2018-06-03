@@ -24,11 +24,11 @@ print('press   q   in the terminal window to proceed to the next test.')
 
 # %% Microphone
 print('PyLivestream splash with live microphone audio')
-subprocess.check_call(['python', 'MicrophoneLivestream.py', '-y',  HOST, '-image', STATIC],
+subprocess.check_call(['python', 'MicrophoneLivestream.py', '-y',  HOST, '-image', str(STATIC)],
                       cwd=R)
 
 print('1990s vector graphics with live microphone audio')
-subprocess.check_call(['python', 'MicrophoneLivestream.py', '-y',  HOST, '-image', MOVING],
+subprocess.check_call(['python', 'MicrophoneLivestream.py', '-y',  HOST, '-image', str(MOVING)],
                       cwd=R)
 # %% Webcam
 print('Webcam test')
@@ -36,17 +36,18 @@ subprocess.check_call(['python', 'WebcamLivestream.py', '-y', HOST],
                       cwd=R)
 # %%  Music
 print('PyLivestream splash with orchestra music  (caption)')
-subprocess.check_call(['python', 'FileGlobLivestream.py', '-y',  HOST, '-image', STATIC,
+subprocess.check_call(['python', 'FileGlobLivestream.py', '-y',  HOST, '-image', str(STATIC),
                        'tests', 'orch.ogg'],
                       cwd=R)
 
 print('1990s vector graphics with orchestra music (NO caption')
-subprocess.check_call(['python', 'FileGlobLivestream.py', '-y',  HOST, '-image', MOVING,
+subprocess.check_call(['python', 'FileGlobLivestream.py', '-y',  HOST, '-image', str(MOVING),
                        'tests', 'orch.ogg'],
                       cwd=R)
 # video
 print('Looping video')
-subprocess.check_call(['python', 'FileGlobLivestream.py', '-y', HOST, VIDPATH, VIDEO.name],
+subprocess.check_call(['python', 'FileGlobLivestream.py', '-y', HOST,
+                       str(VIDPATH), VIDEO.name],
                       cwd=R)
 # %% Screenshare
 print('Screenshare + microphone')
@@ -54,5 +55,5 @@ subprocess.check_call(['python', 'ScreenshareLivestream.py', '-y',  HOST],
                       cwd=R)
 # %% loop video
 print('Looping video')
-subprocess.check_call(['python', 'FileLoopLivestream.py', '-y',  VIDEO, HOST],
+subprocess.check_call(['python', 'FileLoopLivestream.py', '-y',  str(VIDEO), HOST],
                       cwd=R)
