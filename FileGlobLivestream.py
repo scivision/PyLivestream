@@ -50,7 +50,7 @@ if __name__ == '__main__':
     p = ArgumentParser(description="Livestream a globbed input file list")
     p.add_argument('site',
                    help='site to stream: [youtube,periscope,facebook,twitch]',
-                   nargs='+')
+                   nargs='?', default='localhost')
     p.add_argument('path', help='path to discover files from')
     p.add_argument('glob', help='file glob pattern to stream.')
     p.add_argument('-i', '--ini', help='*.ini file with stream parameters',
@@ -68,6 +68,7 @@ if __name__ == '__main__':
     P = p.parse_args()
 
     path = Path(P.path).expanduser()
+    site = P.site.split()
     flist = list(path.glob(P.glob))
 
     if not flist:
@@ -78,9 +79,9 @@ if __name__ == '__main__':
     print()
 
     if P.yes:
-        print('going live on', P.site)
+        print('going live on', site)
     else:
-        input(f"Press Enter to go live on {P.site}.    Or Ctrl C to abort.")
+        input(f"Press Enter to go live on {site}.    Or Ctrl C to abort.")
 
     inifn = Path(P.ini).expanduser()
 
@@ -88,6 +89,6 @@ if __name__ == '__main__':
 
     if P.loop:
         while True:
-            playonce(flist, P.image, P.site, inifn, P.shuffle, usemeta, P.yes)
+            playonce(flist, P.image, site, inifn, P.shuffle, usemeta, P.yes)
     else:
-        playonce(flist, P.image, P.site, inifn, P.shuffle, usemeta, P.yes)
+        playonce(flist, P.image, site, inifn, P.shuffle, usemeta, P.yes)
