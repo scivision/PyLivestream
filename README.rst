@@ -68,19 +68,12 @@ The ``[DEFAULT]`` section has parameters that can be overridden for each site, i
 * ``screencap_origin``: origin (upper left corner) of screen capture region in pixels.
 * ``screencap_res``: resolution of screen capture (area to capture, starting from origin)
 * ``screencap_fps``: frames/sec of screen capture
-* ``webcam_res``: webcam resolution -- find from ``v4l2-ctl --list-formats-ext`` or webcam spec sheet.
-* ``webcam_fps``: webcam fps -- found from command above or webcam spec sheet
 * ``audiofs``: audio sampling frequency. Typically 44100 Hz (CD quality).
 * ``audio_bps``: audio data rate--**leave blank if you want no audio** (usually used for "file", to make an animated GIF in post-processing)
 * ``preset``: ``veryfast`` or ``ultrafast`` if CPU not able to keep up.
 
 
 Next are ``sys.platform`` specific parameters.
-Find webcam name by:
-
-* Windows: ``ffmpeg -list_devices true -f dshow -i dummy``
-* Mac: ``ffmpeg -f avfoundation -list_devices true -i ""``
-* Linux: ``v4l2-ctl --list-devices``
 
 Seek help in FFmpeg documentation, try capturing to a file first and then update ``stream.ini`` for your ``sys.platform``.
 
@@ -167,6 +160,21 @@ the default behavior is that if FFmpeg detects one stream has failed, ALL stream
 
 Webcam
 ------
+Note: your system may not have a webcam, particularly if it's a virtual machine.
+
+Config:
+
+* ``webcam_res``: webcam resolution -- find from ``v4l2-ctl --list-formats-ext`` or webcam spec sheet.
+* ``webcam_fps``: webcam fps -- found from command above or webcam spec sheet
+
+Find webcam name by:
+
+* Windows: ``ffmpeg -list_devices true -f dshow -i dummy``
+* Mac: ``ffmpeg -f avfoundation -list_devices true -i ""``
+* Linux: ``v4l2-ctl --list-devices``
+
+----------
+
 Audio is included::
 
     python WebcamLivestream.py site(s)

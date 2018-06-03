@@ -45,7 +45,7 @@ subprocess.check_call(['python', 'FileGlobLivestream.py', '-y', '-image', str(MO
 # video
 print('Looping video')
 subprocess.check_call(['python', 'FileGlobLivestream.py', '-y',
-                       VIDEO, HOST],
+                       str(VIDEO), HOST],
                       cwd=R)
 # %% Screenshare
 print('Screenshare + microphone')
