@@ -42,17 +42,36 @@ def playonce(flist: List[Path], image: Path, site: str, inifn: Path,
         s.golive()
 
 
+def fileglob(path: Union[str, Path], glob: str) -> List[Path]:
+    path = Path(path).expanduser()
+
+    if not (path.is_dir() or path.is_file()):
+        raise FileNotFoundError(f'{path} is not a directory or file')
+
+    if glob:
+        flist = list(path.glob(glob))
+    else:  # assume single file
+        flist = [Path(path)]
+        if not flist[0].is_file():
+            raise FileNotFoundError(f'{path} is not a file')
+
+    if not flist:
+        raise FileNotFoundError(f'did not find files with {path} {glob}')
+
+    return flist
+
+
 if __name__ == '__main__':
     import signal
     signal.signal(signal.SIGINT, signal.SIG_DFL)
 
     from argparse import ArgumentParser
     p = ArgumentParser(description="Livestream a globbed input file list")
+    p.add_argument('path', help='path to discover files from')
     p.add_argument('site',
                    help='site to stream: [youtube,periscope,facebook,twitch]',
                    nargs='?', default='localhost')
-    p.add_argument('path', help='path to discover files from')
-    p.add_argument('glob', help='file glob pattern to stream.')
+    p.add_argument('-glob', help='file glob pattern to stream.')
     p.add_argument('-i', '--ini', help='*.ini file with stream parameters',
                    default='stream.ini')
     p.add_argument('-image',
@@ -66,13 +85,10 @@ if __name__ == '__main__':
     p.add_argument('-nometa', help='do not add metadata caption to video',
                    action='store_false')
     P = p.parse_args()
-
-    path = Path(P.path).expanduser()
+# %% file / glob wranging
+    flist = fileglob(P.path, P.glob)
+# %%
     site = P.site.split()
-    flist = list(path.glob(P.glob))
-
-    if not flist:
-        raise FileNotFoundError(f'did not find files with {path} {P.glob}')
 
     print('streaming these files. Be sure list is correct! \n')
     print('\n'.join(map(str, flist)))

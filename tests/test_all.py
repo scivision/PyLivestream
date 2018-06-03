@@ -118,8 +118,10 @@ class Tests(unittest.TestCase):
     def test_filein_script(self):
         subprocess.check_call(['python',
                                'FileGlobLivestream.py',
+                               str(VIDFN),
+                               'localhost-test',
                                '-i', str(inifn),
-                               'localhost-test', str(rdir), VIDFN.name, '--yes'],
+                               '--yes'],
                               stdout=DEVNULL, timeout=8,
                               cwd=rdir.parent)
 

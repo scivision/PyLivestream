@@ -206,8 +206,9 @@ several video files
 ~~~~~~~~~~~~~~~~~~~
 Glob list of video files to stream::
 
-    python FileGlobLivestream.py site path pattern
+    python FileGlobLivestream.py path site -glob glob_pattern
 
+-glob       glob pattern of files to stream e.g. `"*.avi"`
 -loop       optionally loop endlessly the globbed file list
 -shuffle    optionally shuffle the globbed file list
 -image      if you have AUDIO files, you should normally set an image to display, as most/all streaming sites REQUIRE a video feed--even a static image.
@@ -218,13 +219,13 @@ stream all videos in directory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Example: all AVI videos in directory ``~/Videos``::
 
-    python FileGlobLivestream.py youtube ~/Videos "*.avi"
+    python FileGlobLivestream.py ~/Videos youtube -glob "*.avi"
 
 stream endlessly looping videos
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Example: all AVI videos in ``~/Videos`` are endlessly looped::
 
-    python FileGlobLivestream.py youtube ~/Videos "*.avi" -loop
+    python FileGlobLivestream.py ~/Videos youtube -glob "*.avi" -loop
 
 
 stream all audio files in directory
@@ -232,7 +233,7 @@ stream all audio files in directory
 Glob list of video files to stream.
 Must include a static image (could be your logo)::
 
-    python FileGlobLivestream.py site path pattern -image image
+    python FileGlobLivestream.py path site -glob glob_pattern -image image
 
 path      path to where video files are
 pattern   e.g. ``*.avi``  pattern matching video files
@@ -240,7 +241,7 @@ pattern   e.g. ``*.avi``  pattern matching video files
 
 Example: stream all .mp3 audio under ``~/Library`` directory::
 
-    python FileGlobLivestream.py youtube ~/Library "*.mp3" -image mylogo.jpg
+    python FileGlobLivestream.py ~/Library youtube -glob "*.mp3" -image mylogo.jpg
 
 
 Screen capture to disk

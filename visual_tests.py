@@ -17,6 +17,7 @@ HOST = 'localhost'
 STATIC = IMGPATH / 'logo.png'
 MOVING = VIDPATH / 'cc_land.gif'
 VIDEO = VIDPATH / 'bunny.avi'
+MUSIC = VIDPATH / 'orch.ogg'
 
 print('these tests enable a user to visually confirm the code is working.')
 print('the streaming is just on your own computer.')
@@ -36,18 +37,19 @@ subprocess.check_call(['python', 'WebcamLivestream.py', '-y', HOST],
                       cwd=R)
 # %%  Music
 print('PyLivestream splash with orchestra music  (caption)')
-subprocess.check_call(['python', 'FileGlobLivestream.py', '-y',  HOST, '-image', str(STATIC),
-                       'tests', 'orch.ogg'],
+subprocess.check_call(['python', 'FileGlobLivestream.py', '-y',  '-image', str(STATIC),
+                       str(VIDPATH), HOST,
+                       '-glob', 'orch.ogg'],
                       cwd=R)
 
 print('1990s vector graphics with orchestra music (NO caption')
-subprocess.check_call(['python', 'FileGlobLivestream.py', '-y',  HOST, '-image', str(MOVING),
-                       'tests', 'orch.ogg'],
+subprocess.check_call(['python', 'FileGlobLivestream.py', '-y', '-image', str(MOVING),
+                       str(MUSIC), HOST],
                       cwd=R)
 # video
 print('Looping video')
-subprocess.check_call(['python', 'FileGlobLivestream.py', '-y', HOST,
-                       str(VIDPATH), VIDEO.name],
+subprocess.check_call(['python', 'FileGlobLivestream.py', '-y',
+                       VIDEO, HOST],
                       cwd=R)
 # %% Screenshare
 print('Screenshare + microphone')

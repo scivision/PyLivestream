@@ -64,7 +64,9 @@ class Ffmpeg():
         sleep(0.5)  # 0.2 not long enough. 0.3 worked, so set 0.5 for some margin.
         return proc
 
-    def movingBG(self, bgfn: Path) -> List[str]:
+    def movingBG(self, bgfn: Union[None, Path]) -> List[str]:
+        assert isinstance(bgfn, Path)
+
         bg: str = str(bgfn)
         if os.name == 'nt':
             bg = bg.replace('\\', '/')   # for PureWindowsPath
