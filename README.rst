@@ -24,7 +24,8 @@ Python scripted livestreaming using FFmpeg
 ==========================================
 
 Streams to one or **multiple** streaming sites simultaneously, using pure object-oriented Python (no extra packages) and FFmpeg.
-Tested with `flake8`, `mypy` type checking and `pytest`.
+Tested with ``flake8``, ``mypy`` type checking and ``pytest``.
+``visual_tests.py`` is a quick check of several command line scripting scenarios on your laptop.
 FFmpeg is used from Python ``subprocess`` to stream to Facebook Live, YouTube Live, Periscope, Twitch, Mixer, Ustream, Vimeo and more for streaming broadcasts.
 
 * Python scripts compute good streaming parameters, and emit the command used so you can just copy and paste in the future if you wish.
