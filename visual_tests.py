@@ -8,6 +8,7 @@ ffmpeg -ss 00:00:30 -i BigBuckBunny_DivX_HD720p_ASP.divx -t 7 -vf scale=-2:240 -
 """
 from pathlib import Path
 import subprocess
+import PyLivestream as pls
 
 R = Path(__file__).parent
 
@@ -21,7 +22,9 @@ MUSIC = VIDPATH / 'orch.ogg'
 
 print('these tests enable a user to visually confirm the code is working.')
 print('the streaming is just on your own computer.')
-print('press   q   in the terminal window to proceed to the next test.')
+print('\n\n press   q   in the terminal window to proceed to the next test. \n\n')
+
+print(f'the desktop resolution appears to be {pls.utils.get_desktop_size(VIDEO)}\n\n')
 
 # %% Microphone
 print('PyLivestream splash with live microphone audio')

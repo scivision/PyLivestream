@@ -80,6 +80,23 @@ def meta_caption(meta) -> str:
     return caption
 
 
+def get_desktop_size(fn: Path, exein: Path=None) -> Tuple[int, int]:
+    """ a video of any type is indeed required to measure desktop size """
+
+    exe = getexe()[1] if exein is None else exein
+
+    cmd = [str(exe), '-v', 'error', '-print_format', 'json',
+           '-select_streams', 'v:0',
+           '-show_entries', 'stream=width,height',
+            str(fn)]
+
+    ret = subprocess.check_output(cmd, universal_newlines=True)
+
+    s = json.loads(ret)['streams'][0]
+
+    return (s['width'], s['height'])
+
+
 def get_resolution(fn: Path, exe: Path=None) -> Union[None, Tuple[int, int]]:
     """
     get resolution (widthxheight) of video file
