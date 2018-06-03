@@ -2,6 +2,7 @@ import json
 import logging
 import subprocess
 from pathlib import Path
+import sys
 from typing import Tuple, Union, List
 
 DEVNULL = subprocess.DEVNULL
@@ -27,12 +28,16 @@ def getexe(exein: Path=None) -> Tuple[str, str]:
         subprocess.check_call((exe, '-h'),
                               stdout=DEVNULL, stderr=DEVNULL)
     except FileNotFoundError as e:
+        print('\n\n *** You must have FFmpeg installed to use PyLivestream.', file=sys.stderr)
+        print('https://www.ffmpeg.org/download.html \n\n', file=sys.stderr)
         raise FileNotFoundError(f'FFmpeg not found at {exe}  {e}.')
 
     try:
         subprocess.check_call((probeexe, '-h'),
                               stdout=DEVNULL, stderr=DEVNULL)
     except FileNotFoundError as e:
+        print('\n\n *** You must have FFmpeg installed to use PyLivestream.', file=sys.stderr)
+        print('https://www.ffmpeg.org/download.html \n\n', file=sys.stderr)
         raise FileNotFoundError(f'FFprobe: {probeexe}  {e}')
 
     return exe, probeexe
