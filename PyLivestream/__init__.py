@@ -77,6 +77,8 @@ class Livestream(stream.Stream):
                 logging.warning(f'streaming only to {sinks[0]}')
 
             utils.run(self.cmd)
+        elif len(sinks) == 1:
+            utils.run(self.cmd)
         else:  # multi-stream output tee
             cmdstem: List[str] = self.cmd[:-3]
             # +global_header is necessary to tee to multiple services
