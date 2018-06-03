@@ -31,6 +31,7 @@ setup(name='PyLivestream',
       ],
       scripts=['FileGlobLivestream.py', 'ScreenshareLivestream.py',
                'FileLoopLivestream.py', 'ScreenCapture2disk.py',
-               'WebcamLivestream.py', 'MicrophoneLivestream.py'],
+               'WebcamLivestream.py', 'MicrophoneLivestream.py',
+               'visual_tests.py'],
       include_package_data=True,
       )
