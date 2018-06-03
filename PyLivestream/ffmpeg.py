@@ -1,6 +1,8 @@
 import subprocess
 from typing import List, Union
 from time import sleep
+import os
+from pathlib import Path
 
 
 class Ffmpeg():
@@ -61,3 +63,10 @@ class Ffmpeg():
 
         sleep(0.5)  # 0.2 not long enough. 0.3 worked, so set 0.5 for some margin.
         return proc
+
+    def movingBG(self, bgfn: Path) -> List[str]:
+        bg: str = str(bgfn)
+        if os.name == 'nt':
+            bg = bg.replace('\\', '/')   # for PureWindowsPath
+
+        return ['-filter_complex', f'movie={bg}:loop=0,setpts=N/FRAME_RATE/TB']

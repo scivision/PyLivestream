@@ -258,7 +258,7 @@ class Stream:
         if self.staticimage:
             v.extend(['-loop', '1', '-f', 'image2', '-i', str(self.image)])
         elif self.movingimage:
-            v.extend(['-filter_complex', f'movie={self.image}:loop=0,setpts=N/FRAME_RATE/TB'])
+            v.extend(self.F.movingBG(self.image))
         elif self.loop and not self.image:  # loop for traditional video
             v.extend(['-stream_loop', '-1'])  # FFmpeg >= 3
 # %% audio (for image+audio) or video
