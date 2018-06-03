@@ -156,7 +156,6 @@ class Tests(unittest.TestCase):
             self.assertEqual(p.site, 'file')
             self.assertEqual(p.video_kbps, 3000)
 
-    @pytest.mark.skipif(CI, reason="Many CI's don't allow opening ports")
     def test_stream(self):
         """stream to localhost"""
         s = pls.FileIn(inifn, 'localhost-test',
