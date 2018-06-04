@@ -18,6 +18,10 @@
 .. image:: https://api.codeclimate.com/v1/badges/b6557d474ec050e74629/maintainability
    :target: https://codeclimate.com/github/scivision/ffmpeg-youtube-live/maintainability
    :alt: Maintainability
+   
+.. image:: http://pepy.tech/badge/pylivestream
+   :target: http://pepy.tech/project/pylivestream
+   :alt: PyPi Download stats
 
 ==========================================
 Python scripted livestreaming using FFmpeg
