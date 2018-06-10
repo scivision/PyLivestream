@@ -1,15 +1,9 @@
 [![travis-ci](https://travis-ci.org/scivision/PyLivestream.svg?branch=master)](https://travis-ci.org/scivision/PyLivestream)
-
 [![coverage](https://coveralls.io/repos/github/scivision/PyLivestream/badge.svg?branch=master)](https://coveralls.io/github/scivision/PyLivestream?branch=master)
-
 [![appveyor status](https://ci.appveyor.com/api/projects/status/uwhsko29b1g5c3no?svg=true)](https://ci.appveyor.com/project/scivision/pylivestream)
-
 [![pypi versions](https://img.shields.io/pypi/pyversions/PyLivestream.svg)](https://pypi.python.org/pypi/PyLivestream)
-
 [![pypi format](https://img.shields.io/pypi/format/PyLivestream.svg)](https://pypi.python.org/pypi/PyLivestream)
-
 [![Maintainability](https://api.codeclimate.com/v1/badges/b6557d474ec050e74629/maintainability)](https://codeclimate.com/github/scivision/ffmpeg-youtube-live/maintainability)
-
 [![PyPi Download stats](http://pepy.tech/badge/pylivestream)](http://pepy.tech/project/pylivestream)
 
 # Python scripted livestreaming using FFmpeg
@@ -25,15 +19,14 @@ FFmpeg is used from Python `subprocess` to stream to Facebook Live, YouTube Live
 
 ![PyLivestream diagram showing screen capture or webcam simultaneously livestreaming to multiple services.](doc/logo.png)
 
-FFmpeg
-
-:   &gt;= 3.0 required
-
-Python
-
-:   &gt;= 3.6 required
 
 ## Install
+
+Requirements:
+
+* FFmpeg &ge; 3.0
+* Python &ge; 3.6 
+
 
 Latest release:
 
