@@ -226,9 +226,18 @@ path path to where video files are pattern e.g. `*.avi` pattern matching
 video files -image filename of image to use as stream background
 (REQUIRED for most websites)
 
-Example: stream all .mp3 audio under `~/Library` directory:
+Example: stream all .mp3 audio under `~/music` directory:
 
-    python FileGlobLivestream.py ~/Library youtube -glob "*.mp3" -image mylogo.jpg
+    python FileGlobLivestream.py ~/music youtube -glob "*.mp3" -image mylogo.jpg
+
+Example: stream all .mp3 audio in `~/music` with an animated GIF or video clip repeating:
+
+    python FileGlobLivestream.py ~/music youtube -glob "*.mp3" -image myclip.avi
+    
+or
+
+    python FileGlobLivestream.py ~/music youtube -glob "*.mp3" -image animated.gif
+    
 
 ### Screen capture to disk
 
