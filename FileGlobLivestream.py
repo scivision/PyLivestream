@@ -12,6 +12,8 @@ from pathlib import Path
 from typing import List, Union
 import PyLivestream as pls
 import random
+import signal
+from argparse import ArgumentParser
 try:
     from tinytag import TinyTag
 except ImportError:
@@ -61,11 +63,9 @@ def fileglob(path: Union[str, Path], glob: str) -> List[Path]:
     return flist
 
 
-if __name__ == '__main__':
-    import signal
+def main():
     signal.signal(signal.SIGINT, signal.SIG_DFL)
 
-    from argparse import ArgumentParser
     p = ArgumentParser(description="Livestream a globbed input file list")
     p.add_argument('path', help='path to discover files from')
     p.add_argument('site',
@@ -108,3 +108,7 @@ if __name__ == '__main__':
             playonce(flist, P.image, site, inifn, P.shuffle, usemeta, P.yes)
     else:
         playonce(flist, P.image, site, inifn, P.shuffle, usemeta, P.yes)
+
+
+if __name__ == '__main__':
+    main()

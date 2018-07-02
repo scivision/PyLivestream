@@ -13,20 +13,20 @@ from .ffmpeg import Ffmpeg
 # NOTE: Python >= 3.6 has guaranteed dict() order.
 
 BR30 = dict([
-        (240, 300),
-        (360, 400),
-        (480, 500),
-        (540, 800),
-        (720, 1800),
-        (1080, 3000),
-        (1440, 6000),
-        (2160, 13000)])
+    (240, 300),
+    (360, 400),
+    (480, 500),
+    (540, 800),
+    (720, 1800),
+    (1080, 3000),
+    (1440, 6000),
+    (2160, 13000)])
 
 BR60 = dict([
-       (720, 2250),
-       (1080, 4500),
-       (1440, 9000),
-       (2160, 20000)])
+    (720, 2250),
+    (1080, 4500),
+    (1440, 9000),
+    (2160, 20000)])
 
 FPS: float = 30.  # default frames/sec if not defined otherwise
 
@@ -113,7 +113,7 @@ class Stream:
         self.server: str = C.get(self.site, 'server', fallback=None)
 # %% Key (hexaecimal stream ID)
         self.key: str = utils.getstreamkey(
-                            C.get(self.site, 'key', fallback=None))
+            C.get(self.site, 'key', fallback=None))
 
     def videoIn(self) -> List[str]:
         """config video input"""
@@ -200,10 +200,10 @@ class Stream:
 
         if self.fps is None or self.fps <= 30:
             self.video_kbps: int = list(BR30.values())[
-                                    bisect.bisect_left(list(BR30.keys()), x)]
+                bisect.bisect_left(list(BR30.keys()), x)]
         else:
             self.video_kbps: int = list(BR60.values())[
-                                    bisect.bisect_left(list(BR60.keys()), x)]
+                bisect.bisect_left(list(BR60.keys()), x)]
 
     def screengrab(self) -> List[str]:
         """choose to grab video from desktop. May not work for Wayland."""

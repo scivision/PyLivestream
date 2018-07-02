@@ -11,14 +11,15 @@ https://support.google.com/youtube/answer/2853702
 from typing import List
 from pathlib import Path
 import PyLivestream
+import signal
+from argparse import ArgumentParser
 
 R = Path(__file__).parent
 
-if __name__ == '__main__':
-    import signal
+
+def main():
     signal.signal(signal.SIGINT, signal.SIG_DFL)
 
-    from argparse import ArgumentParser
     p = ArgumentParser(description="Livestream a single looped input file")
     p.add_argument('infn', help='file to stream, looping endlessly.')
     p.add_argument('site',
@@ -44,3 +45,7 @@ if __name__ == '__main__':
         print('Or Ctrl C to abort.')
 
     S.golive()
+
+
+if __name__ == '__main__':
+    main()

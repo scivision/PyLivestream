@@ -84,7 +84,7 @@ so on.
 3.  Run Python script and chosen input will stream on YouTube Live.
 
 
-    python ScreenshareLivestream.py youtube
+    ScreenshareLivestream youtube
 
 ### Facebook Live
 
@@ -95,7 +95,7 @@ so on.
 3.  Run Python script for Facebook with chosen input
 
 
-    python ScreenshareLivestream.py facebook
+    ScreenshareLivestream facebook
 
 ### Periscope
 
@@ -110,7 +110,7 @@ so on.
 3.  Run Python script for Periscope with chosen input
 
 
-    python ScreenshareLivestream.py periscope
+    ScreenshareLivestream periscope
 
 I prefer using the Phone method as then the phone is a "second screen"
 where I can see if the stream is lagging, and if I "leave broadcast" and
@@ -125,7 +125,7 @@ come back in, I can comment from my phone etc.
 3.  Run Python script for Twitch with chosen input
 
 
-    python ScreenshareLivestream.py twitch
+    ScreenshareLivestream twitch
 
 
 ## Usage
@@ -136,7 +136,7 @@ has failed, ALL streams will stop streaming and the program ends.
 
 -   `stream.ini` is setup for your computer and desired parameters
 -   `site` is `facebook`, `periscope`, `youtube`, etc.
--   For `Webcam.py` and `Screenshare.py`, more than one `site` can be
+-   For `WebcamLivestream` and `ScreenshareLivestream`, more than one `site` can be
     specified for simultaneous multi-streaming
 -   remember to setup a `*.key` file with the hexadecimal stream key for
     EACH site first, OR input the stream key into the "key:" field of
@@ -163,23 +163,23 @@ Find webcam name by:
 
 Audio is included:
 
-    python WebcamLivestream.py site(s)
+    WebcamLivestream site(s)
 
 Stream to multiple sites, in this example Periscope and YouTube Live
 simultaneously:
 
-    python WebcamLivestream.py youtube periscope
+    WebcamLivestream youtube periscope
 
 ### Screen Share Livestream
 
 Audio is included:
 
-    python ScreenshareLivestream.py site(s)
+    ScreenshareLivestream site(s)
 
 Stream to multiple sites, in this example Periscope and YouTube Live
 simultaneously:
 
-    python ScreenshareLivestream.py youtube periscope
+    ScreenshareLivestream youtube periscope
 
 ### File Input
 
@@ -189,13 +189,13 @@ audio/video files.
 
 #### Loop single video endlessly
 
-    python FileLoopLivestream.py site videofile
+    FileLoopLivestream site videofile
 
 #### several video files
 
 Glob list of video files to stream:
 
-    python FileGlobLivestream.py path site -glob glob_pattern
+    FileGlobLivestream path site -glob glob_pattern
 
 * `-glob` glob pattern of files to stream e.g. "*.avi" 
 * `-loop` optionally loop endlessly the globbed file list 
@@ -207,20 +207,20 @@ Glob list of video files to stream:
 
 Example: all AVI videos in directory `~/Videos`:
 
-    python FileGlobLivestream.py ~/Videos youtube -glob "*.avi"
+    FileGlobLivestream ~/Videos youtube -glob "*.avi"
 
 #### stream endlessly looping videos
 
 Example: all AVI videos in `~/Videos` are endlessly looped:
 
-    python FileGlobLivestream.py ~/Videos youtube -glob "*.avi" -loop
+    FileGlobLivestream ~/Videos youtube -glob "*.avi" -loop
 
 #### stream all audio files in directory
 
 Glob list of video files to stream. Must include a static image (could
 be your logo):
 
-    python FileGlobLivestream.py path site -glob glob_pattern -image image
+    FileGlobLivestream path site -glob glob_pattern -image image
 
 path path to where video files are pattern e.g. `*.avi` pattern matching
 video files -image filename of image to use as stream background
@@ -228,22 +228,22 @@ video files -image filename of image to use as stream background
 
 Example: stream all .mp3 audio under `~/music` directory:
 
-    python FileGlobLivestream.py ~/music youtube -glob "*.mp3" -image mylogo.jpg
+    FileGlobLivestream ~/music youtube -glob "*.mp3" -image mylogo.jpg
 
 Example: stream all .mp3 audio in `~/music` with an animated GIF or video clip repeating:
 
-    python FileGlobLivestream.py ~/music youtube -glob "*.mp3" -image myclip.avi
+    FileGlobLivestream ~/music youtube -glob "*.mp3" -image myclip.avi
     
 or
 
-    python FileGlobLivestream.py ~/music youtube -glob "*.mp3" -image animated.gif
+    FileGlobLivestream ~/music youtube -glob "*.mp3" -image animated.gif
     
 
 ### Screen capture to disk
 
 This script saves your screen capture to a file on your disk:
 
-    python ScreenCapture2disk.py myvid.avi
+    ScreenCapture2disk myvid.avi
 
 ## Utilities
 

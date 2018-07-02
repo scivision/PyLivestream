@@ -10,14 +10,15 @@ Windows: get DirectShow device list from::
 """
 from pathlib import Path
 import PyLivestream
+import signal
+from argparse import ArgumentParser
 
 R = Path(__file__).parent
 
-if __name__ == '__main__':
-    import signal
+
+def main():
     signal.signal(signal.SIGINT, signal.SIG_DFL)
 
-    from argparse import ArgumentParser
     p = ArgumentParser(description="livestream microphone audio")
     p.add_argument('site',
                    help='site to stream: [youtube,periscope,facebook,twitch]',
@@ -42,3 +43,7 @@ if __name__ == '__main__':
         input(f"Press Enter to go live on {sites}.    Or Ctrl C to abort.")
 
     s.golive()
+
+
+if __name__ == '__main__':
+    main()

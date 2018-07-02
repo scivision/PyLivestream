@@ -3,6 +3,7 @@ fast_finish: true
 
 env:
   - TRAVIS_PYTHON_VERSION=3.6
+  - TRAVIS_PYTHON_VERSION=3.7
 
 os:
 #  - linux  # need Ubuntu >= 16.04
@@ -43,7 +44,7 @@ script:
 
 after_success:
   - if [[ $TRAVIS_PYTHON_VERSION == 3.6* ]]; then
-    coverage run tests/test_all.py;
+    pytest --cov;
     coveralls;
     fi
 

@@ -11,17 +11,17 @@ Windows: get DirectShow device list from::
 from typing import List
 from pathlib import Path
 import PyLivestream
+import signal
+from argparse import ArgumentParser
 
 R = Path(__file__).parent
 
-if __name__ == '__main__':
-    import signal
+
+def main():
     signal.signal(signal.SIGINT, signal.SIG_DFL)
 
-    from argparse import ArgumentParser
     p = ArgumentParser(description="livestream webcam")
-    p.add_argument('site',
-                   help='site to stream: [youtube,periscope,facebook,twitch]',
+    p.add_argument('site', help='site to stream: [youtube,periscope,facebook,twitch]',
                    nargs='?', default='localhost')
     p.add_argument('-i', '--ini', help='*.ini file with stream parameters',
                    default=R/'stream.ini')
@@ -40,3 +40,7 @@ if __name__ == '__main__':
         input(f"Press Enter to go live on {sites}.    Or Ctrl C to abort.")
 
     S.golive()
+
+
+if __name__ == '__main__':
+    main()

@@ -66,7 +66,7 @@ class Livestream(stream.Stream):
             if self.site == 'localhost':
                 proc = self.F.listener()  # start own RTMP server
             else:
-                print('\n', ' '.join(self.cmd), '\n')
+                print('\n', ' '.join(self.cmd), '\n', flush=True)
                 return
 # %% RUN STREAM
         cmd: List[str]

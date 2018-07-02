@@ -10,12 +10,13 @@ Windows: get DirectShow device list from:
    ffmpeg -list_devices true -f dshow -i dummy
 """
 import PyLivestream
+import signal
+from argparse import ArgumentParser
 
-if __name__ == '__main__':
-    import signal
+
+def main():
     signal.signal(signal.SIGINT, signal.SIG_DFL)
 
-    from argparse import ArgumentParser
     p = ArgumentParser()
     p.add_argument('outfn', help='video file to save to disk.')
     p.add_argument('-i', '--ini', help='*.ini file with stream parameters',
@@ -33,3 +34,7 @@ if __name__ == '__main__':
               "Or Ctrl C to abort.")
 
     s.save()
+
+
+if __name__ == '__main__':
+    main()
