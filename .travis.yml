@@ -1,13 +1,13 @@
 language: generic
 fast_finish: true
-sudo: required
+#sudo: required
 
 env:
   - TRAVIS_PYTHON_VERSION=3.6
   - TRAVIS_PYTHON_VERSION=3.7
 
 os:
-  - linux
+#  - linux   # ffmpeg is not yet ready in Travis xenial
   - osx
 
 dist: xenial
@@ -16,9 +16,9 @@ group: travis_latest
 git:
   depth: 3
   
-addons:
-  apt:
-    packages: ffmpeg
+#addons:
+#  apt:
+#    packages: ffmpeg
 
 before_install:
   - if [[ $TRAVIS_OS_NAME == osx ]]; then
