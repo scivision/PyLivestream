@@ -1,6 +1,11 @@
 language: generic
-fast_finish: true
 #sudo: required
+#dist: xenial
+group: travis_latest
+
+git:
+  depth: 3
+  quiet: true
 
 env:
   - TRAVIS_PYTHON_VERSION=3.6
@@ -9,12 +14,6 @@ env:
 os:
 #  - linux   # ffmpeg is not yet ready in Travis xenial
   - osx
-
-dist: xenial
-group: travis_latest
-
-git:
-  depth: 3
   
 #addons:
 #  apt:
@@ -41,7 +40,7 @@ before_install:
     brew install ffmpeg > /dev/null;
     fi
 
-install: pip -q install -e .[tests]
+install: pip install -e .[tests]
 
 script:
   - pytest -sv

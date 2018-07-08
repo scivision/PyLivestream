@@ -29,9 +29,10 @@ def test_microphone():
             assert S.streams[s].video_kbps == 500
 
 
+@pytest.mark.usefixtures("listener")
 @pytest.mark.skipif(CI, reason="Many CI's don't have audio hardware")
 def test_microphone_stream():
-    S = pls.Microphone(inifn, 'localhost', image=IMGFN)
+    S = pls.Microphone(inifn, 'localhost-test', image=IMGFN)
     print('press   q   in terminal to proceed')
     S.golive()
 

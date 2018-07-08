@@ -29,9 +29,10 @@ def test_webcam():
                 assert S.streams[s].video_kbps == 1800
 
 
+@pytest.mark.usefixtures("listener")
 @pytest.mark.skipif(CI, reason="This is an interactive test")
 def test_webcam_stream():
-    S = pls.Webcam(inifn, 'localhost')
+    S = pls.Webcam(inifn, 'localhost-test')
     print('press   q   in terminal to proceed')
     S.golive()
 

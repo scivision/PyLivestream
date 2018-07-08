@@ -27,9 +27,10 @@ def test_screenshare():
             assert S.streams[s].video_kbps == 1800
 
 
+@pytest.mark.usefixtures("listener")
 @pytest.mark.skipif(CI, reason="Many CI's don't have video hardware")
 def test_screenshare_stream():
-    S = pls.Screenshare(inifn, 'localhost')
+    S = pls.Screenshare(inifn, 'localhost-test')
     print('press   q   in terminal to proceed')
     S.golive()
 
