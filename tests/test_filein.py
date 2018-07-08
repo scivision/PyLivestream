@@ -45,6 +45,7 @@ def test_filein_audio():
             assert S.streams[s].video_kbps == 500
 
 
+@pytest.mark.skipif(CI, reason="Many CI's don't have audio hardware")
 def test_file_simple():
     """stream to localhost"""
     s = pls.FileIn(inifn, 'localhost',
@@ -55,6 +56,7 @@ def test_file_simple():
 
 
 @pytest.mark.usefixtures("listener")
+@pytest.mark.skipif(CI, reason="Many CI's don't have audio hardware")
 def test_filein_script():
     subprocess.check_call(['FileGlobLivestream',
                            str(VIDFN),
