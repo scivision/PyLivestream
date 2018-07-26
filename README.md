@@ -212,32 +212,35 @@ Example: all AVI videos in directory `~/Videos`:
 #### stream endlessly looping videos
 
 Example: all AVI videos in `~/Videos` are endlessly looped:
-
-    FileGlobLivestream ~/Videos youtube -glob "*.avi" -loop
+```sh
+FileGlobLivestream ~/Videos youtube -glob "*.avi" -loop
+```
 
 #### stream all audio files in directory
 
 Glob list of video files to stream. Must include a static image (could
 be your logo):
+```sh
+FileGlobLivestream path site -glob glob_pattern -image image
+```
 
-    FileGlobLivestream path site -glob glob_pattern -image image
-
-path path to where video files are pattern e.g. `*.avi` pattern matching
-video files -image filename of image to use as stream background
-(REQUIRED for most websites)
+* `path` path to where video files are 
+* `glob_pattern` e.g. `*.avi` pattern matching video files 
+* `-image` filename of image to use as stream background (REQUIRED for most websites)
 
 Example: stream all .mp3 audio under `~/music` directory:
-
-    FileGlobLivestream ~/music youtube -glob "*.mp3" -image mylogo.jpg
+```sh
+FileGlobLivestream ~/music youtube -glob "*.mp3" -image mylogo.jpg
+```
 
 Example: stream all .mp3 audio in `~/music` with an animated GIF or video clip repeating:
-
-    FileGlobLivestream ~/music youtube -glob "*.mp3" -image myclip.avi
-    
+```sh
+FileGlobLivestream ~/music youtube -glob "*.mp3" -image myclip.avi
+```    
 or
-
-    FileGlobLivestream ~/music youtube -glob "*.mp3" -image animated.gif
-    
+```sh
+FileGlobLivestream ~/music youtube -glob "*.mp3" -image animated.gif
+``` 
 
 ### Screen capture to disk
 
@@ -267,9 +270,16 @@ Comments on dropouts / lag for livestreaming in general (not just with this prog
     with HD Netflix due to deep buffering, but it will show up on livestreaming.
 -   Do Skype / Duo / FaceTime work excellently for you on your network?
     If not, live streaming will not work well.
--   Try a wired (Ethernet) connection to the Internet. I have seen very
-    expensive consumer WiFi APs that just had bad performance in real
-    world strenuous use (like live streaming).
+-   Try a wired (Ethernet) connection to the Internet. 
+    I have seen very expensive consumer WiFi APs that had bad performance in real world strenuous use (like live streaming).
+    
+### YouTube stream health
+
+Particularly when streaming with a static background `-image`, YouTube will often warn in "Stream Health":
+
+> The stream's current bitrate is lower than the recommended bitrate.
+
+Disregard this warning as long as your image looks OK.
 
 ### FFmpeg References
 

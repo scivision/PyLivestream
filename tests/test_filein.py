@@ -14,7 +14,7 @@ sites = ['periscope', 'youtube', 'facebook']
 inifn = R / 'test.ini'
 
 VIDFN = R / 'bunny.avi'
-
+LOGO = R.parent / 'doc' / 'logo.png'
 
 def test_filein_video():
     S = pls.FileIn(inifn, sites, VIDFN)
@@ -34,7 +34,7 @@ def test_filein_video():
 def test_filein_audio():
     flist = list(R.glob('*.ogg'))
 
-    S = pls.FileIn(inifn, sites, flist[0])
+    S = pls.FileIn(inifn, sites, flist[0], image=LOGO)
     for s in S.streams:
         assert '-re' in S.streams[s].cmd
         assert S.streams[s].fps is None
@@ -42,7 +42,7 @@ def test_filein_audio():
         if s == 'periscope':
             assert S.streams[s].video_kbps == 800
         else:
-            assert S.streams[s].video_kbps == 500
+            assert S.streams[s].video_kbps == 400
 
 
 @pytest.mark.skipif(CI, reason="Many CI's don't have audio hardware")
@@ -50,7 +50,7 @@ def test_file_simple():
     """stream to localhost"""
     s = pls.FileIn(inifn, 'localhost',
                    R / 'orch_short.ogg',
-                   image=R.parent / 'doc' / 'logo.png',
+                   image=LOGO,
                    yes=True)
     s.golive()
 
@@ -68,4 +68,4 @@ def test_filein_script():
 
 
 if __name__ == '__main__':
-    pytest.main()
+    pytest.main([__file__])

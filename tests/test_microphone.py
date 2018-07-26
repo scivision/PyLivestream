@@ -12,27 +12,45 @@ DEVNULL = subprocess.DEVNULL
 
 sites = ['periscope', 'youtube', 'facebook']
 inifn = R / 'test.ini'
-IMGFN = R.parent / 'doc' / 'logo.png'
+
+LOGO = R.parent / 'doc' / 'logo.png'
+IMG4K = R / 'check4k.png'
 
 
 def test_microphone():
     S = pls.Microphone(inifn, sites,
-                       image=IMGFN)
+                       image=LOGO)
 
     for s in S.streams:
         assert '-re' not in S.streams[s].cmd
         assert S.streams[s].fps is None
+        assert S.streams[s].res == (720, 540)
 
         if s == 'periscope':
             assert S.streams[s].video_kbps == 800
         else:
-            assert S.streams[s].video_kbps == 500
+            assert S.streams[s].video_kbps == 800
+
+
+def test_microphone_4Kbg():
+    S = pls.Microphone(inifn, sites,
+                       image=IMG4K)
+
+    for s in S.streams:
+        assert '-re' not in S.streams[s].cmd
+        assert S.streams[s].fps is None
+        assert S.streams[s].res == (3840, 2160)
+
+        if s == 'periscope':
+            assert S.streams[s].video_kbps == 800
+        else:
+            assert S.streams[s].video_kbps == 4000
 
 
 @pytest.mark.usefixtures("listener")
 @pytest.mark.skipif(CI, reason="Many CI's don't have audio hardware")
 def test_microphone_stream():
-    S = pls.Microphone(inifn, 'localhost-test', image=IMGFN)
+    S = pls.Microphone(inifn, 'localhost-test', image=LOGO)
     print('press   q   in terminal to proceed')
     S.golive()
 
@@ -48,4 +66,4 @@ def test_microphone_script():
 
 
 if __name__ == '__main__':
-    pytest.main()
+    pytest.main([__file__])

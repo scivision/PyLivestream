@@ -108,6 +108,7 @@ def get_resolution(fn: Path, exe: Path=None) -> Union[None, Tuple[int, int]]:
         if s['codec_type'] != 'video':
             continue
         res = (s['width'], s['height'])
+        break
 
     return res
 
@@ -147,6 +148,7 @@ def get_framerate(fn: Path, exe: Path=None) -> Union[None, float]:
         except ZeroDivisionError:
             logging.error(f'FPS not available:{fn}. Is it a video/audio file?')
             fps = None
+        break
 
     return fps
 

@@ -11,22 +11,32 @@ from .ffmpeg import Ffmpeg
 
 # %%  Col0: vertical pixels (height). Col1: video kbps. Interpolates.
 # NOTE: Python >= 3.6 has guaranteed dict() order.
+# YouTube spec: https://support.google.com/youtube/answer/2853702
 
-BR30 = dict([
-    (240, 300),
-    (360, 400),
-    (480, 500),
-    (540, 800),
-    (720, 1800),
-    (1080, 3000),
-    (1440, 6000),
-    (2160, 13000)])
+BR30 = {
+    240: 300,
+    360: 400,
+    480: 500,
+    540: 800,
+    720: 1800,
+    1080: 3000,
+    1440: 6000,
+    2160: 13000}
 
-BR60 = dict([
-    (720, 2250),
-    (1080, 4500),
-    (1440, 9000),
-    (2160, 20000)])
+BR60 = {
+    720: 2250,
+    1080: 4500,
+    1440: 9000,
+    2160: 20000}
+
+# for static images, ignore YouTube bitrate warning as long as image looks OK on stream
+BRS = {
+    240: 200,
+    480: 400,
+    720: 800,
+    1080: 1200,
+    1440: 2000,
+    2160: 4000}
 
 FPS: float = 30.  # default frames/sec if not defined otherwise
 
@@ -86,9 +96,11 @@ class Stream:
             self.origin: Tuple[int, int] = C.get(self.site,
                                                  'screencap_origin').split(',')
             self.movingimage = self.staticimage = False
-        elif self.vidsource is None or self.vidsource == 'file':
-            self.res: Tuple[int, int] = utils.get_resolution(self.infn,
-                                                             self.probeexe)
+        elif self.vidsource == 'file': # streaming video from a file
+            self.res: Tuple[int, int] = utils.get_resolution(self.infn, self.probeexe)
+            self.fps: float = utils.get_framerate(self.infn, self.probeexe)
+        elif self.vidsource is None and self.image:  # audio-only stream with background image
+            self.res: Tuple[int, int] = utils.get_resolution(self.image, self.probeexe)
             self.fps: float = utils.get_framerate(self.infn, self.probeexe)
         else:
             raise ValueError(f'unknown video source {self.vidsource}')
@@ -192,18 +204,18 @@ class Stream:
         if self.res is not None:
             x: int = int(self.res[1])
         elif self.vidsource is None or self.vidsource == 'file':
-            logging.info('assuming 480p input.')
+            logging.warning('assuming 480p input.')
             x = 480
         else:
             raise ValueError('Unsure of your video resolution request.'
                              'Try setting video_kpbs in the .ini file.')
 
-        if self.fps is None or self.fps <= 30:
-            self.video_kbps: int = list(BR30.values())[
-                bisect.bisect_left(list(BR30.keys()), x)]
+        if self.fps is None or self.fps < 20:
+            self.video_kbps: int = list(BRS.values())[bisect.bisect_left(list(BRS.keys()), x)]
+        elif 20 <= self.fps <= 35:
+            self.video_kbps: int = list(BR30.values())[bisect.bisect_left(list(BR30.keys()), x)]
         else:
-            self.video_kbps: int = list(BR60.values())[
-                bisect.bisect_left(list(BR60.keys()), x)]
+            self.video_kbps: int = list(BR60.values())[bisect.bisect_left(list(BR60.keys()), x)]
 
     def screengrab(self) -> List[str]:
         """choose to grab video from desktop. May not work for Wayland."""
