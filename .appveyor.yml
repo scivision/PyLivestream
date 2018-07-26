@@ -4,24 +4,23 @@ image:
 
 stack: python 3
 
+build: off
+
 environment:
-  PY_DIR: C:\Python36-x64
+  PY_DIR: C:\Python37-x64
 
 clone_depth: 3
 
-before_build:
+init:
 - cmd: set PATH=%PY_DIR%;%PY_DIR%\Scripts;%PATH%
-# FFmpeg 4.0 binary for AppVeyor Windows 
-- cmd: curl -fsSL -o ffmpeg.zip https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-4.0-win64-static.zip
-- cmd: 7z x ffmpeg.zip
-- cmd: set PATH=%APPVEYOR_BUILD_FOLDER%\ffmpeg-4.0-win64-static\bin;%PATH%
+- cmd: cinst -y ffmpeg
 
 - sh: sudo apt-get -yq update > /dev/null
 - sh: sudo apt-get install -yq --no-install-suggests --no-install-recommends ffmpeg > /dev/null
 
-build_script:
+install:
 - pip install -e .[tests]
   
-after_build:
+test_script:
 - pytest -sv
 

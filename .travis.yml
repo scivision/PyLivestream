@@ -1,6 +1,6 @@
 language: generic
-#sudo: required
-#dist: xenial
+sudo: required
+dist: xenial
 group: travis_latest
 
 git:
@@ -12,10 +12,10 @@ env:
   - TRAVIS_PYTHON_VERSION=3.7
 
 os:
-#  - linux   # ffmpeg is not yet ready in Travis xenial
+  - linux
   - osx
   
-#addons:
+#addons:  FIXME: waiting travis xenial ffmpeg
 #  apt:
 #    packages: ffmpeg
 
@@ -36,8 +36,11 @@ before_install:
   - source activate test
   
   - if [[ $TRAVIS_OS_NAME == osx ]]; then
-    brew update > /dev/null;
-    brew install ffmpeg > /dev/null;
+      brew update > /dev/null;
+      brew install ffmpeg > /dev/null;
+    else
+      sudo apt-get -yq update > /dev/null
+      sudo apt-get install -yq --no-install-suggests --no-install-recommends ffmpeg > /dev/null
     fi
 
 install: pip install -e .[tests]

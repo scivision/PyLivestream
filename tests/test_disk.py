@@ -2,15 +2,13 @@
 from pathlib import Path
 import PyLivestream as pls
 import pytest
-import os
 import subprocess
 
-CI = bool(os.environ['CI']) if 'CI' in os.environ else False
-rdir = Path(__file__).resolve().parent  # .resolve() is necessary
+R = Path(__file__).resolve().parent  # .resolve() is necessary
 DEVNULL = subprocess.DEVNULL
 
 sites = ['periscope', 'youtube', 'facebook']
-inifn = rdir/'test.ini'
+inifn = R / 'test.ini'
 
 
 def test_disk():

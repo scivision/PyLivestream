@@ -7,12 +7,12 @@ import subprocess
 from PyLivestream.listener import listener  # noqa: F401
 
 CI = bool(os.environ['CI']) if 'CI' in os.environ else False
-rdir = Path(__file__).resolve().parent  # .resolve() is necessary
+R = Path(__file__).resolve().parent  # .resolve() is necessary
 DEVNULL = subprocess.DEVNULL
 
 sites = ['periscope', 'youtube', 'facebook']
-inifn = rdir/'test.ini'
-IMGFN = rdir.parent / 'doc' / 'logo.png'
+inifn = R / 'test.ini'
+IMGFN = R.parent / 'doc' / 'logo.png'
 
 
 def test_microphone():
@@ -44,7 +44,7 @@ def test_microphone_script():
                            '-i', str(inifn),
                            'localhost-test', '--yes'],
                           stdout=DEVNULL, timeout=8,
-                          cwd=rdir.parent)
+                          cwd=R.parent)
 
 
 if __name__ == '__main__':

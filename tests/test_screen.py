@@ -8,11 +8,11 @@ import math
 from PyLivestream.listener import listener  # noqa: F401
 
 CI = bool(os.environ['CI']) if 'CI' in os.environ else False
-rdir = Path(__file__).resolve().parent  # .resolve() is necessary
+R = Path(__file__).resolve().parent  # .resolve() is necessary
 DEVNULL = subprocess.DEVNULL
 
 sites = ['periscope', 'youtube', 'facebook']
-inifn = rdir/'test.ini'
+inifn = R / 'test.ini'
 
 
 def test_screenshare():
@@ -42,7 +42,7 @@ def test_webcam_script():
                            '-i', str(inifn),
                            'localhost-test', '--yes'],
                           stdout=DEVNULL, timeout=8,
-                          cwd=rdir.parent)
+                          cwd=R.parent)
 
 
 if __name__ == '__main__':

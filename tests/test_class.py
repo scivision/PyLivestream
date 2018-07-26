@@ -3,27 +3,24 @@ from pathlib import Path
 import PyLivestream as pls
 import pytest
 import subprocess
-import os
 import math
 
-CI = bool(os.environ['CI']) if 'CI' in os.environ else False
-
-rdir = Path(__file__).resolve().parent  # .resolve() is necessary
+R = Path(__file__).resolve().parent  # .resolve() is necessary
 DEVNULL = subprocess.DEVNULL
 
-inifn = rdir/'test.ini'
+inifn = R / 'test.ini'
 sites = ['periscope', 'youtube', 'facebook']
 
-VIDFN = rdir / 'bunny.avi'
+VIDFN = R / 'bunny.avi'
 
 
 def test_key():
     """tests reading of stream key"""
     assert pls.utils.getstreamkey('abc123') == 'abc123'
-    assert pls.utils.getstreamkey(rdir / 'periscope.key') == 'abcd1234'
+    assert pls.utils.getstreamkey(R / 'periscope.key') == 'abcd1234'
     assert pls.utils.getstreamkey('') is None
     assert pls.utils.getstreamkey(None) is None
-    assert pls.utils.getstreamkey(rdir) is None
+    assert pls.utils.getstreamkey(R) is None
 
 
 def test_exe():

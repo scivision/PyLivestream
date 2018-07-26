@@ -7,13 +7,13 @@ import subprocess
 from PyLivestream.listener import listener  # noqa: F401
 
 CI = bool(os.environ['CI']) if 'CI' in os.environ else False
-rdir = Path(__file__).resolve().parent  # .resolve() is necessary
+R = Path(__file__).resolve().parent  # .resolve() is necessary
 DEVNULL = subprocess.DEVNULL
 
 sites = ['periscope', 'youtube', 'facebook']
-inifn = rdir/'test.ini'
+inifn = R / 'test.ini'
 
-VIDFN = rdir / 'bunny.avi'
+VIDFN = R / 'bunny.avi'
 
 
 def test_filein_video():
@@ -32,7 +32,7 @@ def test_filein_video():
 
 
 def test_filein_audio():
-    flist = list(rdir.glob('*.ogg'))
+    flist = list(R.glob('*.ogg'))
 
     S = pls.FileIn(inifn, sites, flist[0])
     for s in S.streams:
@@ -49,8 +49,8 @@ def test_filein_audio():
 def test_file_simple():
     """stream to localhost"""
     s = pls.FileIn(inifn, 'localhost',
-                   rdir / 'orch_short.ogg',
-                   image=rdir.parent / 'doc' / 'logo.png',
+                   R / 'orch_short.ogg',
+                   image=R.parent / 'doc' / 'logo.png',
                    yes=True)
     s.golive()
 
@@ -64,7 +64,7 @@ def test_filein_script():
                            '-i', str(inifn),
                            '--yes'],
                           stdout=DEVNULL, timeout=8,
-                          cwd=rdir.parent)
+                          cwd=R.parent)
 
 
 if __name__ == '__main__':
