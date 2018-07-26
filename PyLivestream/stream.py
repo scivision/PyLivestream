@@ -96,7 +96,7 @@ class Stream:
             self.origin: Tuple[int, int] = C.get(self.site,
                                                  'screencap_origin').split(',')
             self.movingimage = self.staticimage = False
-        elif self.vidsource == 'file': # streaming video from a file
+        elif self.vidsource == 'file':  # streaming video from a file
             self.res: Tuple[int, int] = utils.get_resolution(self.infn, self.probeexe)
             self.fps: float = utils.get_framerate(self.infn, self.probeexe)
         elif self.vidsource is None and self.image:  # audio-only stream with background image

@@ -16,6 +16,7 @@ inifn = R / 'test.ini'
 VIDFN = R / 'bunny.avi'
 LOGO = R.parent / 'doc' / 'logo.png'
 
+
 def test_filein_video():
     S = pls.FileIn(inifn, sites, VIDFN)
     for s in S.streams:
