@@ -1,11 +1,9 @@
 #!/usr/bin/env python
 from pathlib import Path
-import PyLivestream as pls
+import pylivestream as pls
 import pytest
-import subprocess
 
-R = Path(__file__).resolve().parent  # .resolve() is necessary
-DEVNULL = subprocess.DEVNULL
+R = Path(__file__).parent
 
 sites = ['periscope', 'youtube', 'facebook']
 inifn = R / 'test.ini'
@@ -19,4 +17,4 @@ def test_disk():
 
 
 if __name__ == '__main__':
-    pytest.main([__file__])
+    pytest.main(['-x', __file__])

@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Union, Dict
+from typing import List, Union, Dict, Sequence
 import logging
 #
 from . import stream
@@ -40,7 +40,8 @@ class Livestream(stream.Stream):
 
         cmd.extend(self.loglevel)
         cmd.extend(self.yes)
-        cmd.extend(self.timelimit)
+
+#        cmd.extend(self.timelimit)  # terminate input after N seconds, IF specified
 
         cmd.extend(self.queue)
 
@@ -52,17 +53,19 @@ class Livestream(stream.Stream):
         cmd += vidOut + audOut
         cmd += buf
 
+        cmd.extend(self.timelimit)  # terminate output after N seconds, IF specified
+
         streamid: str = self.key if self.key else ''
 
         self.sink: List[str] = [self.server + streamid]
 
         self.cmd: List[str] = cmd + self.sink
 
-    def startlive(self, sinks: List[str]=None):
+    def startlive(self, sinks: Sequence[str]=None):
         """finally start the stream(s)"""
         proc = None
 # %% special cases for localhost tests
-        if self.key is None:
+        if self.key is None and self.site != 'localhost-test':
             if self.site == 'localhost':
                 proc = self.F.listener()  # start own RTMP server
             else:
@@ -112,7 +115,7 @@ class Screenshare(Livestream):
 
     def __init__(self,
                  ini: Path,
-                 websites: Union[str, List[str]],
+                 websites: Union[str, Sequence[str]],
                  caption: str=None,
                  yes: bool=False) -> None:
 
@@ -143,7 +146,7 @@ class Webcam(Livestream):
 
     def __init__(self,
                  ini: Path,
-                 websites: Union[str, List[str]],
+                 websites: Union[str, Sequence[str]],
                  caption: str=None,
                  yes: bool=False) -> None:
 
@@ -174,7 +177,7 @@ class Microphone(Livestream):
 
     def __init__(self,
                  ini: Path,
-                 sites: Union[str, List[str]],
+                 sites: Union[str, Sequence[str]],
                  image: Path,
                  caption: str=None,
                  yes: bool=False) -> None:
@@ -206,7 +209,7 @@ class FileIn(Livestream):
 
     def __init__(self,
                  ini: Path,
-                 sites: Union[str, List[str]],
+                 sites: Union[str, Sequence[str]],
                  infn: Path,
                  loop: bool=False,
                  image: Path=None,

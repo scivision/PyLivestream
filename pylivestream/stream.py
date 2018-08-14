@@ -103,7 +103,7 @@ class Stream:
             self.res: Tuple[int, int] = utils.get_resolution(self.image, self.probeexe)
             self.fps: float = utils.get_framerate(self.infn, self.probeexe)
         else:
-            raise ValueError(f'unknown video source {self.vidsource}')
+            logging.warning('no video source selected')
 
         self.audiofs: int = C.get(self.site, 'audiofs')  # not getint
         self.preset: str = C.get(self.site, 'preset')

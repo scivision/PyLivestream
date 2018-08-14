@@ -14,6 +14,21 @@ def run(cmd: List[str]):
     subprocess.check_call(cmd)
 
 
+"""
+This is an error-tolerant way; we haven't found it necessary.
+I don't like putting enormous amounts in a PIPE, this can be unstable.
+Better to let users know there's a problem.
+
+    ret = subprocess.run(cmd, stderr=subprocess.PIPE, universal_newlines=True)
+
+    if ret.returncode != 0:
+        if "Connection reset by peer" in ret.stderr:
+            logging.info('input stream (from your computer) ended.')
+        else:
+            logging.error(ret.stderr)
+"""
+
+
 def getexe(exein: Path=None) -> Tuple[str, str]:
     """checks that host streaming program is installed"""
 

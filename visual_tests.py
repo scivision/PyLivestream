@@ -26,39 +26,39 @@ def main():
 
     # %% Microphone
     print('PyLivestream splash with live microphone audio')
-    subprocess.check_call(['python', 'MicrophoneLivestream.py', '-y',  HOST, '-image', str(STATIC)],
+    subprocess.check_call(['MicrophoneLivestream', '-y',  HOST, '-image', str(STATIC)],
                           cwd=R)
 
     print('1990s vector graphics with live microphone audio')
-    subprocess.check_call(['python', 'MicrophoneLivestream.py', '-y',  HOST, '-image', str(MOVING)],
+    subprocess.check_call(['MicrophoneLivestream', '-y',  HOST, '-image', str(MOVING)],
                           cwd=R)
     # %%  Music
     print('PyLivestream splash with orchestra music  (caption)')
-    subprocess.check_call(['python', 'FileGlobLivestream.py', '-y',  '-image', str(STATIC),
+    subprocess.check_call(['FileGlobLivestream', '-y',  '-image', str(STATIC),
                            str(VIDPATH), HOST,
                            '-glob', 'orch.ogg'],
                           cwd=R)
 
     print('1990s vector graphics with orchestra music (NO caption')
-    subprocess.check_call(['python', 'FileGlobLivestream.py', '-y', '-image', str(MOVING),
+    subprocess.check_call(['FileGlobLivestream', '-y', '-image', str(MOVING),
                            str(MUSIC), HOST],
                           cwd=R)
     # video
     print('Looping video')
-    subprocess.check_call(['python', 'FileGlobLivestream.py', '-y',
+    subprocess.check_call(['FileGlobLivestream', '-y',
                            str(VIDEO), HOST],
                           cwd=R)
     # %% Screenshare
     print('Screenshare + microphone')
-    subprocess.check_call(['python', 'ScreenshareLivestream.py', '-y',  HOST],
+    subprocess.check_call(['ScreenshareLivestream', '-y',  HOST],
                           cwd=R)
     # %% loop video
     print('Looping video')
-    subprocess.check_call(['python', 'FileLoopLivestream.py', '-y',  str(VIDEO), HOST],
+    subprocess.check_call(['FileLoopLivestream', '-y',  str(VIDEO), HOST],
                           cwd=R)
     # %% Webcam
     print('Webcam test - will fail if no webcam present on your system')
-    subprocess.check_call(['python', 'WebcamLivestream.py', '-y', HOST],
+    subprocess.check_call(['WebcamLivestream', '-y', HOST],
                           cwd=R)
 
 

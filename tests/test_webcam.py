@@ -1,24 +1,28 @@
 #!/usr/bin/env python
 from pathlib import Path
-import PyLivestream as pls
+import pylivestream as pls
 import pytest
+from pytest import approx
 import os
 import subprocess
-from PyLivestream.listener import listener  # noqa: F401
+from pylivestream.listener import listener  # noqa: F401
 
 CI = bool(os.environ['CI']) if 'CI' in os.environ else False
-R = Path(__file__).resolve().parent  # .resolve() is necessary
-DEVNULL = subprocess.DEVNULL
+R = Path(__file__).parent
 
 sites = ['localhost', 'periscope', 'youtube', 'facebook']
 inifn = R / 'test.ini'
+
+S = pls.stream.Stream(inifn, 'localhost-test')
+S.osparam()
+timelimit = int(S.timelimit[1]) + 3   # allowing 3 seconds leeway
 
 
 def test_webcam():
     S = pls.Webcam(inifn, sites)
     for s in S.streams:
         assert '-re' not in S.streams[s].cmd
-        assert S.streams[s].fps == 30.
+        assert S.streams[s].fps == approx(30.)
 
         if s == 'periscope':
             assert S.streams[s].video_kbps == 800
@@ -33,7 +37,7 @@ def test_webcam():
 @pytest.mark.skipif(CI, reason="This is an interactive test")
 def test_webcam_stream():
     S = pls.Webcam(inifn, 'localhost-test')
-    print('press   q   in terminal to proceed')
+
     S.golive()
 
 
@@ -43,9 +47,8 @@ def test_webcam_script():
     subprocess.check_call(['WebcamLivestream',
                            '-i', str(inifn),
                            'localhost-test', '--yes'],
-                          stdout=DEVNULL, timeout=8,
-                          cwd=R.parent)
+                          timeout=timelimit)
 
 
 if __name__ == '__main__':
-    pytest.main([__file__])
+    pytest.main(['-x', __file__])

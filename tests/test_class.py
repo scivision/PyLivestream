@@ -1,16 +1,10 @@
 #!/usr/bin/env python
 from pathlib import Path
-import PyLivestream as pls
+import pylivestream as pls
 import pytest
-import subprocess
-import math
+from pytest import approx
 
-R = Path(__file__).resolve().parent  # .resolve() is necessary
-DEVNULL = subprocess.DEVNULL
-
-inifn = R / 'test.ini'
-sites = ['periscope', 'youtube', 'facebook']
-
+R = Path(__file__).parent
 VIDFN = R / 'bunny.avi'
 
 
@@ -39,8 +33,8 @@ def test_attrs():
         assert pls.utils.get_resolution(p) is None
 
     assert pls.utils.get_resolution(VIDFN) == (426, 240)
-    assert math.isclose(pls.utils.get_framerate(VIDFN), 24.0)
+    assert pls.utils.get_framerate(VIDFN) == approx(24.0)
 
 
 if __name__ == '__main__':
-    pytest.main([__file__])
+    pytest.main(['-x', __file__])

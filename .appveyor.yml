@@ -4,12 +4,12 @@ image:
 
 stack: python 3
 
-build: off
-
 environment:
   PY_DIR: C:\Python37-x64
 
 clone_depth: 3
+
+build: off
 
 init:
 - cmd: set PATH=%PY_DIR%;%PY_DIR%\Scripts;%PATH%
@@ -18,9 +18,7 @@ init:
 - sh: sudo apt-get -yq update > /dev/null
 - sh: sudo apt-get install -yq --no-install-suggests --no-install-recommends ffmpeg > /dev/null
 
-install:
-- pip install -e .[tests]
-  
-test_script:
-- pytest -sv
+install: pip install -e .[tests]
+
+test_script: pytest -rsv
 

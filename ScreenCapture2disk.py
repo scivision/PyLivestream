@@ -9,7 +9,7 @@ https://support.google.com/youtube/answer/2853702
 Windows: get DirectShow device list from:
    ffmpeg -list_devices true -f dshow -i dummy
 """
-import PyLivestream
+import pylivestream as pls
 import signal
 from argparse import ArgumentParser
 
@@ -25,7 +25,7 @@ def main():
                    action='store_true')
     P = p.parse_args()
 
-    s = PyLivestream.SaveDisk(P.ini, P.outfn, yes=P.yes)
+    s = pls.SaveDisk(P.ini, P.outfn, yes=P.yes)
 # %%
     if P.yes:
         print('saving screen capture to', s.outfn)

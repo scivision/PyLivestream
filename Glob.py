@@ -10,7 +10,7 @@ https://support.google.com/youtube/answer/2853702
 """
 from pathlib import Path
 from typing import List, Union
-import PyLivestream as pls
+import pylivestream as pls
 import random
 import signal
 from argparse import ArgumentParser

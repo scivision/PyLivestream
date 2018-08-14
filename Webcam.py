@@ -10,7 +10,7 @@ Windows: get DirectShow device list from::
 """
 from typing import List
 from pathlib import Path
-import PyLivestream
+import pylivestream as pls
 import signal
 from argparse import ArgumentParser
 
@@ -31,7 +31,7 @@ def main():
 
     site = P.site.split()
 
-    S = PyLivestream.Webcam(P.ini, site, yes=P.yes)
+    S = pls.Webcam(P.ini, site, yes=P.yes)
     sites: List[str] = list(S.streams.keys())
 # %% Go live
     if P.yes:
