@@ -241,7 +241,7 @@ FileGlobLivestream ~/music youtube -glob "*.mp3" -image mylogo.jpg
 Example: stream all .mp3 audio in `~/music` with an animated GIF or video clip repeating:
 ```sh
 FileGlobLivestream ~/music youtube -glob "*.mp3" -image myclip.avi
-```    
+```
 or
 ```sh
 FileGlobLivestream ~/music youtube -glob "*.mp3" -image animated.gif
@@ -277,6 +277,13 @@ Comments on dropouts / lag for livestreaming in general (not just with this prog
     If not, live streaming will not work well.
 -   Try a wired (Ethernet) connection to the Internet. 
     I have seen very expensive consumer WiFi APs that had bad performance in real world strenuous use (like live streaming).
+
+### Troubleshooting
+
+Black / Blank desktop sharing video. 
+In general since this program generates command lines that are run by FFmpeg, try just using FFmpeg by itself to write to a video file.
+This is a known issue with Wayland--instead use X11.
+See [FFmpeg Desktop capture docs](https://trac.ffmpeg.org/wiki/Capture/Desktop).
     
 ### YouTube stream health
 
