@@ -33,7 +33,7 @@ class Ffmpeg():
         else:
             return []
 
-    def drawtext(self, text: str=None) -> List[str]:
+    def drawtext(self, text: str = None) -> List[str]:
         # fontfile=/path/to/font.ttf:
         if not text:  # None or '' or [] etc.
             return []
@@ -69,7 +69,7 @@ class Ffmpeg():
 
         return proc
 
-    def movingBG(self, bgfn: Path=None) -> List[str]:
+    def movingBG(self, bgfn: Path = None) -> List[str]:
         if not bgfn:
             return []
 

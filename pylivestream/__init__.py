@@ -12,12 +12,12 @@ class Livestream(stream.Stream):
 
     def __init__(self,
                  ini: Path,
-                 site: str, vidsource: str=None,
-                 image: Path=None,
-                 loop: bool=False,
-                 infn: Path=None,
-                 caption: str=None,
-                 yes: bool=False) -> None:
+                 site: str, vidsource: str = None,
+                 image: Path = None,
+                 loop: bool = False,
+                 infn: Path = None,
+                 caption: str = None,
+                 yes: bool = False) -> None:
         super().__init__(ini, site, vidsource, image, loop, infn,
                          caption=caption, yes=yes)
 
@@ -61,7 +61,7 @@ class Livestream(stream.Stream):
 
         self.cmd: List[str] = cmd + self.sink
 
-    def startlive(self, sinks: Sequence[str]=None):
+    def startlive(self, sinks: Sequence[str] = None):
         """finally start the stream(s)"""
         proc = None
 # %% special cases for localhost tests
@@ -116,8 +116,8 @@ class Screenshare(Livestream):
     def __init__(self,
                  ini: Path,
                  websites: Union[str, Sequence[str]],
-                 caption: str=None,
-                 yes: bool=False) -> None:
+                 caption: str = None,
+                 yes: bool = False) -> None:
 
         vidsource = 'screen'
 
@@ -147,8 +147,8 @@ class Webcam(Livestream):
     def __init__(self,
                  ini: Path,
                  websites: Union[str, Sequence[str]],
-                 caption: str=None,
-                 yes: bool=False) -> None:
+                 caption: str = None,
+                 yes: bool = False) -> None:
 
         vidsource = 'camera'
 
@@ -179,8 +179,8 @@ class Microphone(Livestream):
                  ini: Path,
                  sites: Union[str, Sequence[str]],
                  image: Path,
-                 caption: str=None,
-                 yes: bool=False) -> None:
+                 caption: str = None,
+                 yes: bool = False) -> None:
 
         if isinstance(sites, str):
             sites = [sites]
@@ -211,10 +211,10 @@ class FileIn(Livestream):
                  ini: Path,
                  sites: Union[str, Sequence[str]],
                  infn: Path,
-                 loop: bool=False,
-                 image: Path=None,
-                 caption: str=None,
-                 yes: bool=False) -> None:
+                 loop: bool = False,
+                 image: Path = None,
+                 caption: str = None,
+                 yes: bool = False) -> None:
 
         vidsource = 'file'
 
@@ -243,9 +243,9 @@ class FileIn(Livestream):
 class SaveDisk(stream.Stream):
 
     def __init__(self,
-                 ini: Path, outfn: Path=None,
-                 caption: str=None,
-                 yes: bool=False) -> None:
+                 ini: Path, outfn: Path = None,
+                 caption: str = None,
+                 yes: bool = False) -> None:
         """
         records to disk screen capture with audio
 

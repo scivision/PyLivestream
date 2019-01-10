@@ -1,58 +1,42 @@
-language: generic
-sudo: required
-dist: xenial
+language: python
 group: travis_latest
+dist: xenial
 
 git:
   depth: 3
   quiet: true
 
-env:
-- TRAVIS_PYTHON_VERSION=3.6
-- TRAVIS_PYTHON_VERSION=3.7
+python:
+- 3.7
+- 3.6
 
-os:
-- linux
-- osx
-  
-#addons:  FIXME: waiting travis xenial ffmpeg
-#  apt:
-#    packages: ffmpeg
+addons: 
+  apt:
+    packages: ffmpeg
 
-before_install:
-  - if [[ $TRAVIS_OS_NAME == osx ]]; then
-      wget https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh;
-    else
-      wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
-    fi
-
-  - bash miniconda.sh -b -p $HOME/miniconda
-  - export PATH=$HOME/miniconda/bin:$PATH
-  - hash -r
-
-  - conda config --set always_yes yes --set changeps1 no
-  - conda update -q conda
-  - conda create -n test python=$TRAVIS_PYTHON_VERSION
-  - source activate test
-  
-  - if [[ $TRAVIS_OS_NAME == osx ]]; then
-      brew update > /dev/null;
-      brew install ffmpeg > /dev/null;
-    else
-      sudo apt-get -yq update > /dev/null;
-      sudo apt-get install -yq --no-install-suggests --no-install-recommends ffmpeg > /dev/null;
-    fi
+matrix:
+  include:
+  - os: linux
+    python: 3.7
+    install: pip install -e .[tests,cov]
+    script: 
+    - flake8
+    - mypy . --ignore-missing-imports
+    after_success:
+    - pytest --cov --cov-config=setup.cfg
+    - coveralls
+  - os: osx
+    language: sh
+    before_install: brew install ffmpeg
+    install: pip3 install -e .[tests]
+  - os: windows
+    language: sh
+    before_install:
+    - choco install ffmpeg
+    - choco install python3
+    - export PATH="/c/Python37:/c/Python37/Scripts:$PATH"
 
 install: pip install -e .[tests]
 
-script:
-- pytest -rsv
-- flake8
-- mypy . --ignore-missing-imports
-
-after_success:
-- if [[ $TRAVIS_PYTHON_VERSION == 3.6* ]]; then
-  pytest --cov --cov-config=setup.cfg;
-  coveralls;
-  fi
+script: pytest -rsv
 
