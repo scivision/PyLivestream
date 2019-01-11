@@ -2,7 +2,6 @@
 [![coverage](https://coveralls.io/repos/github/scivision/PyLivestream/badge.svg?branch=master)](https://coveralls.io/github/scivision/PyLivestream?branch=master)
 [![appveyor status](https://ci.appveyor.com/api/projects/status/uwhsko29b1g5c3no?svg=true)](https://ci.appveyor.com/project/scivision/pylivestream)
 [![pypi versions](https://img.shields.io/pypi/pyversions/PyLivestream.svg)](https://pypi.python.org/pypi/PyLivestream)
-[![pypi format](https://img.shields.io/pypi/format/PyLivestream.svg)](https://pypi.python.org/pypi/PyLivestream)
 [![Maintainability](https://api.codeclimate.com/v1/badges/b6557d474ec050e74629/maintainability)](https://codeclimate.com/github/scivision/ffmpeg-youtube-live/maintainability)
 [![PyPi Download stats](http://pepy.tech/badge/pylivestream)](http://pepy.tech/project/pylivestream)
 

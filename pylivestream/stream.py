@@ -226,7 +226,7 @@ class Stream:
             v += ['-s', 'x'.join(map(str, self.res))]
 
         if sys.platform == 'linux':
-            v += [f'-i', ':0.0+{self.origin[0]},{self.origin[1]}']
+            v += ['-i', f':0.0+{self.origin[0]},{self.origin[1]}']
         elif sys.platform == 'win32':
             v += ['-offset_x', self.origin[0], '-offset_y', self.origin[1],
                   '-i', self.videochan]
