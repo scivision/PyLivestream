@@ -2,12 +2,10 @@
 from pathlib import Path
 import pylivestream as pls
 import pytest
-import os
 import subprocess
-from pylivestream.listener import listener  # noqa: F401
 
-CI = bool(os.environ['CI']) if 'CI' in os.environ else False
 R = Path(__file__).parent
+skip = False
 
 sites = ['periscope', 'youtube', 'facebook']
 inifn = R / 'test.ini'
@@ -18,6 +16,7 @@ IMG4K = R / 'check4k.png'
 S = pls.stream.Stream(inifn, 'localhost-test')
 S.osparam()
 timelimit = int(S.timelimit[1]) + 3   # allowing 3 seconds leeway
+del S
 
 
 def test_microphone():
@@ -50,17 +49,23 @@ def test_microphone_4Kbg():
             assert S.streams[s].video_kbps == 4000
 
 
-@pytest.mark.usefixtures("listener")
-@pytest.mark.skipif(CI, reason="Many CI's don't have audio hardware")
-def test_microphone_stream():
+def test_microphone_stream(listener):
+    global skip
     S = pls.Microphone(inifn, 'localhost-test', image=LOGO)
+
+    ok = S.check_device()
+
+    if not ok:
+        skip = True
+        pytest.skip(f'device not available: {S.streams.popitem()[1].checkcmd}')
 
     S.golive()
 
 
-@pytest.mark.usefixtures("listener")
-@pytest.mark.skipif(CI, reason="Many CI's don't have audio hardware")
-def test_microphone_script():
+def test_microphone_script(listener):
+    if skip:
+        pytest.skip(f'device not available')
+
     subprocess.check_call(['MicrophoneLivestream',
                            '-i', str(inifn),
                            'localhost-test', '--yes'],

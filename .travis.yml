@@ -1,3 +1,6 @@
+# travis-only windows bug (appveyor windows fine)
+# temporary macos travis bug (worked before)
+
 language: python
 group: travis_latest
 dist: xenial
@@ -25,15 +28,16 @@ matrix:
     after_success:
     - pytest --cov --cov-config=setup.cfg
     - coveralls
-  - os: osx
-    language: sh
-    before_install: brew install ffmpeg
-    install: pip3 install -e .[tests]
-  - os: windows
-    language: sh
-    before_install: # test with FFmpeg on AppVeyor
-    - choco install python3
-    - export PATH="/c/Python37:/c/Python37/Scripts:$PATH"
+#  - os: osx
+#    language: sh
+#    before_install: brew install ffmpeg > /dev/null
+#    install: pip3 install -e .[tests]
+#  - os: windows
+#    language: sh
+#    before_install: # test with FFmpeg on AppVeyor
+#    - choco install ffmpeg
+#    - choco install python3
+#    - export PATH="/c/Python37:/c/Python37/Scripts:$PATH"
 
 install: pip install -e .[tests]
 

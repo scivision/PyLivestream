@@ -4,7 +4,7 @@ import pytest
 import subprocess
 
 
-@pytest.fixture()
+@pytest.fixture(scope='function')
 def listener():
     """needed for pytest, regular function doesn't terminate properly under test"""
     print('starting RTMP listener')

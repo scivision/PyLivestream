@@ -127,16 +127,16 @@ class Stream:
         self.key: str = utils.getstreamkey(
             C.get(self.site, 'key', fallback=None))
 
-    def videoIn(self) -> List[str]:
+    def videoIn(self, quick: bool = False) -> List[str]:
         """config video input"""
         v: List[str]
 # %% configure video input
         if self.vidsource == 'screen':
-            v = self.screengrab()
+            v = self.screengrab(quick)
         elif self.vidsource == 'camera':
-            v = self.webcam()
+            v = self.webcam(quick)
         elif self.vidsource is None or self.vidsource == 'file':
-            v = self.filein()
+            v = self.filein(quick)
         else:
             raise ValueError(f'unknown vidsource {self.vidsource}')
 
@@ -166,7 +166,7 @@ class Stream:
 
         return v
 
-    def audioIn(self) -> List[str]:
+    def audioIn(self, quick: bool = False) -> List[str]:
         """
         -ac * may not be needed, took out.
         -ac 2 NOT -ac 1 to avoid "non monotonous DTS in output stream" errors
@@ -175,11 +175,13 @@ class Stream:
             return []
 
         if not self.vidsource == 'file':
-            return ['-f', self.acap, '-i', self.audiochan]
+            a = ['-f', self.acap, '-i', self.audiochan]
         else:  # file input
-            return []
+            a = []
 #        else: #  file input
-#            return ['-ac','2']
+#            a = ['-ac','2']
+
+        return a
 
     def audioOut(self) -> List[str]:
         """select audio codec
@@ -217,25 +219,35 @@ class Stream:
         else:
             self.video_kbps: int = list(BR60.values())[bisect.bisect_left(list(BR60.keys()), x)]
 
-    def screengrab(self) -> List[str]:
-        """choose to grab video from desktop. May not work for Wayland."""
-        v: List[str] = ['-f', self.vcap,
-                        '-r', str(self.fps)]
+    def screengrab(self, quick: bool = False) -> List[str]:
+        """choose to grab video from desktop. May not work for Wayland.
+        NOTE: for Linux and MacOS, assumes DISPLAY :0.0
+        """
+        v: List[str] = ['-f', self.vcap]
 
-        if self.res is not None:
+        if not quick:
+            v += ['-r', str(self.fps)]
+
+        if not quick and self.res is not None:
             v += ['-s', 'x'.join(map(str, self.res))]
 
         if sys.platform == 'linux':
-            v += ['-i', f':0.0+{self.origin[0]},{self.origin[1]}']
+            if quick:
+                v += ['-i', ':0.0']
+            else:
+                v += ['-i', f':0.0+{self.origin[0]},{self.origin[1]}']
         elif sys.platform == 'win32':
-            v += ['-offset_x', self.origin[0], '-offset_y', self.origin[1],
-                  '-i', self.videochan]
+            if quick:
+                v += ['-i', self.videochan]
+            else:
+                v += ['-offset_x', self.origin[0], '-offset_y', self.origin[1],
+                      '-i', self.videochan]
         elif sys.platform == 'darwin':
             v += ['-i', "0:0"]
 
         return v
 
-    def webcam(self) -> List[str]:
+    def webcam(self, quick: bool = False) -> List[str]:
         """configure webcam"""
         v: List[str] = ['-f', self.hcam,
                         '-i', self.videochan]
@@ -243,7 +255,7 @@ class Stream:
 
         return v
 
-    def filein(self) -> List[str]:
+    def filein(self, quick: bool = False) -> List[str]:
         """
         used for:
 
@@ -268,11 +280,14 @@ class Stream:
             v.append(self.F.THROTTLE)
 # %% image /  audio / vidoe cases
         if self.staticimage:
-            v.extend(['-loop', '1', '-f', 'image2', '-i', str(self.image)])
+            if not quick:
+                v += ['-loop', '1']
+            v.extend(['-f', 'image2', '-i', str(self.image)])
         elif self.movingimage:
             v.extend(self.F.movingBG(self.image))
         elif self.loop and not self.image:  # loop for traditional video
-            v.extend(['-stream_loop', '-1'])  # FFmpeg >= 3
+            if not quick:
+                v.extend(['-stream_loop', '-1'])  # FFmpeg >= 3
 # %% audio (for image+audio) or video
         if self.infn:
             v.extend(['-i', str(self.infn)])
@@ -298,3 +313,21 @@ class Stream:
         buf += ['-f', 'flv']
 
         return buf
+
+    def check_device(self, site: str = None) -> bool:
+        """
+        requires stream to have been configured first.
+        does a quick test stream to "null" to verify device is actually accessible
+        """
+        if not site:
+            try:
+                site = self.site
+            except AttributeError:
+                site = list(self.streams.keys())[0]  # type: ignore
+
+        try:
+            checkcmd = self.checkcmd  # type: ignore
+        except AttributeError:
+            checkcmd = self.streams[site].checkcmd  # type: ignore
+
+        return utils.check_device(checkcmd)

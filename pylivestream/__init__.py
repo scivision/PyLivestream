@@ -38,12 +38,12 @@ class Livestream(stream.Stream):
         cmd: List[str] = []
         cmd.append(self.exe)
 
-        cmd.extend(self.loglevel)
-        cmd.extend(self.yes)
+        cmd += self.loglevel
+        cmd += self.yes
 
-#        cmd.extend(self.timelimit)  # terminate input after N seconds, IF specified
+#        cmd += self.timelimit  # terminate input after N seconds, IF specified
 
-        cmd.extend(self.queue)
+        cmd += self.queue
 
         cmd += vidIn + audIn
 
@@ -60,9 +60,20 @@ class Livestream(stream.Stream):
         self.sink: List[str] = [self.server + streamid]
 
         self.cmd: List[str] = cmd + self.sink
+# %% quick check command, to verify device exists
+        self.checkcmd = ([self.exe] + self.loglevel + ['-t', '0.1'] +
+                         self.videoIn(quick=True) +
+                         self.audioIn(quick=True) +
+                         ['-t', '0.1'] +  # webcam needs at output
+                         ['-f', 'null', '-']
+                         )
 
     def startlive(self, sinks: Sequence[str] = None):
         """finally start the stream(s)"""
+
+        if not self.check_device():
+            return
+
         proc = None
 # %% special cases for localhost tests
         if self.key is None and self.site != 'localhost-test':
@@ -71,6 +82,10 @@ class Livestream(stream.Stream):
             else:
                 print('\n', ' '.join(self.cmd), '\n', flush=True)
                 return
+
+        if proc is not None and proc.poll() is not None:
+            # listener stopped prematurely, probably due to error
+            raise RuntimeError(f'listener stopped with code {proc.poll()}')
 # %% RUN STREAM
         cmd: List[str]
         if not sinks:  # single stream
@@ -104,8 +119,8 @@ class Livestream(stream.Stream):
 
             utils.run(cmd)
 
-# %% this kill the listener before starting the next process, or upon final process closing.
-        if proc is not None:
+# %% stop the listener before starting the next process, or upon final process closing.
+        if proc is not None and proc.poll() is None:
             proc.terminate()
         yield
 

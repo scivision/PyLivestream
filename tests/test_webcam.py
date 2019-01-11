@@ -3,19 +3,18 @@ from pathlib import Path
 import pylivestream as pls
 import pytest
 from pytest import approx
-import os
 import subprocess
-from pylivestream.listener import listener  # noqa: F401
 
-CI = bool(os.environ['CI']) if 'CI' in os.environ else False
 R = Path(__file__).parent
 
 sites = ['localhost', 'periscope', 'youtube', 'facebook']
 inifn = R / 'test.ini'
+skip = False
 
 S = pls.stream.Stream(inifn, 'localhost-test')
 S.osparam()
 timelimit = int(S.timelimit[1]) + 3   # allowing 3 seconds leeway
+del S
 
 
 def test_webcam():
@@ -33,17 +32,24 @@ def test_webcam():
                 assert S.streams[s].video_kbps == 1800
 
 
-@pytest.mark.usefixtures("listener")
-@pytest.mark.skipif(CI, reason="This is an interactive test")
-def test_webcam_stream():
+def test_webcam_stream(listener):
+    global skip
     S = pls.Webcam(inifn, 'localhost-test')
+
+    ok = S.check_device()
+
+    if not ok:
+        skip = True
+        pytest.skip(f'device not available: {S.streams.popitem()[1].checkcmd}')
 
     S.golive()
 
 
-@pytest.mark.usefixtures("listener")
-@pytest.mark.skipif(CI, reason="Many CI's don't have webcam hardware")
-def test_webcam_script():
+def test_webcam_script(listener):
+
+    if skip:
+        pytest.skip('device not available')
+
     subprocess.check_call(['WebcamLivestream',
                            '-i', str(inifn),
                            'localhost-test', '--yes'],

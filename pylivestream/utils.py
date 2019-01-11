@@ -6,6 +6,7 @@ import sys
 from typing import Tuple, Union, List
 
 DEVNULL = subprocess.DEVNULL
+R = Path(__file__).resolve().parents[1] / 'tests/'
 
 
 def run(cmd: List[str]):
@@ -27,6 +28,32 @@ Better to let users know there's a problem.
         else:
             logging.error(ret.stderr)
 """
+
+
+def check_device(cmd: List[str]) -> bool:
+    try:
+        run(cmd)
+        ok = True
+    except subprocess.CalledProcessError:
+        logging.critical(f'device not available, test command failed: \n {" ".join(cmd)}')
+        ok = False
+
+    return ok
+
+
+def check_display(fn: Path = None) -> bool:
+    """see if it's possible to display something with a test file"""
+    if isinstance(fn, Path) and not fn.is_file():
+        raise FileNotFoundError(str(fn))
+
+    if fn is None:
+        fn = R / 'bunny.avi'
+
+    cmd = ['ffplay', '-v', 'error', '-t', '1.0', '-autoexit', str(fn)]
+
+    ret = subprocess.run(cmd, timeout=10).returncode
+
+    return ret == 0
 
 
 def getexe(exein: Path = None) -> Tuple[str, str]:

@@ -3,12 +3,10 @@ from pathlib import Path
 import pylivestream as pls
 import pytest
 from pytest import approx
-import os
 import subprocess
-from pylivestream.listener import listener  # noqa: F401
 
-CI = bool(os.environ['CI']) if 'CI' in os.environ else False
 R = Path(__file__).parent
+skip = False
 
 sites = ['periscope', 'youtube', 'facebook']
 inifn = R / 'test.ini'
@@ -19,6 +17,7 @@ LOGO = R.parent / 'doc' / 'logo.png'
 S = pls.stream.Stream(inifn, 'localhost-test')
 S.osparam()
 timelimit = int(S.timelimit[1]) + 3   # allowing 3 seconds leeway
+del S
 
 
 def test_filein_video():
@@ -50,19 +49,34 @@ def test_filein_audio():
             assert S.streams[s].video_kbps == 400
 
 
-@pytest.mark.skipif(CI, reason="Many CI's don't have audio hardware")
 def test_file_simple():
-    """stream to localhost"""
-    s = pls.FileIn(inifn, 'localhost',
+    """stream to localhost
+    no listener fixture, to test the other listener
+    """
+    global skip
+    # not localhost-test, to test the other listener
+    S = pls.FileIn(inifn, 'localhost',
                    R / 'orch_short.ogg',
                    image=LOGO,
                    yes=True)
-    s.golive()
+
+    ok = pls.utils.check_display()
+
+    if not ok:
+        skip = True
+        pytest.skip(f'device display not available')
+
+    try:
+        S.golive()
+    except RuntimeError as e:
+        skip = True
+        pytest.skip(f'listener error {e}')
 
 
-@pytest.mark.usefixtures("listener")
-@pytest.mark.skipif(CI, reason="Many CI's don't have audio hardware")
-def test_filein_script():
+def test_filein_script(listener):
+    if skip:
+        pytest.skip('device not available')
+
     subprocess.check_call(['FileGlobLivestream',
                            str(VIDFN),
                            'localhost-test',
