@@ -237,11 +237,11 @@ class Stream:
             else:
                 v += ['-i', f':0.0+{self.origin[0]},{self.origin[1]}']
         elif sys.platform == 'win32':
-            if quick:
-                v += ['-i', self.videochan]
-            else:
-                v += ['-offset_x', self.origin[0], '-offset_y', self.origin[1],
-                      '-i', self.videochan]
+            if not quick:
+                v += ['-offset_x', self.origin[0], '-offset_y', self.origin[1]]
+
+            v += ['-i', self.videochan]
+
         elif sys.platform == 'darwin':
             v += ['-i', "0:0"]
 
