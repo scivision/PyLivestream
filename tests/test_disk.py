@@ -5,15 +5,14 @@ import pytest
 
 R = Path(__file__).parent
 
-sites = ['periscope', 'youtube', 'facebook']
 inifn = R / 'test.ini'
 
 
-def test_disk():
-    for s in sites:
-        p = pls.SaveDisk(inifn, '')
-        assert p.site == 'file'
-        assert p.video_kbps == 3000
+@pytest.mark.parametrize('site', ['periscope', 'youtube', 'facebook'])
+def test_disk(site):
+    p = pls.SaveDisk(inifn, '')
+    assert p.site == 'file'
+    assert p.video_kbps == 3000
 
 
 if __name__ == '__main__':

@@ -17,20 +17,20 @@ def test_key():
     assert pls.utils.getstreamkey(R) is None
 
 
-def test_exe():
+@pytest.mark.parametrize('rex', (None, '', 'ffmpeg'))
+def test_exe(rex):
     exe, pexe = pls.utils.getexe()
     assert 'ffmpeg' in exe
     assert 'ffprobe' in pexe
 
-    for p in (None, '', 'ffmpeg'):
-        exe, pexe = pls.utils.getexe(p)
-        assert 'ffmpeg' in exe
-        assert 'ffprobe' in pexe
+    exe, pexe = pls.utils.getexe(rex)
+    assert 'ffmpeg' in exe
+    assert 'ffprobe' in pexe
 
 
-def test_attrs():
-    for p in (None, '',):
-        assert pls.utils.get_resolution(p) is None
+@pytest.mark.parametrize('inp', (None, ''))
+def test_attrs(inp):
+    assert pls.utils.get_resolution(inp) is None
 
     assert pls.utils.get_resolution(VIDFN) == (426, 240)
     assert pls.utils.get_framerate(VIDFN) == approx(24.0)
