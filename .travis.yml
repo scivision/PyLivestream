@@ -26,11 +26,13 @@ matrix:
     - flake8
     - mypy . --ignore-missing-imports
     after_success:
-    - pytest --cov --cov-config=setup.cfg
+    - pytest --cov
     - coveralls
 #  - os: osx
 #    language: sh
-#    before_install: brew install ffmpeg > /dev/null
+#    before_install: 
+#    - brew update > /dev/null
+#    - brew install ffmpeg > /dev/null
 #    install: pip3 install -e .[tests]
 #  - os: windows
 #    language: sh
