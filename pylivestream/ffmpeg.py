@@ -3,15 +3,16 @@ from typing import List, Union
 from time import sleep
 import os
 from pathlib import Path
+import shutil
 
 
 class Ffmpeg():
 
     def __init__(self):
 
-        self.ERROR = ['-v', 'error']
-        self.WARNING = ['-v', 'warning']
-        self.INFO = ['-v', 'info']
+        self.ERROR = ['-loglevel', 'error']
+        self.WARNING = ['-loglevel', 'warning']
+        self.INFO = ['-loglevel', 'info']
 
         self.YES = ['-y']
 
@@ -52,20 +53,27 @@ class Ffmpeg():
     def listener(self):
         """
         no need to check return code, errors will show up in client.
+
         -timeout 1 is necessary to avoid instant error, since stream starts after the listener.
         I put -timeout 5 to allow for very slow computers.
         -timeout is the delay to wait for stream input before erroring.
+
+        sleep: 0.2 not long enough. 0.3 worked, so set 0.5 for some margin.
         """
         print('starting RTMP listener.  Press   q   in this terminal to end stream.')
 
-        proc = subprocess.Popen(['ffplay', '-v', 'fatal',
+        FFPLAY = shutil.which('ffplay')
+        if not FFPLAY:
+            raise FileNotFoundError('FFplay not found, cannot start listener')
+
+        proc = subprocess.Popen([FFPLAY, '-v', 'fatal',
                                  '-timeout', '5',
                                  '-autoexit', 'rtmp://localhost'])
 #        proc = subprocess.Popen(['ffmpeg', '-v', 'fatal', '-timeout', '5',
 #                                 '-i', 'rtmp://localhost', '-f', 'null', '-'],
 #                                stdout=subprocess.DEVNULL)
 
-        sleep(0.5)  # 0.2 not long enough. 0.3 worked, so set 0.5 for some margin.
+        sleep(0.5)
 
         return proc
 

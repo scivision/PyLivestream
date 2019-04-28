@@ -5,7 +5,6 @@ import pytest
 import subprocess
 
 R = Path(__file__).parent
-skip = False
 
 sites = ['periscope', 'youtube', 'facebook']
 inifn = R / 'test.ini'
@@ -50,22 +49,12 @@ def test_microphone_4Kbg():
 
 
 def test_microphone_stream(listener):
-    global skip
     S = pls.Microphone(inifn, 'localhost-test', image=LOGO)
-
-    ok = S.check_device()
-
-    if not ok:
-        skip = True
-        pytest.skip(f'device not available: {S.streams.popitem()[1].checkcmd}')
 
     S.golive()
 
 
 def test_microphone_script(listener):
-    if skip:
-        pytest.skip(f'device not available')
-
     subprocess.check_call(['MicrophoneLivestream',
                            '-i', str(inifn),
                            'localhost-test', '--yes'],

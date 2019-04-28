@@ -61,18 +61,21 @@ class Livestream(stream.Stream):
 
         self.cmd: List[str] = cmd + self.sink
 # %% quick check command, to verify device exists
-        self.checkcmd = ([self.exe] + self.loglevel + ['-t', '0.1'] +
-                         self.videoIn(quick=True) +
-                         self.audioIn(quick=True) +
-                         ['-t', '0.1'] +  # webcam needs at output
-                         ['-f', 'null', '-']
-                         )
+        # 0.1 seems OK, spurious buffer error on Windows that wasn't helped by any bigger size
+        CHECKTIMEOUT = '0.1'
+
+        self.checkcmd: List[str] = ([self.exe] +
+                                    self.loglevel + ['-t', CHECKTIMEOUT] +
+                                    self.videoIn(quick=True) +
+                                    self.audioIn(quick=True) +
+                                    ['-t', CHECKTIMEOUT] +  # webcam needs at output
+                                    ['-f', 'null', '-']
+                                    )
 
     def startlive(self, sinks: Sequence[str] = None):
         """finally start the stream(s)"""
 
-        if not self.check_device():
-            return
+        self.check_device()
 
         proc = None
 # %% special cases for localhost tests

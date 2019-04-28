@@ -9,7 +9,6 @@ R = Path(__file__).parent
 
 sites = ['localhost', 'periscope', 'youtube', 'facebook']
 inifn = R / 'test.ini'
-skip = False
 
 S = pls.stream.Stream(inifn, 'localhost-test')
 S.osparam()
@@ -33,23 +32,12 @@ def test_webcam():
 
 
 def test_webcam_stream(listener):
-    global skip
     S = pls.Webcam(inifn, 'localhost-test')
-
-    ok = S.check_device()
-
-    if not ok:
-        skip = True
-        pytest.skip(f'device not available: {S.streams.popitem()[1].checkcmd}')
 
     S.golive()
 
 
 def test_webcam_script(listener):
-
-    if skip:
-        pytest.skip('device not available')
-
     subprocess.check_call(['WebcamLivestream',
                            '-i', str(inifn),
                            'localhost-test', '--yes'],

@@ -7,7 +7,7 @@ stack: python 3
 environment:
   PY_DIR: C:\Python37-x64
 
-clone_depth: 3
+clone_depth: 25
 
 build: off
 

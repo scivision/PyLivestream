@@ -3,6 +3,7 @@ import logging
 import subprocess
 from pathlib import Path
 import sys
+import shutil
 from typing import Tuple, Union, List
 
 DEVNULL = subprocess.DEVNULL
@@ -10,9 +11,15 @@ R = Path(__file__).resolve().parents[1] / 'tests/'
 
 
 def run(cmd: List[str]):
+    """
+    FIXME: shell=True for Windows seems necessary to specify devices enclosed by "" quotes
+    """
     print('\n', ' '.join(cmd), '\n')
 
-    subprocess.check_call(cmd)
+    if sys.platform == 'win32':
+        subprocess.run(' '.join(cmd), shell=True)
+    else:
+        subprocess.run(cmd)
 
 
 """
@@ -66,21 +73,15 @@ def getexe(exein: Path = None) -> Tuple[str, str]:
         exe = str(Path(exein).expanduser())
         probeexe = str(Path(exein).expanduser().parent / 'ffprobe')
 # %% verify
-    try:
-        subprocess.check_call((exe, '-h'),
-                              stdout=DEVNULL, stderr=DEVNULL)
-    except FileNotFoundError as e:
-        print('\n\n *** You must have FFmpeg installed to use PyLivestream.', file=sys.stderr)
+    if not shutil.which(exe):
+        print('\n\n *** Must have FFmpeg installed to use PyLivestream.', file=sys.stderr)
         print('https://www.ffmpeg.org/download.html \n\n', file=sys.stderr)
-        raise FileNotFoundError(f'FFmpeg not found at {exe}  {e}.')
+        raise FileNotFoundError(f'FFmpeg not found at {exe}.')
 
-    try:
-        subprocess.check_call((probeexe, '-h'),
-                              stdout=DEVNULL, stderr=DEVNULL)
-    except FileNotFoundError as e:
-        print('\n\n *** You must have FFmpeg installed to use PyLivestream.', file=sys.stderr)
+    if not shutil.which(probeexe):
+        print('\n\n *** You must have FFmpeg + FFprobe installed to use PyLivestream.', file=sys.stderr)
         print('https://www.ffmpeg.org/download.html \n\n', file=sys.stderr)
-        raise FileNotFoundError(f'FFprobe: {probeexe}  {e}')
+        raise FileNotFoundError(f'FFprobe not found at {probeexe}')
 
     return exe, probeexe
 

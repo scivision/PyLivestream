@@ -111,10 +111,15 @@ class Stream:
                                                            'timelimit',
                                                            fallback=None))
 
-        self.videochan: str = C.get(sys.platform, 'videochan')
+        # NOTE: This used to be 'videochan' but that was too generic.
+        self.webcamchan: str = C.get(sys.platform, 'webcamchan', fallback=None)
+        self.screenchan: str = C.get(sys.platform, 'screenchan', fallback=None)
+
         self.audiochan: str = C.get(sys.platform, 'audiochan', fallback=None)
+
         self.vcap: str = C.get(sys.platform, 'vcap')
         self.acap: str = C.get(sys.platform, 'acap', fallback=None)
+
         self.hcam: str = C.get(sys.platform, 'hcam')
 
         self.video_kbps: int = C.getint(self.site, 'video_kbps', fallback=None)
@@ -144,7 +149,7 @@ class Stream:
 
     def videoOut(self) -> List[str]:
         """configure video output"""
-        v: List[str] = ['-c:v', 'libx264', '-pix_fmt', 'yuv420p']
+        v: List[str] = ['-codec:v', 'libx264', '-pix_fmt', 'yuv420p']
 # %% set frames/sec, bitrate and keyframe interval
         """
          DON'T DO THIS.
@@ -169,7 +174,8 @@ class Stream:
     def audioIn(self, quick: bool = False) -> List[str]:
         """
         -ac * may not be needed, took out.
-        -ac 2 NOT -ac 1 to avoid "non monotonous DTS in output stream" errors
+
+        NOTE: -ac 2 NOT -ac 1 to avoid "non monotonous DTS in output stream" errors
         """
         if not self.audio_bps or not self.acap or not self.audiochan:
             return []
@@ -193,7 +199,7 @@ class Stream:
         if not self.audio_bps or not self.acap or not self.audiochan:
             return []
 
-        return ['-c:a', 'aac',
+        return ['-codec:a', 'aac',
                 '-b:a', str(self.audio_bps),
                 '-ar', str(self.audiofs)]
 
@@ -220,9 +226,14 @@ class Stream:
             self.video_kbps: int = list(BR60.values())[bisect.bisect_left(list(BR60.keys()), x)]
 
     def screengrab(self, quick: bool = False) -> List[str]:
-        """choose to grab video from desktop. May not work for Wayland.
-        NOTE: for Linux and MacOS, assumes DISPLAY :0.0
         """
+        grab video from desktop.
+        May not work for Wayland desktop.
+
+        NOTE: Linux assumes DISPLAY :0.0, MacOS 0:0
+        """
+        DISPLAY = ":0.0"
+
         v: List[str] = ['-f', self.vcap]
 
         if not quick:
@@ -233,14 +244,14 @@ class Stream:
 
         if sys.platform == 'linux':
             if quick:
-                v += ['-i', ':0.0']
+                v += ['-i', DISPLAY]
             else:
-                v += ['-i', f':0.0+{self.origin[0]},{self.origin[1]}']
+                v += ['-i', f'{DISPLAY}+{self.origin[0]},{self.origin[1]}']
         elif sys.platform == 'win32':
             if not quick:
-                v += ['-offset_x', self.origin[0], '-offset_y', self.origin[1]]
+                v += ['-offset_x', str(self.origin[0]), '-offset_y', str(self.origin[1])]
 
-            v += ['-i', self.videochan]
+            v += ['-i', self.screenchan]
 
         elif sys.platform == 'darwin':
             v += ['-i', "0:0"]
@@ -250,7 +261,7 @@ class Stream:
     def webcam(self, quick: bool = False) -> List[str]:
         """configure webcam"""
         v: List[str] = ['-f', self.hcam,
-                        '-i', self.videochan]
+                        '-i', self.webcamchan]
         #  '-r', str(self.fps),  # -r causes bad dropouts
 
         return v
