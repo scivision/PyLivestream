@@ -6,7 +6,6 @@ from pytest import approx
 import subprocess
 
 R = Path(__file__).parent
-skip = False
 
 sites = ['periscope', 'youtube', 'facebook']
 inifn = R / 'test.ini'
@@ -53,30 +52,16 @@ def test_file_simple():
     """stream to localhost
     no listener fixture, to test the other listener
     """
-    global skip
     # not localhost-test, to test the other listener
     S = pls.FileIn(inifn, 'localhost',
                    R / 'orch_short.ogg',
                    image=LOGO,
                    yes=True)
 
-    ok = pls.utils.check_display()
-
-    if not ok:
-        skip = True
-        pytest.skip(f'device display not available')
-
-    try:
-        S.golive()
-    except RuntimeError as e:
-        skip = True
-        pytest.skip(f'listener error {e}')
+    S.golive()
 
 
 def test_filein_script(listener):
-    if skip:
-        pytest.skip('device not available')
-
     subprocess.check_call(['FileGlobLivestream',
                            str(VIDFN),
                            'localhost-test',

@@ -6,7 +6,6 @@ from pytest import approx
 import subprocess
 
 R = Path(__file__).parent
-skip = False
 
 sites = ['periscope', 'youtube', 'facebook']
 inifn = R / 'test.ini'
@@ -30,22 +29,12 @@ def test_screenshare():
 
 
 def test_screenshare_stream(listener):
-    global skip
     S = pls.Screenshare(inifn, 'localhost-test')
-
-    ok = S.check_device()
-
-    if not ok:
-        skip = True
-        pytest.skip(f'device not available: {S.streams.popitem()[1].checkcmd}')
 
     S.golive()
 
 
 def test_webcam_script(listener):
-    if skip:
-        pytest.skip(f'device not available')
-
     subprocess.check_call(['ScreenshareLivestream',
                            '-i', str(inifn),
                            'localhost-test', '--yes'],
