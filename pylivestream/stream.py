@@ -236,8 +236,9 @@ class Stream:
 
         v: List[str] = ['-f', self.vcap]
 
-        if not quick:
-            v += ['-r', str(self.fps)]
+        # FIXME: explict frame rate is problematic for MacOS with screenshare. Just leave it off?
+        # if not quick:
+        #     v += ['-r', str(self.fps)]
 
         if not quick and self.res is not None:
             v += ['-s', 'x'.join(map(str, self.res))]
@@ -259,9 +260,20 @@ class Stream:
         return v
 
     def webcam(self, quick: bool = False) -> List[str]:
-        """configure webcam"""
+        """
+        configure webcam
+
+        https://trac.ffmpeg.org/wiki/Capture/Webcam
+        """
+        webcam_chan = self.webcamchan
+
+        if sys.platform == 'darwin':
+            if not webcam_chan:
+                webcam_chan = 'default'
+
         v: List[str] = ['-f', self.hcam,
-                        '-i', self.webcamchan]
+                        '-i', webcam_chan]
+
         #  '-r', str(self.fps),  # -r causes bad dropouts
 
         return v

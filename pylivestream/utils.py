@@ -14,6 +14,7 @@ def run(cmd: List[str]):
     """
     FIXME: shell=True for Windows seems necessary to specify devices enclosed by "" quotes
     """
+
     print('\n', ' '.join(cmd), '\n')
 
     if sys.platform == 'win32':
