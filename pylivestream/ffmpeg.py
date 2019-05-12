@@ -4,6 +4,8 @@ from time import sleep
 import os
 from pathlib import Path
 import shutil
+import socket
+import logging
 
 
 class Ffmpeg():
@@ -60,20 +62,33 @@ class Ffmpeg():
 
         sleep: 0.2 not long enough. 0.3 worked, so set 0.5 for some margin.
         """
-        print('starting RTMP listener.  Press   q   in this terminal to end stream.')
+
+        TIMEOUT = 0.5
+        PORT = 1935
 
         FFPLAY = shutil.which('ffplay')
         if not FFPLAY:
             raise FileNotFoundError('FFplay not found, cannot start listener')
 
-        proc = subprocess.Popen([FFPLAY, '-v', 'fatal',
-                                 '-timeout', '5',
-                                 '-autoexit', 'rtmp://localhost'])
+# %% check if port permissions OK
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.settimeout(TIMEOUT)  # seconds
+            ret = s.connect_ex(('localhost', PORT))
+
+        if ret:
+            logging.error(f'Port {PORT} does not seem open, following commands will probably fail.')
+
+        cmd = [FFPLAY, '-loglevel', 'error', '-timeout', '5', '-autoexit', 'rtmp://localhost']
+
+        print('starting Localhost RTMP listener. \n\n', ' '.join(cmd), '\n\n Press   q   in this terminal to end stream.')
+
+        proc = subprocess.Popen(cmd)
+
 #        proc = subprocess.Popen(['ffmpeg', '-v', 'fatal', '-timeout', '5',
 #                                 '-i', 'rtmp://localhost', '-f', 'null', '-'],
 #                                stdout=subprocess.DEVNULL)
 
-        sleep(0.5)
+        sleep(TIMEOUT)
 
         return proc
 
