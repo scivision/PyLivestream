@@ -134,8 +134,7 @@ class Stream:
 
     def videoIn(self, quick: bool = False) -> List[str]:
         """config video input"""
-        v: List[str]
-# %% configure video input
+
         if self.vidsource == 'screen':
             v = self.screengrab(quick)
         elif self.vidsource == 'camera':
@@ -145,11 +144,16 @@ class Stream:
         else:
             raise ValueError(f'unknown vidsource {self.vidsource}')
 
+        if sys.platform == 'darwin':
+            v = ['-pix_fmt', 'uyvy422'] + v
+
         return v
 
     def videoOut(self) -> List[str]:
         """configure video output"""
-        v: List[str] = ['-codec:v', 'libx264', '-pix_fmt', 'yuv420p']
+
+        vid_format = 'uyvy422' if sys.platform == 'darwin' else 'yuv420p'
+        v: List[str] = ['-codec:v', 'libx264', '-pix_fmt', vid_format]
 # %% set frames/sec, bitrate and keyframe interval
         """
          DON'T DO THIS.
@@ -230,7 +234,7 @@ class Stream:
         grab video from desktop.
         May not work for Wayland desktop.
 
-        NOTE: Linux assumes DISPLAY :0.0, MacOS 0:0
+        NOTE: Linux assumes DISPLAY :0.0
         """
         DISPLAY = ":0.0"
 
@@ -255,7 +259,7 @@ class Stream:
             v += ['-i', self.screenchan]
 
         elif sys.platform == 'darwin':
-            v += ['-i', "0:0"]
+            v += ['-i', self.screenchan]
 
         return v
 
