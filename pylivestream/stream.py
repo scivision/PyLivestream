@@ -233,10 +233,7 @@ class Stream:
         """
         grab video from desktop.
         May not work for Wayland desktop.
-
-        NOTE: Linux assumes DISPLAY :0.0
         """
-        DISPLAY = ":0.0"
 
         v: List[str] = ['-f', self.vcap]
 
@@ -249,9 +246,9 @@ class Stream:
 
         if sys.platform == 'linux':
             if quick:
-                v += ['-i', DISPLAY]
+                v += ['-i', self.screenchan]
             else:
-                v += ['-i', f'{DISPLAY}+{self.origin[0]},{self.origin[1]}']
+                v += ['-i', f'{self.screenchan}+{self.origin[0]},{self.origin[1]}']
         elif sys.platform == 'win32':
             if not quick:
                 v += ['-offset_x', str(self.origin[0]), '-offset_y', str(self.origin[1])]
