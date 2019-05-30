@@ -19,18 +19,13 @@ def main():
 
     p = ArgumentParser(description="Livestream a single looped input file")
     p.add_argument('infn', help='file to stream, looping endlessly.')
-    p.add_argument('site',
-                   help='site to stream: [youtube,periscope,facebook,twitch]',
-                   nargs='?', default='localhost')
+    p.add_argument('websites', help='site to stream, e.g. localhost youtube periscope facebook twitch', nargs='+')
     p.add_argument('-i', '--ini', help='*.ini file with stream parameters')
     p.add_argument('-y', '--yes', help='no confirmation dialog', action='store_true')
     p.add_argument('-t', '--timeout', help='stop streaming after --timeout seconds', type=int)
     P = p.parse_args()
 
-    site = P.site.split()
-
-    S = pls.FileIn(P.ini, site, infn=P.infn,
-                   loop=True, yes=P.yes, timeout=P.timeout)
+    S = pls.FileIn(P.ini, P.websites, infn=P.infn, loop=True, yes=P.yes, timeout=P.timeout)
     sites: List[str] = list(S.streams.keys())
 # %% Go live
     if P.yes:

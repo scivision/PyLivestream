@@ -216,7 +216,7 @@ def get_framerate(fn: Path, exe: Path = None) -> Union[None, float]:
     return fps
 
 
-def getstreamkey(keyfn: str) -> Union[None, str]:
+def getstreamkey(keyfn: str) -> str:
     """
     1. read key from ini
     2. if empty, None
@@ -231,5 +231,8 @@ def getstreamkey(keyfn: str) -> Union[None, str]:
         key = keyp.read_text().strip() if keyp.is_file() else None
     except FileNotFoundError:  # not a file, might be the key itself, if not a .key filename
         key = None if keyfn.endswith('.key') else keyfn
+
+    if isinstance(key, str):
+        key = '"' + key + '"'  # necessary for keys with command-line unfriendly parameters
 
     return key

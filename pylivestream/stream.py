@@ -145,8 +145,7 @@ class Stream:
 
         self.server: str = C.get(self.site, 'server', fallback=None)
 # %% Key (hexaecimal stream ID)
-        self.key: str = utils.getstreamkey(
-            C.get(self.site, 'key', fallback=None))
+        self.key: str = utils.getstreamkey(C.get(self.site, 'key', fallback=None))
 
     def videoIn(self, quick: bool = False) -> List[str]:
         """

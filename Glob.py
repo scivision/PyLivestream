@@ -67,9 +67,7 @@ def main():
 
     p = ArgumentParser(description="Livestream a globbed input file list")
     p.add_argument('path', help='path to discover files from')
-    p.add_argument('site',
-                   help='site to stream: [youtube,periscope,facebook,twitch]',
-                   nargs='?', default='localhost')
+    p.add_argument('websites', help='site to stream, e.g. localhost youtube periscope facebook twitch', nargs='+')
     p.add_argument('-glob', help='file glob pattern to stream.')
     p.add_argument('-i', '--ini', help='*.ini file with stream parameters')
     p.add_argument('-image',
@@ -83,25 +81,23 @@ def main():
     P = p.parse_args()
 # %% file / glob wranging
     flist = fileglob(P.path, P.glob)
-# %%
-    site = P.site.split()
 
     print('streaming these files. Be sure list is correct! \n')
     print('\n'.join(map(str, flist)))
     print()
 
     if P.yes:
-        print('going live on', site)
+        print('going live on', P.websites)
     else:
-        input(f"Press Enter to go live on {site}.    Or Ctrl C to abort.")
+        input(f"Press Enter to go live on {P.websites}.    Or Ctrl C to abort.")
 
     usemeta = P.nometa
 
     if P.loop:
         while True:
-            playonce(flist, P.image, site, P.ini, P.shuffle, usemeta, P.yes)
+            playonce(flist, P.image, P.websites, P.ini, P.shuffle, usemeta, P.yes)
     else:
-        playonce(flist, P.image, site, P.ini, P.shuffle, usemeta, P.yes)
+        playonce(flist, P.image, P.websites, P.ini, P.shuffle, usemeta, P.yes)
 
 
 if __name__ == '__main__':

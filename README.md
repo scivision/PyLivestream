@@ -10,20 +10,30 @@
 Streams to one or **multiple** streaming sites simultaneously, using pure object-oriented Python (no extra packages) and FFmpeg.
 Tested with `flake8`, `mypy` type checking and `pytest`.
 `visual_tests.py` is a quick check of several command line scripting scenarios on your laptop.
-FFmpeg is used from Python `subprocess` to stream to Facebook Live, YouTube Live, Periscope, Twitch, Mixer, Ustream, Vimeo and more for streaming broadcasts.
+FFmpeg is used from Python `subprocess` to stream to sites including:
+
+* [Facebook Live](#facebook-live)
+* [YouTube Live](#youtube-live)
+* [Periscope](#periscope)
+* [Twitch](#twitch)
+* also Mixer, Ustream, Vimeo, Restream.io and more for streaming broadcasts.
+
+![PyLivestream diagram showing screen capture or webcam simultaneously livestreaming to multiple services.](./doc/logo.png)
+
+
+### PyLivestream benefits
 
 * Python scripts compute good streaming parameters, and emit the command used to copy and paste if desired.
 * Works on any OS (Mac, Linux, Windows) and computing platform, including PC, Mac, and Raspberry Pi.
 * Uses a [pylivestream.ini](./pylivestream/pylivestream.ini) file to adjust all parameters.
 
-However, note that PyLivestream:
+### PyLivestream limitations
 
 * does *not* auto-restart if network connection glitches
 * is intended as a bare minimum command generator to run the FFmpeg program
 * is not intended for bidirectional robust streaming--consider a program/system based on Jitsi for that.
 * generally does not work from Windows Subsystem for Linux 1 because of lack of hardware interface in WSL1. It works fine from native Windows.
 
-![PyLivestream diagram showing screen capture or webcam simultaneously livestreaming to multiple services.](doc/logo.png)
 
 
 ## Install
