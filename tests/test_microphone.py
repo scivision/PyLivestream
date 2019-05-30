@@ -9,7 +9,6 @@ import platform
 R = Path(__file__).parent
 
 sites = ['periscope', 'youtube', 'facebook']
-inifn = R.parent / 'stream.ini'
 
 LOGO = R.parent / 'doc' / 'logo.png'
 IMG4K = R / 'check4k.png'
@@ -20,7 +19,7 @@ WSL = 'Microsoft' in platform.uname().release
 
 
 def test_props():
-    S = pls.Microphone(inifn, sites,
+    S = pls.Microphone(inifn=None, websites=sites,
                        image=LOGO)
 
     for s in S.streams:
@@ -35,7 +34,7 @@ def test_props():
 
 
 def test_4Kbg():
-    S = pls.Microphone(inifn, sites,
+    S = pls.Microphone(inifn=None, websites=sites,
                        image=IMG4K)
 
     for s in S.streams:
@@ -52,7 +51,7 @@ def test_4Kbg():
 @pytest.mark.timeout(TIMEOUT)
 @pytest.mark.skipif(CI or WSL, reason='has no audio hardware typically')
 def test_stream():
-    S = pls.Microphone(inifn, 'localhost', image=LOGO, timeout=5)
+    S = pls.Microphone(inifn=None, websites='localhost', image=None, timeout=5)
 
     S.golive()
 
@@ -60,7 +59,6 @@ def test_stream():
 @pytest.mark.skipif(CI or WSL, reason='has no audio hardware typically')
 def test_script():
     subprocess.check_call(['MicrophoneLivestream',
-                           '-i', str(inifn),
                            'localhost', '--yes', '--timeout', '5'],
                           timeout=TIMEOUT)
 

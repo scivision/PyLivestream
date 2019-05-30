@@ -10,7 +10,6 @@ import platform
 R = Path(__file__).parents[1]
 
 sites = ['localhost', 'periscope', 'youtube', 'facebook']
-inifn = R / 'stream.ini'
 
 TIMEOUT = 30
 CI = os.environ.get('CI', None) in ('true', 'True')
@@ -18,7 +17,7 @@ WSL = 'Microsoft' in platform.uname().release
 
 
 def test_props():
-    S = pls.Webcam(inifn, sites)
+    S = pls.Webcam(inifn=None, websites=sites)
     for s in S.streams:
         assert '-re' not in S.streams[s].cmd
         assert S.streams[s].fps == approx(30.)
@@ -35,7 +34,7 @@ def test_props():
 @pytest.mark.timeout(TIMEOUT)
 @pytest.mark.skipif(CI or WSL, reason='has no video hardware typically')
 def test_stream():
-    S = pls.Webcam(inifn, 'localhost', timeout=5)
+    S = pls.Webcam(inifn=None, websites='localhost', timeout=5)
 
     S.golive()
 
@@ -43,7 +42,6 @@ def test_stream():
 @pytest.mark.skipif(CI or WSL, reason='has no vidoe hardware typically')
 def test_script():
     subprocess.check_call(['WebcamLivestream',
-                           '-i', str(inifn),
                            'localhost', '--yes',
                            '--timeout', '5'],
                           timeout=TIMEOUT)

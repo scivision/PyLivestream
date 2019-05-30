@@ -44,9 +44,10 @@ FPS: float = 30.  # default frames/sec if not defined otherwise
 # %% top level
 class Stream:
 
-    def __init__(self, ini: Path, site: str, *,
+    def __init__(self, inifn: Path, site: str, *,
                  vidsource: str = None,
-                 image: Path = None, loop: bool = False, infn: Path = None,
+                 image: Path = None,
+                 loop: bool = False, infn: Path = None,
                  caption: str = None,
                  yes: bool = False,
                  timeout: int = None,
@@ -56,10 +57,17 @@ class Stream:
 
         self.loglevel: List[str] = self.F.INFO if verbose else self.F.ERROR
 
-        self.ini: Path = Path(ini).expanduser()
+        self.inifn: Path = inifn
+
         self.site: str = site
         self.vidsource = vidsource
-        self.image = Path(image).expanduser() if image else None
+
+        if image:
+            self.image = Path(image).expanduser()
+        else:
+            # Must be pathlib.Path for detection
+            self.image = utils.get_pkgfile('data/logo.png')
+
         self.loop: bool = loop
 
         self.infn = Path(infn).expanduser() if infn else None
@@ -73,13 +81,15 @@ class Stream:
 
     def osparam(self):
         """load OS specific config"""
-        if not self.ini.is_file():
-            raise FileNotFoundError(self.ini)
 
         C = ConfigParser(inline_comment_prefixes=('#', ';'))
-        C.read(str(self.ini))
+        if self.inifn is None:
+            self.inifn = utils.get_pkgfile('pylivestream.ini')
 
-        assert self.site in C, f'{self.site} not found: {self.ini}'
+        C.read_string(Path(self.inifn).expanduser().read_text(), source=self.inifn)
+
+        if self.site not in C:
+            raise ValueError(f'streaming site {self.site} not found in configuration file {self.inifn}')
 
         if 'XDG_SESSION_TYPE' in os.environ:
             if os.environ['XDG_SESSION_TYPE'] == 'wayland':
@@ -139,7 +149,9 @@ class Stream:
             C.get(self.site, 'key', fallback=None))
 
     def videoIn(self, quick: bool = False) -> List[str]:
-        """config video input"""
+        """
+        config video input
+        """
 
         if self.vidsource == 'screen':
             v = self.screengrab(quick)
@@ -156,7 +168,9 @@ class Stream:
         return v
 
     def videoOut(self) -> List[str]:
-        """configure video output"""
+        """
+        configure video output
+        """
 
         vid_format = 'uyvy422' if sys.platform == 'darwin' else 'yuv420p'
         v: List[str] = ['-codec:v', 'libx264', '-pix_fmt', vid_format]
@@ -183,7 +197,7 @@ class Stream:
 
     def audioIn(self, quick: bool = False) -> List[str]:
         """
-        -ac * may not be needed, took out.
+        -ac 2 doesn't seem to be needed, so it was removed.
 
         NOTE: -ac 2 NOT -ac 1 to avoid "non monotonous DTS in output stream" errors
         """
@@ -200,7 +214,9 @@ class Stream:
         return a
 
     def audioOut(self) -> List[str]:
-        """select audio codec
+        """
+        select audio codec
+
         https://trac.ffmpeg.org/wiki/Encode/AAC#FAQ
         https://support.google.com/youtube/answer/2853702?hl=en
         https://www.facebook.com/facebookmedia/get-started/live
@@ -214,19 +230,21 @@ class Stream:
                 '-ar', str(self.audiofs)]
 
     def video_bitrate(self):
-        """get "best" video bitrate.
-        Based on YouTube Live minimum specified stream rate."""
+        """
+        get "best" video bitrate.
+        Based on YouTube Live minimum specified stream rate.
+        """
         if self.video_kbps:  # per-site override
             return
 
         if self.res is not None:
             x: int = int(self.res[1])
         elif self.vidsource is None or self.vidsource == 'file':
-            logging.warning('assuming 480p input.')
+            logging.info('assuming 480p input.')
             x = 480
         else:
             raise ValueError('Unsure of your video resolution request.'
-                             'Try setting video_kpbs in the .ini file.')
+                             'Try setting video_kpbs in PyLivestream configuration file (see README.md)')
 
         if self.fps is None or self.fps < 20:
             self.video_kbps: int = list(BRS.values())[bisect.bisect_left(list(BRS.keys()), x)]

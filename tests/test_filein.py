@@ -9,7 +9,6 @@ import os
 R = Path(__file__).parent
 
 sites = ['periscope', 'youtube', 'facebook']
-inifn = R.parent / 'stream.ini'
 
 VIDFN = R / 'bunny.avi'
 LOGO = R.parent / 'doc' / 'logo.png'
@@ -19,7 +18,7 @@ CI = os.environ.get('CI', None) in ('true', 'True')
 
 
 def test_props():
-    S = pls.FileIn(inifn, sites, infn=VIDFN)
+    S = pls.FileIn(inifn=None, websites=sites, infn=VIDFN)
     for s in S.streams:
         assert '-re' in S.streams[s].cmd
         assert S.streams[s].fps == approx(24.)
@@ -36,7 +35,7 @@ def test_props():
 def test_audio():
     flist = list(R.glob('*.ogg'))
 
-    S = pls.FileIn(inifn, sites, infn=flist[0], image=LOGO)
+    S = pls.FileIn(inifn=None, websites=sites, infn=flist[0], image=LOGO)
     for s in S.streams:
         assert '-re' in S.streams[s].cmd
         assert S.streams[s].fps is None
@@ -52,7 +51,7 @@ def test_audio():
 def test_simple():
     """stream to localhost
     """
-    S = pls.FileIn(inifn, 'localhost',
+    S = pls.FileIn(inifn=None, websites='localhost',
                    infn=R / 'orch_short.ogg',
                    image=LOGO,
                    yes=True, timeout=5)
@@ -65,7 +64,6 @@ def test_script():
     subprocess.check_call(['FileGlobLivestream',
                            str(VIDFN),
                            'localhost',
-                           '-i', str(inifn),
                            '--yes', '--timeout', '5'],
                           timeout=TIMEOUT)
 

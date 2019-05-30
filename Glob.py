@@ -71,8 +71,7 @@ def main():
                    help='site to stream: [youtube,periscope,facebook,twitch]',
                    nargs='?', default='localhost')
     p.add_argument('-glob', help='file glob pattern to stream.')
-    p.add_argument('-i', '--ini', help='*.ini file with stream parameters',
-                   default='stream.ini')
+    p.add_argument('-i', '--ini', help='*.ini file with stream parameters')
     p.add_argument('-image',
                    help='static image to display, for audio-only files.')
     p.add_argument('-shuffle', help='shuffle the globbed file list',
@@ -96,15 +95,13 @@ def main():
     else:
         input(f"Press Enter to go live on {site}.    Or Ctrl C to abort.")
 
-    inifn = Path(P.ini).expanduser()
-
     usemeta = P.nometa
 
     if P.loop:
         while True:
-            playonce(flist, P.image, site, inifn, P.shuffle, usemeta, P.yes)
+            playonce(flist, P.image, site, P.ini, P.shuffle, usemeta, P.yes)
     else:
-        playonce(flist, P.image, site, inifn, P.shuffle, usemeta, P.yes)
+        playonce(flist, P.image, site, P.ini, P.shuffle, usemeta, P.yes)
 
 
 if __name__ == '__main__':

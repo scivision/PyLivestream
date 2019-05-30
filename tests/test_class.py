@@ -41,5 +41,10 @@ def test_config_not_found(tmp_path):
         pls.Livestream(tmp_path / 'nothere.ini', 'localhost')
 
 
+def test_config_default(tmp_path):
+    S = pls.Livestream(None, 'localhost')
+    assert 'localhost' in S.site
+
+
 if __name__ == '__main__':
     pytest.main(['-x', __file__])

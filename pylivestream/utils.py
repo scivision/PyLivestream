@@ -5,9 +5,9 @@ from pathlib import Path
 import sys
 import shutil
 from typing import Tuple, Union, List
+import pkg_resources
 
 DEVNULL = subprocess.DEVNULL
-R = Path(__file__).resolve().parents[1] / 'tests/'
 
 
 def run(cmd: List[str]):
@@ -52,16 +52,35 @@ def check_device(cmd: List[str]) -> bool:
 def check_display(fn: Path = None) -> bool:
     """see if it's possible to display something with a test file"""
     if isinstance(fn, Path) and not fn.is_file():
-        raise FileNotFoundError(str(fn))
+        raise FileNotFoundError(fn)
 
     if fn is None:
-        fn = R / 'bunny.avi'
+        fn = get_pkgfile('logo.png')
 
     cmd = ['ffplay', '-v', 'error', '-t', '1.0', '-autoexit', str(fn)]
 
     ret = subprocess.run(cmd, timeout=10).returncode
 
     return ret == 0
+
+
+def get_pkgfile(fn: Union[str, Path]) -> Path:
+    fn = Path(fn).expanduser()
+
+    flist: List[Union[str, Path]] = [fn, fn.name]
+    for f1 in flist:
+        f2 = Path(pkg_resources.resource_filename(__name__, str(f1)))
+        if f2.is_file():
+            break
+
+        f2 = Path(sys.prefix) / 'share/pylivestream' / f1
+        if f2.is_file():
+            break
+
+    if not f2.is_file():
+        raise FileNotFoundError(fn)
+
+    return f2
 
 
 def getexe(exein: Path = None) -> Tuple[str, str]:
@@ -77,12 +96,12 @@ def getexe(exein: Path = None) -> Tuple[str, str]:
     if not shutil.which(exe):
         print('\n\n *** Must have FFmpeg installed to use PyLivestream.', file=sys.stderr)
         print('https://www.ffmpeg.org/download.html \n\n', file=sys.stderr)
-        raise FileNotFoundError(f'FFmpeg not found at {exe}.')
+        raise FileNotFoundError(exe)
 
     if not shutil.which(probeexe):
         print('\n\n *** You must have FFmpeg + FFprobe installed to use PyLivestream.', file=sys.stderr)
         print('https://www.ffmpeg.org/download.html \n\n', file=sys.stderr)
-        raise FileNotFoundError(f'FFprobe not found at {probeexe}')
+        raise FileNotFoundError(probeexe)
 
     return exe, probeexe
 
@@ -94,7 +113,7 @@ def get_meta(fn: Path, exein: Path = None) -> Union[None, dict]:
     fn = Path(fn).expanduser()
 
     if not fn.is_file():
-        raise FileNotFoundError(f'{fn} is not a file.')
+        raise FileNotFoundError(fn)
 
     exe = getexe()[1] if exein is None else exein
 

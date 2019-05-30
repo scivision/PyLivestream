@@ -1,5 +1,2 @@
 include doc/logo.png
 include LICENSE
-include *.py
-recursive-include tests *.py *.ogv *.avi *.gif *.png
-include pytest.ini mypy.ini .flake8
