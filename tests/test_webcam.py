@@ -4,19 +4,20 @@ import pylivestream as pls
 import pytest
 from pytest import approx
 import subprocess
+import os
+import platform
 
-R = Path(__file__).parent
+R = Path(__file__).parents[1]
 
 sites = ['localhost', 'periscope', 'youtube', 'facebook']
-inifn = R / 'test.ini'
+inifn = R / 'stream.ini'
 
-S = pls.stream.Stream(inifn, 'localhost-test')
-S.osparam()
-timelimit = int(S.timelimit[1]) + 3   # allowing 3 seconds leeway
-del S
+TIMEOUT = 30
+CI = os.environ.get('CI', None) in ('true', 'True')
+WSL = 'Microsoft' in platform.uname().release
 
 
-def test_webcam():
+def test_props():
     S = pls.Webcam(inifn, sites)
     for s in S.streams:
         assert '-re' not in S.streams[s].cmd
@@ -31,17 +32,21 @@ def test_webcam():
                 assert S.streams[s].video_kbps == 1800
 
 
-def test_webcam_stream(listener):
-    S = pls.Webcam(inifn, 'localhost-test')
+@pytest.mark.timeout(TIMEOUT)
+@pytest.mark.skipif(CI or WSL, reason='has no video hardware typically')
+def test_stream():
+    S = pls.Webcam(inifn, 'localhost', timeout=5)
 
     S.golive()
 
 
-def test_webcam_script(listener):
+@pytest.mark.skipif(CI or WSL, reason='has no vidoe hardware typically')
+def test_script():
     subprocess.check_call(['WebcamLivestream',
                            '-i', str(inifn),
-                           'localhost-test', '--yes'],
-                          timeout=timelimit)
+                           'localhost', '--yes',
+                           '--timeout', '5'],
+                          timeout=TIMEOUT)
 
 
 if __name__ == '__main__':

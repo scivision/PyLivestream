@@ -12,14 +12,16 @@ Tested with `flake8`, `mypy` type checking and `pytest`.
 `visual_tests.py` is a quick check of several command line scripting scenarios on your laptop.
 FFmpeg is used from Python `subprocess` to stream to Facebook Live, YouTube Live, Periscope, Twitch, Mixer, Ustream, Vimeo and more for streaming broadcasts.
 
--   Python scripts compute good streaming parameters, and emit the command used to copy and paste if desired.
--   Works on any OS (Mac, Linux, Windows) and computing platform, including PC, Mac, and Raspberry Pi.
--   Uses an `.ini` file to adjust all parameters.
+* Python scripts compute good streaming parameters, and emit the command used to copy and paste if desired.
+* Works on any OS (Mac, Linux, Windows) and computing platform, including PC, Mac, and Raspberry Pi.
+* Uses an `.ini` file to adjust all parameters.
 
 However, note that PyLivestream:
+
 * does *not* auto-restart if network connection glitches
 * is intended as a bare minimum command generator to run the FFmpeg program
 * is not intended for bidirectional robust streaming--consider a program/system based on Jitsi for that.
+* generally does not work from Windows Subsystem for Linux 1 because of lack of hardware interface in WSL1. It works fine from native Windows.
 
 ![PyLivestream diagram showing screen capture or webcam simultaneously livestreaming to multiple services.](doc/logo.png)
 

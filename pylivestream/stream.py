@@ -44,10 +44,13 @@ FPS: float = 30.  # default frames/sec if not defined otherwise
 # %% top level
 class Stream:
 
-    def __init__(self, ini: Path, site: str, vidsource: str = None,
+    def __init__(self, ini: Path, site: str, *,
+                 vidsource: str = None,
                  image: Path = None, loop: bool = False, infn: Path = None,
                  caption: str = None,
-                 yes: bool = False, verbose: bool = False) -> None:
+                 yes: bool = False,
+                 timeout: int = None,
+                 verbose: bool = False) -> None:
 
         self.F = Ffmpeg()
 
@@ -66,11 +69,12 @@ class Stream:
 
         self.caption: Union[str, None] = caption
 
+        self.timelimit: List[str] = self.F.timelimit(timeout)
+
     def osparam(self):
         """load OS specific config"""
-
-        if not self.ini.is_file:
-            raise FileNotFoundError(f'{self.ini} is not a file.')
+        if not self.ini.is_file():
+            raise FileNotFoundError(self.ini)
 
         C = ConfigParser(inline_comment_prefixes=('#', ';'))
         C.read(str(self.ini))
@@ -107,9 +111,11 @@ class Stream:
 
         self.audiofs: int = C.get(self.site, 'audiofs')  # not getint
         self.preset: str = C.get(self.site, 'preset')
-        self.timelimit: List[str] = self.F.timelimit(C.get(self.site,
-                                                           'timelimit',
-                                                           fallback=None))
+
+        if not self.timelimit:
+            self.timelimit: List[str] = self.F.timelimit(C.get(self.site,
+                                                               'timelimit',
+                                                               fallback=None))
 
         # NOTE: This used to be 'videochan' but that was too generic.
         self.webcamchan: str = C.get(sys.platform, 'webcamchan', fallback=None)

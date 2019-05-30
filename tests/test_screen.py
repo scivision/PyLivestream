@@ -4,19 +4,20 @@ import pylivestream as pls
 import pytest
 from pytest import approx
 import subprocess
+import os
+import platform
 
-R = Path(__file__).parent
+R = Path(__file__).parents[1]
 
 sites = ['periscope', 'youtube', 'facebook']
-inifn = R / 'test.ini'
+inifn = R / 'stream.ini'
 
-S = pls.stream.Stream(inifn, 'localhost-test')
-S.osparam()
-timelimit = int(S.timelimit[1]) + 3   # allowing 3 seconds leeway
-del S
+TIMEOUT = 30
+CI = os.environ.get('CI', None) in ('true', 'True')
+WSL = 'Microsoft' in platform.uname().release
 
 
-def test_screenshare():
+def test_props():
     S = pls.Screenshare(inifn, sites)
     for s in S.streams:
         assert '-re' not in S.streams[s].cmd
@@ -25,20 +26,23 @@ def test_screenshare():
         if s == 'periscope':
             assert S.streams[s].video_kbps == 800
         else:
-            assert S.streams[s].video_kbps == 1800
+            assert S.streams[s].video_kbps == 500
 
 
-def test_screenshare_stream(listener):
-    S = pls.Screenshare(inifn, 'localhost-test')
+@pytest.mark.timeout(TIMEOUT)
+@pytest.mark.skipif(CI or WSL, reason='has no GUI')
+def test_stream():
+    S = pls.Screenshare(inifn, 'localhost', timeout=5)
 
     S.golive()
 
 
-def test_webcam_script(listener):
+@pytest.mark.skipif(CI or WSL, reason='no GUI typically')
+def test_script():
     subprocess.check_call(['ScreenshareLivestream',
                            '-i', str(inifn),
-                           'localhost-test', '--yes'],
-                          timeout=timelimit)
+                           'localhost', '--yes', '--timeout', '5'],
+                          timeout=TIMEOUT)
 
 
 if __name__ == '__main__':

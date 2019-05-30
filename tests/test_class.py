@@ -36,5 +36,10 @@ def test_attrs(inp):
     assert pls.utils.get_framerate(VIDFN) == approx(24.0)
 
 
+def test_config_not_found(tmp_path):
+    with pytest.raises(FileNotFoundError):
+        pls.Livestream(tmp_path / 'nothere.ini', 'localhost')
+
+
 if __name__ == '__main__':
     pytest.main(['-x', __file__])

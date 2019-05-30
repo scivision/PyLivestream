@@ -4,23 +4,22 @@ import pylivestream as pls
 import pytest
 from pytest import approx
 import subprocess
+import os
 
 R = Path(__file__).parent
 
 sites = ['periscope', 'youtube', 'facebook']
-inifn = R / 'test.ini'
+inifn = R.parent / 'stream.ini'
 
 VIDFN = R / 'bunny.avi'
 LOGO = R.parent / 'doc' / 'logo.png'
+TIMEOUT = 30
 
-S = pls.stream.Stream(inifn, 'localhost-test')
-S.osparam()
-timelimit = int(S.timelimit[1]) + 3   # allowing 3 seconds leeway
-del S
+CI = os.environ.get('CI', None) in ('true', 'True')
 
 
-def test_filein_video():
-    S = pls.FileIn(inifn, sites, VIDFN)
+def test_props():
+    S = pls.FileIn(inifn, sites, infn=VIDFN)
     for s in S.streams:
         assert '-re' in S.streams[s].cmd
         assert S.streams[s].fps == approx(24.)
@@ -34,10 +33,10 @@ def test_filein_video():
                 assert S.streams[s].video_kbps == 1800
 
 
-def test_filein_audio():
+def test_audio():
     flist = list(R.glob('*.ogg'))
 
-    S = pls.FileIn(inifn, sites, flist[0], image=LOGO)
+    S = pls.FileIn(inifn, sites, infn=flist[0], image=LOGO)
     for s in S.streams:
         assert '-re' in S.streams[s].cmd
         assert S.streams[s].fps is None
@@ -48,26 +47,27 @@ def test_filein_audio():
             assert S.streams[s].video_kbps == 400
 
 
-def test_file_simple():
+@pytest.mark.timeout(TIMEOUT)
+@pytest.mark.skipif(CI, reason='CI has no audio hardware typically')
+def test_simple():
     """stream to localhost
-    no listener fixture, to test the other listener
     """
-    # not localhost-test, to test the other listener
     S = pls.FileIn(inifn, 'localhost',
-                   R / 'orch_short.ogg',
+                   infn=R / 'orch_short.ogg',
                    image=LOGO,
-                   yes=True)
+                   yes=True, timeout=5)
 
     S.golive()
 
 
-def test_filein_script(listener):
+@pytest.mark.skipif(CI, reason='CI has no audio hardware typically')
+def test_script():
     subprocess.check_call(['FileGlobLivestream',
                            str(VIDFN),
-                           'localhost-test',
+                           'localhost',
                            '-i', str(inifn),
-                           '--yes'],
-                          timeout=timelimit)
+                           '--yes', '--timeout', '5'],
+                          timeout=TIMEOUT)
 
 
 if __name__ == '__main__':

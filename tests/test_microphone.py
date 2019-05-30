@@ -3,22 +3,23 @@ from pathlib import Path
 import pylivestream as pls
 import pytest
 import subprocess
+import os
+import platform
 
 R = Path(__file__).parent
 
 sites = ['periscope', 'youtube', 'facebook']
-inifn = R / 'test.ini'
+inifn = R.parent / 'stream.ini'
 
 LOGO = R.parent / 'doc' / 'logo.png'
 IMG4K = R / 'check4k.png'
 
-S = pls.stream.Stream(inifn, 'localhost-test')
-S.osparam()
-timelimit = int(S.timelimit[1]) + 3   # allowing 3 seconds leeway
-del S
+TIMEOUT = 30
+CI = os.environ.get('CI', None) in ('true', 'True')
+WSL = 'Microsoft' in platform.uname().release
 
 
-def test_microphone():
+def test_props():
     S = pls.Microphone(inifn, sites,
                        image=LOGO)
 
@@ -33,7 +34,7 @@ def test_microphone():
             assert S.streams[s].video_kbps == 800
 
 
-def test_microphone_4Kbg():
+def test_4Kbg():
     S = pls.Microphone(inifn, sites,
                        image=IMG4K)
 
@@ -48,17 +49,20 @@ def test_microphone_4Kbg():
             assert S.streams[s].video_kbps == 4000
 
 
-def test_microphone_stream(listener):
-    S = pls.Microphone(inifn, 'localhost-test', image=LOGO)
+@pytest.mark.timeout(TIMEOUT)
+@pytest.mark.skipif(CI or WSL, reason='has no audio hardware typically')
+def test_stream():
+    S = pls.Microphone(inifn, 'localhost', image=LOGO, timeout=5)
 
     S.golive()
 
 
-def test_microphone_script(listener):
+@pytest.mark.skipif(CI or WSL, reason='has no audio hardware typically')
+def test_script():
     subprocess.check_call(['MicrophoneLivestream',
                            '-i', str(inifn),
-                           'localhost-test', '--yes'],
-                          timeout=timelimit)
+                           'localhost', '--yes', '--timeout', '5'],
+                          timeout=TIMEOUT)
 
 
 if __name__ == '__main__':

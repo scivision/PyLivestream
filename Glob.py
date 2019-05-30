@@ -9,7 +9,7 @@ https://www.scivision.co/youtube-live-ffmpeg-livestream/
 https://support.google.com/youtube/answer/2853702
 """
 from pathlib import Path
-from typing import List, Union
+from typing import List, Union, Iterable
 import pylivestream as pls
 import random
 import signal
@@ -44,18 +44,17 @@ def playonce(flist: List[Path], image: Path, site: str, inifn: Path,
         s.golive()
 
 
-def fileglob(path: Union[str, Path], glob: str) -> List[Path]:
+def fileglob(path: Union[str, Path], glob: str) -> Iterable[Path]:
     path = Path(path).expanduser()
 
-    if not (path.is_dir() or path.is_file()):
-        raise FileNotFoundError(f'{path} is not a directory or file')
-
     if glob:
-        flist = list(path.glob(glob))
+        if not path.is_dir():
+            raise NotADirectoryError(path)
+        flist = path.glob(glob)
     else:  # assume single file
-        flist = [Path(path)]
-        if not flist[0].is_file():
-            raise FileNotFoundError(f'{path} is not a file')
+        if not path.is_file():
+            raise FileNotFoundError(path)
+        flist = (p for p in [path])
 
     if not flist:
         raise FileNotFoundError(f'did not find files with {path} {glob}')
@@ -78,12 +77,10 @@ def main():
                    help='static image to display, for audio-only files.')
     p.add_argument('-shuffle', help='shuffle the globbed file list',
                    action='store_true')
-    p.add_argument('-loop', help='repeat the globbed file list endlessly',
-                   action='store_true')
-    p.add_argument('-y', '--yes', help='no confirmation dialog',
-                   action='store_true')
-    p.add_argument('-nometa', help='do not add metadata caption to video',
-                   action='store_false')
+    p.add_argument('-loop', help='repeat the globbed file list endlessly', action='store_true')
+    p.add_argument('-y', '--yes', help='no confirmation dialog', action='store_true')
+    p.add_argument('-nometa', help='do not add metadata caption to video', action='store_false')
+    p.add_argument('-t', '--timeout', help='stop streaming after --timeout seconds', type=int)
     P = p.parse_args()
 # %% file / glob wranging
     flist = fileglob(P.path, P.glob)

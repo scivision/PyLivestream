@@ -1,5 +1,6 @@
-""" this is necessary for pytest when console scripts are called via subprocess in unit test.
-The style in FFMPEG won't work for test and vice versa."""
+"""
+This is no longer necessary due to PyLivestream improvements
+"""
 import pytest
 import subprocess
 

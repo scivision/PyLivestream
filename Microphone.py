@@ -28,13 +28,13 @@ def main():
     p.add_argument('-i', '--ini',
                    help='*.ini file with stream parameters',
                    default=R/'stream.ini')
-    p.add_argument('-y', '--yes', help='no confirmation dialog',
-                   action='store_true')
+    p.add_argument('-y', '--yes', help='no confirmation dialog', action='store_true')
+    p.add_argument('-t', '--timeout', help='stop streaming after --timeout seconds', type=int)
     P = p.parse_args()
 
     site = P.site.split()
 
-    s = pls.Microphone(P.ini, site, image=P.image, yes=P.yes)
+    s = pls.Microphone(P.ini, site, image=P.image, yes=P.yes, timeout=P.timeout)
     sites = list(s.streams.keys())
 # %% Go live
     if P.yes:

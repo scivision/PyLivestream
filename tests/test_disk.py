@@ -5,14 +5,14 @@ import pytest
 
 R = Path(__file__).parent
 
-inifn = R / 'test.ini'
+inifn = R.parent / 'stream.ini'
 
 
 @pytest.mark.parametrize('site', ['periscope', 'youtube', 'facebook'])
-def test_disk(site):
+def test_props(site):
     p = pls.SaveDisk(inifn, '')
     assert p.site == 'file'
-    assert p.video_kbps == 3000
+    assert p.video_kbps == 2000
 
 
 if __name__ == '__main__':

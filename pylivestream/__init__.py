@@ -11,15 +11,18 @@ __all__ = ['FileIn', 'Microphone', 'SaveDisk', 'Screenshare', 'Webcam']
 class Livestream(stream.Stream):
 
     def __init__(self,
-                 ini: Path,
-                 site: str, vidsource: str = None,
+                 ini: Path, site: str, *,
+                 vidsource: str = None,
                  image: Path = None,
                  loop: bool = False,
                  infn: Path = None,
                  caption: str = None,
-                 yes: bool = False) -> None:
-        super().__init__(ini, site, vidsource, image, loop, infn,
-                         caption=caption, yes=yes)
+                 yes: bool = False,
+                 timeout: int = None) -> None:
+        super().__init__(ini, site, vidsource=vidsource,
+                         image=image, loop=loop,
+                         infn=infn, caption=caption, yes=yes,
+                         timeout=timeout)
 
         self.site = site.lower()
 
@@ -135,7 +138,8 @@ class Screenshare(Livestream):
                  ini: Path,
                  websites: Union[str, Sequence[str]],
                  caption: str = None,
-                 yes: bool = False) -> None:
+                 yes: bool = False,
+                 timeout: int = None):
 
         vidsource = 'screen'
 
@@ -144,8 +148,8 @@ class Screenshare(Livestream):
 
         streams = {}
         for site in websites:
-            streams[site] = Livestream(ini, site, vidsource,
-                                       caption=caption, yes=yes)
+            streams[site] = Livestream(ini, site, vidsource=vidsource,
+                                       caption=caption, yes=yes, timeout=timeout)
 
         self.streams: Dict[str, Livestream] = streams
 
@@ -164,9 +168,10 @@ class Webcam(Livestream):
 
     def __init__(self,
                  ini: Path,
-                 websites: Union[str, Sequence[str]],
+                 websites: Union[str, Sequence[str]], *,
                  caption: str = None,
-                 yes: bool = False) -> None:
+                 yes: bool = False,
+                 timeout: int = None):
 
         vidsource = 'camera'
 
@@ -175,8 +180,9 @@ class Webcam(Livestream):
 
         streams = {}
         for site in websites:
-            streams[site] = Livestream(ini, site, vidsource,
-                                       caption=caption,  yes=yes)
+            streams[site] = Livestream(ini, site, vidsource=vidsource,
+                                       caption=caption, yes=yes,
+                                       timeout=timeout)
 
         self.streams: Dict[str, Livestream] = streams
 
@@ -195,10 +201,11 @@ class Microphone(Livestream):
 
     def __init__(self,
                  ini: Path,
-                 sites: Union[str, Sequence[str]],
+                 sites: Union[str, Sequence[str]], *,
                  image: Path,
                  caption: str = None,
-                 yes: bool = False) -> None:
+                 yes: bool = False,
+                 timeout: int = None):
 
         if isinstance(sites, str):
             sites = [sites]
@@ -207,7 +214,7 @@ class Microphone(Livestream):
         for site in sites:
             streams[site] = Livestream(ini, site, image=image,
                                        loop=True,
-                                       caption=caption, yes=yes)
+                                       caption=caption, yes=yes, timeout=timeout)
 
         self.streams: Dict[str, Livestream] = streams
 
@@ -227,12 +234,13 @@ class FileIn(Livestream):
 
     def __init__(self,
                  ini: Path,
-                 sites: Union[str, Sequence[str]],
+                 sites: Union[str, Sequence[str]], *,
                  infn: Path,
                  loop: bool = False,
                  image: Path = None,
                  caption: str = None,
-                 yes: bool = False) -> None:
+                 yes: bool = False,
+                 timeout: int = None):
 
         vidsource = 'file'
 
@@ -241,9 +249,9 @@ class FileIn(Livestream):
 
         streams = {}
         for site in sites:
-            streams[site] = Livestream(ini, site, vidsource, image=image,
+            streams[site] = Livestream(ini, site, vidsource=vidsource, image=image,
                                        loop=loop, infn=infn,
-                                       caption=caption, yes=yes)
+                                       caption=caption, yes=yes, timeout=timeout)
 
         self.streams: Dict[str, Livestream] = streams
 
@@ -261,9 +269,10 @@ class FileIn(Livestream):
 class SaveDisk(stream.Stream):
 
     def __init__(self,
-                 ini: Path, outfn: Path = None,
+                 ini: Path, outfn: Path = None, *,
                  caption: str = None,
-                 yes: bool = False) -> None:
+                 yes: bool = False,
+                 timeout: int = None):
         """
         records to disk screen capture with audio
 
@@ -272,7 +281,8 @@ class SaveDisk(stream.Stream):
         site = 'file'
         vidsource = 'screen'
 
-        super().__init__(ini, site, vidsource, caption=caption)
+        super().__init__(ini, site,
+                         vidsource=vidsource, caption=caption, timeout=timeout)
 
         self.outfn = Path(outfn).expanduser() if outfn else None
 
