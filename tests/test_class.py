@@ -12,9 +12,18 @@ def test_key():
     """tests reading of stream key"""
     assert pls.utils.getstreamkey('abc123') == 'abc123'
     assert pls.utils.getstreamkey(R / 'periscope.key') == 'abcd1234'
-    assert pls.utils.getstreamkey('') is None
-    assert pls.utils.getstreamkey(None) is None
-    assert pls.utils.getstreamkey(R) is None
+
+
+@pytest.mark.parametrize('key', ['', None], ids=['empty string', 'None'])
+def test_empty_key(key):
+    assert pls.utils.getstreamkey(key) is None
+
+
+@pytest.mark.parametrize('key', [R, R/'nothere.key'])
+def test_bad_key(key):
+
+    with pytest.raises(FileNotFoundError):
+        assert pls.utils.getstreamkey(key) is None
 
 
 @pytest.mark.parametrize('rex', (None, '', 'ffmpeg'))

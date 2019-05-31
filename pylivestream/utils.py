@@ -223,16 +223,19 @@ def getstreamkey(keyfn: str) -> str:
     3. if non-empty, see if it's a file to read, or just the key itself.
     """
 
-    if not keyfn:  # '' or None
+    if not keyfn:
         return None
 
-    try:
-        keyp: Path = Path(keyfn).expanduser().resolve(strict=True)
-        key = keyp.read_text().strip() if keyp.is_file() else None
-    except FileNotFoundError:  # not a file, might be the key itself, if not a .key filename
-        key = None if keyfn.endswith('.key') else keyfn
-
-    if isinstance(key, str):
-        key = '"' + key + '"'  # necessary for keys with command-line unfriendly parameters
+    keyp = Path(keyfn).expanduser().resolve(strict=False)
+    if keyp.is_file():
+        # read only first line in case of trailing blank line
+        key = keyp.read_text().split('\n')[0].strip()
+    elif keyp.suffix == '.key':
+        raise FileNotFoundError(keyfn)
+    elif keyp.is_dir():
+        raise FileNotFoundError(keyfn)
+    else:
+        # assume it's a text key
+        key = keyfn
 
     return key
