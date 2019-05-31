@@ -12,7 +12,7 @@ Tested with `flake8`, `mypy` type checking and `pytest`.
 `visual_tests.py` is a quick check of several command line scripting scenarios on your laptop.
 FFmpeg is used from Python `subprocess` to stream to sites including:
 
-* [Facebook Live](#facebook-live)
+* [Facebook Live](#facebook-live)  (may not be working due to FFmpeg bug vis. mandatory RTMPS)
 * [YouTube Live](#youtube-live)
 * [Periscope](#periscope)
 * [Twitch](#twitch)
