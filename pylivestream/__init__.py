@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import List, Dict, Sequence
 import logging
+import os
 #
 from . import stream
 from . import utils
@@ -17,6 +18,8 @@ class Livestream(stream.Stream):
         self.site = site.lower()
 
         self.osparam(kwargs.get('key'))
+
+        self.docheck = kwargs.get('docheck')
 
         self.video_bitrate()
 
@@ -50,9 +53,16 @@ class Livestream(stream.Stream):
 
         streamid: str = self.key if self.key else ''
 
-        self.sink: List[str] = [self.server + streamid]
+        # cannot have double quotes for Mac/Linux,
+        #    but need double quotes for Windows
+        sink: str = self.server + streamid
+        if os.name == 'nt':
+            sink = '"' + sink + '"'
 
-        self.cmd: List[str] = cmd + self.sink
+        self.sink = sink
+        cmd.append(sink)
+
+        self.cmd: List[str] = cmd
 # %% quick check command, to verify device exists
         # 0.1 seems OK, spurious buffer error on Windows that wasn't helped by any bigger size
         CHECKTIMEOUT = '0.1'
@@ -68,7 +78,8 @@ class Livestream(stream.Stream):
     def startlive(self, sinks: Sequence[str] = None):
         """finally start the stream(s)"""
 
-        self.check_device()
+        if self.docheck:
+            self.check_device()
 
         proc = None
 # %% special cases for localhost tests
@@ -76,6 +87,7 @@ class Livestream(stream.Stream):
             if self.site == 'localhost':
                 proc = self.F.listener()  # start own RTMP server
             else:
+                print('A livestream key was not provided or found. Here is the command I would have run:')
                 print('\n', ' '.join(self.cmd), '\n', flush=True)
                 return
 
@@ -83,7 +95,6 @@ class Livestream(stream.Stream):
             # listener stopped prematurely, probably due to error
             raise RuntimeError(f'listener stopped with code {proc.poll()}')
 # %% RUN STREAM
-        cmd: List[str]
         if not sinks:  # single stream
             utils.run(self.cmd)
         elif self.movingimage:
@@ -96,8 +107,8 @@ class Livestream(stream.Stream):
         else:  # multi-stream output tee
             cmdstem: List[str] = self.cmd[:-3]
             # +global_header is necessary to tee to multiple services
-            cmd = cmdstem + ['-flags:v', '+global_header',
-                             '-f', 'tee']
+            cmd: List[str] = cmdstem + ['-flags:v', '+global_header',
+                                        '-f', 'tee']
 
             if self.image:
                 #  connect image to video stream, audio file to audio stream
@@ -111,7 +122,19 @@ class Livestream(stream.Stream):
                     # audio device to audio stream
                     cmd += ['-map', '0:v', '-map', '1:a']
 
-            cmd += ['[f=flv]' + '|[f=flv]'.join(sinks)]  # no double quotes
+            # cannot have double quotes for Mac/Linux,
+            #    but need double quotes for Windows
+            if os.name == 'nt':
+                sink = f'"[f=flv]{sinks[0][1:-1]}'
+                for s in sinks[1:]:
+                    sink += f'|[f=flv]{s[1:-1]}'
+                sink += '"'
+            else:
+                sink = f'[f=flv]{sinks[0]}'
+                for s in sinks[1:]:
+                    sink += f'|[f=flv]{s}'
+
+            cmd.append(sink)
 
             utils.run(cmd)
 
@@ -119,6 +142,24 @@ class Livestream(stream.Stream):
         if proc is not None and proc.poll() is None:
             proc.terminate()
         yield
+
+    def check_device(self, site: str = None) -> bool:
+        """
+        requires stream to have been configured first.
+        does a quick test stream to "null" to verify device is actually accessible
+        """
+        if not site:
+            try:
+                site = self.site
+            except AttributeError:
+                site = list(self.streams.keys())[0]  # type: ignore
+
+        try:
+            checkcmd = self.checkcmd
+        except AttributeError:
+            checkcmd = self.streams[site].checkcmd  # type: ignore
+
+        return utils.check_device(checkcmd)
 
 
 # %% operators
@@ -139,7 +180,7 @@ class Screenshare(Livestream):
 
     def golive(self):
 
-        sinks: List[str] = [self.streams[stream].sink[0]
+        sinks: List[str] = [self.streams[stream].sink
                             for stream in self.streams]
 
         try:
@@ -165,7 +206,7 @@ class Webcam(Livestream):
 
     def golive(self):
 
-        sinks: List[str] = [self.streams[stream].sink[0]
+        sinks: List[str] = [self.streams[stream].sink
                             for stream in self.streams]
 
         try:
@@ -191,7 +232,7 @@ class Microphone(Livestream):
 
     def golive(self):
 
-        sinks: List[str] = [self.streams[stream].sink[0]
+        sinks: List[str] = [self.streams[stream].sink
                             for stream in self.streams]
 
         try:
@@ -219,7 +260,7 @@ class FileIn(Livestream):
 
     def golive(self):
 
-        sinks: List[str] = [self.streams[stream].sink[0]
+        sinks: List[str] = [self.streams[stream].sink
                             for stream in self.streams]
 
         try:

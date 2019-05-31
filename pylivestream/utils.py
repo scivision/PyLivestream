@@ -183,15 +183,17 @@ def get_framerate(fn: Path, exe: str = None) -> float:
 
     FFprobe gets framerate from the first video stream in the file it finds.
 
-    inputs:
-    ------
-    fn: Path to the video filename
+    Parameters
+    ----------
+    fn: pathlib.Path
+        video filename
+    exe: str, optional
+        path to ffprobe
 
-    outputs:
+    Returns
     -------
-    fps: video framerate (frames/second)
-
-    if not a video file, None is returned.
+    fps: float
+        video framerate (frames/second). If not a video file, None is returned.
     """
 
     meta = get_meta(fn, exe)
@@ -209,7 +211,7 @@ def get_framerate(fn: Path, exe: str = None) -> float:
         try:
             fps = fps[0] / fps[1]
         except ZeroDivisionError:
-            logging.error(f'FPS not available:{fn}. Is it a video/audio file?')
+            logging.error(f'FPS not available: {fn}. Is it a video/audio file?')
             fps = None
         break
 
@@ -231,9 +233,9 @@ def getstreamkey(keyfn: str) -> str:
         # read only first line in case of trailing blank line
         key = keyp.read_text().split('\n')[0].strip()
     elif keyp.suffix == '.key':
-        raise FileNotFoundError(keyfn)
+        raise FileNotFoundError(keyp)
     elif keyp.is_dir():
-        raise FileNotFoundError(keyfn)
+        raise IsADirectoryError(keyp)
     else:
         # assume it's a text key
         key = keyfn

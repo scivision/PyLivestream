@@ -8,10 +8,11 @@ R = Path(__file__).parent
 VIDFN = R / 'bunny.avi'
 
 
-def test_key():
+@pytest.mark.parametrize('keyin,keyout', [('abc123', 'abc123'),
+                                          (R/'periscope.key', 'abcd1234')])
+def test_key(keyin, keyout):
     """tests reading of stream key"""
-    assert pls.utils.getstreamkey('abc123') == 'abc123'
-    assert pls.utils.getstreamkey(R / 'periscope.key') == 'abcd1234'
+    assert pls.utils.getstreamkey(keyin) == keyout
 
 
 @pytest.mark.parametrize('key', ['', None], ids=['empty string', 'None'])
@@ -19,10 +20,11 @@ def test_empty_key(key):
     assert pls.utils.getstreamkey(key) is None
 
 
-@pytest.mark.parametrize('key', [R, R/'nothere.key'])
-def test_bad_key(key):
+@pytest.mark.parametrize('key,excp', [(R, IsADirectoryError),
+                                      (R/'nothere.key', FileNotFoundError)])
+def test_bad_key(key, excp):
 
-    with pytest.raises(FileNotFoundError):
+    with pytest.raises(excp):
         assert pls.utils.getstreamkey(key) is None
 
 

@@ -70,17 +70,17 @@ We suggest copying this file to another location on your hard drive and editing,
 
 The `[DEFAULT]` section has parameters that can be overridden for each site, if desired.
 
--   `screencap_origin`: origin (upper left corner) of screen capture region in pixels.
--   `screencap_res`: resolution of screen capture (area to capture, starting from origin)
--   `screencap_fps`: frames/sec of screen capture
--   `audiofs`: audio sampling frequency. Typically 44100 Hz (CD quality).
--   `audio_bps`: audio data rate--**leave blank if you want no audio** (usually used for "file", to make an animated GIF in  post-processing)
--   `preset`: `veryfast` or `ultrafast` if CPU not able to keep up.
+* `screencap_origin`: origin (upper left corner) of screen capture region in pixels.
+* `screencap_res`: resolution of screen capture (area to capture, starting from origin)
+* `screencap_fps`: frames/sec of screen capture
+* `audiofs`: audio sampling frequency. Typically 44100 Hz (CD quality).
+* `audio_bps`: audio data rate--**leave blank if you want no audio** (usually used for "file", to make an animated GIF in  post-processing)
+* `preset`: `veryfast` or `ultrafast` if CPU not able to keep up.
 
 Next are `sys.platform` specific parameters.
 
-Seek help in FFmpeg documentation, try capturing to a file first and
-then update [pylivestream.ini](./pylivestream/pylivestream.ini) for your `sys.platform`.
+Seek help in FFmpeg documentation, try capturing to a file first and then update
+[pylivestream.ini](./pylivestream/pylivestream.ini) for your `sys.platform`.
 
 * exe: override path to desired FFmpeg executable. In case you have multiple FFmpeg versions installed (say, from Anaconda Python).
 
@@ -90,11 +90,9 @@ The included [pylivestream.ini](./pylivestream/pylivestream.ini) is with default
 
 ## Stream Start
 
-The program will load a `*.key` file according to the configuration file
-key for the website. For example, Periscope expects to see the stream
-hexadecimal key in `periscope.key`, as obtained from the app. Likewise,
-YouTube expects a file `youtube.key` with the hexadecimal stream key and
-so on.
+The program will load a `*.key` file according to the configuration file key for the website.
+For example, Periscope expects to see the stream hexadecimal key in `~/periscope.key`, as obtained from phone Periscope app.
+Likewise, YouTube expects a file `~/youtube.key` with the hexadecimal stream key and so on.
 
 ### YouTube Live
 
@@ -160,8 +158,8 @@ Note: your system may not have a webcam, particularly if it's a virtual machine.
 
 Config:
 
--   `webcam_res`: webcam resolution -- find from `v4l2-ctl --list-formats-ext` or webcam spec sheet.
--   `webcam_fps`: webcam fps -- found from command above or webcam spec sheet
+* `webcam_res`: webcam resolution -- find from `v4l2-ctl --list-formats-ext` or webcam spec sheet.
+* `webcam_fps`: webcam fps -- found from command above or webcam spec sheet
 
 Find webcam name by:
 
@@ -182,27 +180,53 @@ Find webcam name by:
     ```
 
 
-Audio is included:
+Stream to multiple sites, in this example Periscope and YouTube Live simultaneously:
 
-    WebcamLivestream site(s)
+```sh
+WebcamLivestream youtube periscope
+```
 
-Stream to multiple sites, in this example Periscope and YouTube Live
-simultaneously:
+or from devlopment code:
 
-    WebcamLivestream youtube periscope
+```sh
+python Webcam.py youtube periscope
+```
+
 
 ### Screen Share Livestream
 
-Audio is included:
+Stream to multiple sites, in this example Periscope and YouTube Live simultaneously:
 
-    ScreenshareLivestream site(s)
+```sh
+ScreenshareLivestream youtube periscope
+```
 
-Stream to multiple sites, in this example Periscope and YouTube Live
-simultaneously:
+or from development code:
 
-    ScreenshareLivestream youtube periscope
+```sh
+python Screenshare.py youtube periscope
+```
 
-### File Input
+
+### Image + Audio Livestream
+
+Microphone audio + static image is accomplished by
+
+```sh
+python Microphone.py youtube periscope -image doc/logo.jpg
+```
+or wherever your image file is.
+
+### Audio-only Livestream
+
+Audio-only streaming is not typically allowed by the Video streaming sites.
+You can test it to your own computer by:
+
+```sh
+python Microphone.py localhost
+```
+
+### File Livestream
 
 Captions: if you have installed the optional `tinytag` Python module,
 the Title - Artist will be added automatically onto the video from the
@@ -216,7 +240,15 @@ audio/video files.
 
 Glob list of video files to stream:
 
-    FileGlobLivestream path site -glob glob_pattern
+```sh
+FileGlobLivestream path site -glob glob_pattern
+```
+
+or from development code:
+
+```sh
+python Glob.py path site -glob glob_pattern
+```
 
 * `-glob` glob pattern of files to stream e.g. "*.avi"
 * `-loop` optionally loop endlessly the globbed file list
@@ -273,26 +305,26 @@ This script saves your screen capture to a file on your disk:
 ## Utilities
 
 
--   `PyLivestream.get_framerate(vidfn)` gives the frames/sec of a video file.
--   `PyLivestream.get_resolution(vidfn)` gives the resolution (width x height) of video file.
+* `PyLivestream.get_framerate(vidfn)` gives the frames/sec of a video file.
+* `PyLivestream.get_resolution(vidfn)` gives the resolution (width x height) of video file.
 
 ## Notes
 
--   Linux requires X11, not Wayland (choose at login)
--   `x11grab` was deprecated in FFmpeg 3.3, was previously replaced by `xcbgrab`
--   Reference [webpage](https://www.scivision.co/youtube-live-ffmpeg-livestream/)
--   [Test videos](http://www.divx.com/en/devices/profiles/video) for looping/globbing
+* Linux requires X11, not Wayland (choose at login)
+* `x11grab` was deprecated in FFmpeg 3.3, was previously replaced by `xcbgrab`
+* Reference [webpage](https://www.scivision.co/youtube-live-ffmpeg-livestream/)
+* [Test videos](http://www.divx.com/en/devices/profiles/video) for looping/globbing
 
 Comments on dropouts / lag for livestreaming in general (not just with this program):
 
--   Low CPU machines (like Raspberry Pi) may need to cut back on resolution.
--   live streaming takes an excellent quality (not necessarily high
+* Low CPU machines (like Raspberry Pi) may need to cut back on resolution.
+* live streaming takes an excellent quality (not necessarily high
     speed) Internet connection in general. Some DSL / wireless internet
     provider have really spotty performance. You might not notice this
     with HD Netflix due to deep buffering, but it will show up on livestreaming.
--   Do Skype / Duo / FaceTime work excellently for you on your network?
+* Do Skype / Duo / FaceTime work excellently for you on your network?
     If not, live streaming will not work well.
--   Try a wired (Ethernet) connection to the Internet.
+* Try a wired (Ethernet) connection to the Internet.
     I have seen very expensive consumer WiFi APs that had bad performance in real world strenuous use (like live streaming).
 
 ### Troubleshooting
@@ -312,38 +344,38 @@ Disregard this warning as long as your image looks OK.
 
 ### FFmpeg References
 
--   [streaming](https://trac.ffmpeg.org/wiki/EncodingForStreamingSites)
--   [webcam](https://trac.ffmpeg.org/wiki/Capture/Webcam)
--   webcam [overlay](https://trac.ffmpeg.org/wiki/EncodingForStreamingSites#Withwebcamoverlay)
+* [streaming](https://trac.ffmpeg.org/wiki/EncodingForStreamingSites)
+* [webcam](https://trac.ffmpeg.org/wiki/Capture/Webcam)
+* webcam [overlay](https://trac.ffmpeg.org/wiki/EncodingForStreamingSites#Withwebcamoverlay)
 
 #### Windows
 
--   [gdigrab](https://ffmpeg.org/ffmpeg-devices.html#gdigrab)
+* [gdigrab](https://ffmpeg.org/ffmpeg-devices.html#gdigrab)
 
 DirectShow didn't work for me on Windows 10, so I used gdigrab instead.
 
--   [DirectShow](https://trac.ffmpeg.org/wiki/DirectShow) device selection
--   DirectShow [examples](https://ffmpeg.org/ffmpeg-devices.html#Examples-4)
+* [DirectShow](https://trac.ffmpeg.org/wiki/DirectShow) device selection
+* DirectShow [examples](https://ffmpeg.org/ffmpeg-devices.html#Examples-4)
 
 ### Stream References
 
--   [Twitch parameters](https://help.twitch.tv/customer/portal/articles/1253460-broadcast-requirements)
--   Twitch [servers](http://bashtech.net/twitch/ingest.php)
--   Twitch [encoding](https://stream.twitch.tv/encoding/)
+* [Twitch parameters](https://help.twitch.tv/customer/portal/articles/1253460-broadcast-requirements)
+* Twitch [servers](http://bashtech.net/twitch/ingest.php)
+* Twitch [encoding](https://stream.twitch.tv/encoding/)
 
--   [Periscope parameters](https://www.pscp.tv/help/external-encoders)
--   [YouTube Live parameters](https://support.google.com/youtube/answer/2853702)
--   [Facebook Live parameters](https://www.facebook.com/facebookmedia/get-started/live)
--   [Mixer parameters](https://watchbeam.zendesk.com/hc/en-us/articles/210090606-Stream-Settings-the-basics)
--   Mixer [server list](https://watchbeam.zendesk.com/hc/en-us/articles/209659883-How-to-change-your-Ingest-Server)
--   [Ustream parameters](https://support.ustream.tv/hc/en-us/articles/207852117-Internet-connection-and-recommended-encoding-settings)
--   Vimeo [config](https://help.vimeo.com/hc/en-us/articles/115012811168)
--   Vimeo [parameters](https://help.vimeo.com/hc/en-us/articles/115012811208-Encoder-guides)
+* [Periscope parameters](https://www.pscp.tv/help/external-encoders)
+* [YouTube Live parameters](https://support.google.com/youtube/answer/2853702)
+* [Facebook Live parameters](https://www.facebook.com/facebookmedia/get-started/live)
+* [Mixer parameters](https://watchbeam.zendesk.com/hc/en-us/articles/210090606-Stream-Settings-the-basics)
+* Mixer [server list](https://watchbeam.zendesk.com/hc/en-us/articles/209659883-How-to-change-your-Ingest-Server)
+* [Ustream parameters](https://support.ustream.tv/hc/en-us/articles/207852117-Internet-connection-and-recommended-encoding-settings)
+* Vimeo [config](https://help.vimeo.com/hc/en-us/articles/115012811168)
+* Vimeo [parameters](https://help.vimeo.com/hc/en-us/articles/115012811208-Encoder-guides)
 
 ### Logo Credits
 
--   Owl PC: Creative Commons no attrib. commercial
--   YouTube: YouTube Brand Resources
--   Facebook: Wikimedia Commons
--   [Periscope](periscope.tv/press)
+* Owl PC: Creative Commons no attrib. commercial
+* YouTube: YouTube Brand Resources
+* Facebook: Wikimedia Commons
+* [Periscope](periscope.tv/press)
 

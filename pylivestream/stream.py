@@ -58,8 +58,7 @@ class Stream:
         if kwargs.get('image'):
             self.image = Path(kwargs['image']).expanduser()
         else:
-            # Must be pathlib.Path for detection
-            self.image = utils.get_pkgfile('data/logo.png')
+            self.image = None
 
         self.loop: bool = kwargs.get('loop')
 
@@ -96,18 +95,19 @@ class Stream:
             self.fps: float = C.getint(self.site, 'webcam_fps')
             self.movingimage = self.staticimage = False
         elif self.vidsource == 'screen':
-            self.res: List[str] = C.get(self.site, 'screencap_res').split('x')
-            self.fps: float = C.getint(self.site, 'screencap_fps')
+            self.res = C.get(self.site, 'screencap_res').split('x')
+            self.fps = C.getint(self.site, 'screencap_fps')
             self.origin: List[str] = C.get(self.site, 'screencap_origin').split(',')
             self.movingimage = self.staticimage = False
         elif self.vidsource == 'file':  # streaming video from a file
-            self.res: List[str] = utils.get_resolution(self.infn, self.probeexe)
-            self.fps: float = utils.get_framerate(self.infn, self.probeexe)
+            self.res = utils.get_resolution(self.infn, self.probeexe)
+            self.fps = utils.get_framerate(self.infn, self.probeexe)
         elif self.vidsource is None and self.image:  # audio-only stream + background image
-            self.res: List[str] = utils.get_resolution(self.image, self.probeexe)
-            self.fps: float = utils.get_framerate(self.infn, self.probeexe)
-        else:
-            logging.warning('no video source selected')
+            self.res = utils.get_resolution(self.image, self.probeexe)
+            self.fps = utils.get_framerate(self.infn, self.probeexe)
+        else:  # audio-only
+            self.res = None
+            self.fps = None
 
         if self.res is not None and len(self.res) != 2:
             raise ValueError(f'need height, width of video resolution, I have: {self.res}')
@@ -178,6 +178,9 @@ class Stream:
          The settings below still save video/data bandwidth for the still image
          + audio case.
         """
+        if self.res is None:  # audio-only, no image or video
+            return []
+
         fps = self.fps if self.fps is not None else FPS
 
         v += ['-preset', self.preset,
@@ -356,21 +359,3 @@ class Stream:
         buf += ['-f', 'flv']
 
         return buf
-
-    def check_device(self, site: str = None) -> bool:
-        """
-        requires stream to have been configured first.
-        does a quick test stream to "null" to verify device is actually accessible
-        """
-        if not site:
-            try:
-                site = self.site
-            except AttributeError:
-                site = list(self.streams.keys())[0]  # type: ignore
-
-        try:
-            checkcmd = self.checkcmd  # type: ignore
-        except AttributeError:
-            checkcmd = self.streams[site].checkcmd  # type: ignore
-
-        return utils.check_device(checkcmd)

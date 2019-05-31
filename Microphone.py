@@ -1,13 +1,8 @@
 #!/usr/bin/env python
 """
-LIVE STREAM using FFmpeg -- webcam
-
-https://www.scivision.co/youtube-live-ffmpeg-livestream/
-
-Windows: get DirectShow device list from::
-
-   ffmpeg -list_devices true -f dshow -i dummy
+Livestream: Image + microphone audio
 """
+
 import pylivestream as pls
 import signal
 from argparse import ArgumentParser
