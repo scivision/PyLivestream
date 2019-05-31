@@ -9,7 +9,7 @@ https://www.scivision.co/youtube-live-ffmpeg-livestream/
 https://support.google.com/youtube/answer/2853702
 """
 from pathlib import Path
-from typing import List, Union, Iterable
+from typing import List, Union
 import pylivestream as pls
 import random
 import signal
@@ -44,17 +44,17 @@ def playonce(flist: List[Path], image: Path, site: str, inifn: Path,
         s.golive()
 
 
-def fileglob(path: Union[str, Path], glob: str) -> Iterable[Path]:
+def fileglob(path: Union[str, Path], glob: str) -> List[Path]:
     path = Path(path).expanduser()
 
     if glob:
         if not path.is_dir():
             raise NotADirectoryError(path)
-        flist = path.glob(glob)
+        flist = list(path.glob(glob))
     else:  # assume single file
         if not path.is_file():
             raise FileNotFoundError(path)
-        flist = (p for p in [path])
+        flist = [path]
 
     if not flist:
         raise FileNotFoundError(f'did not find files with {path} {glob}')
