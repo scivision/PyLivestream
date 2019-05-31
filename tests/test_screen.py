@@ -14,7 +14,7 @@ WSL = 'Microsoft' in platform.uname().release
 
 
 def test_props():
-    S = pls.Screenshare(inifn=None, websites=sites)
+    S = pls.Screenshare(inifn=None, websites=sites, key='abc')
     for s in S.streams:
         assert '-re' not in S.streams[s].cmd
         assert S.streams[s].fps == approx(30.)
@@ -28,7 +28,7 @@ def test_props():
 @pytest.mark.timeout(TIMEOUT)
 @pytest.mark.skipif(CI or WSL, reason='has no GUI')
 def test_stream():
-    S = pls.Screenshare(inifn=None, websites='localhost', timeout=5)
+    S = pls.Screenshare(inifn=None, websites='localhost', timeout=5, key='abc')
 
     S.golive()
 

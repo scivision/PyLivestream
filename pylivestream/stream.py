@@ -4,7 +4,7 @@ import logging
 import os
 import sys
 from configparser import ConfigParser
-from typing import Tuple, List, Union
+from typing import List
 #
 from . import utils
 from .ffmpeg import Ffmpeg
@@ -44,49 +44,42 @@ FPS: float = 30.  # default frames/sec if not defined otherwise
 # %% top level
 class Stream:
 
-    def __init__(self, inifn: Path, site: str, *,
-                 vidsource: str = None,
-                 image: Path = None,
-                 loop: bool = False, infn: Path = None,
-                 caption: str = None,
-                 yes: bool = False,
-                 timeout: int = None,
-                 verbose: bool = False) -> None:
+    def __init__(self, inifn: Path, site: str, **kwargs) -> None:
 
         self.F = Ffmpeg()
 
-        self.loglevel: List[str] = self.F.INFO if verbose else self.F.ERROR
+        self.loglevel: List[str] = self.F.INFO if kwargs.get('verbose') else self.F.ERROR
 
-        self.inifn: Path = inifn
+        self.inifn: Path = Path(inifn).expanduser() if inifn else None
 
         self.site: str = site
-        self.vidsource = vidsource
+        self.vidsource = kwargs.get('vidsource')
 
-        if image:
-            self.image = Path(image).expanduser()
+        if kwargs.get('image'):
+            self.image = Path(kwargs['image']).expanduser()
         else:
             # Must be pathlib.Path for detection
             self.image = utils.get_pkgfile('data/logo.png')
 
-        self.loop: bool = loop
+        self.loop: bool = kwargs.get('loop')
 
-        self.infn = Path(infn).expanduser() if infn else None
-        self.yes: List[str] = self.F.YES if yes else []
+        self.infn = Path(kwargs['infn']).expanduser() if kwargs.get('infn') else None
+        self.yes: List[str] = self.F.YES if kwargs.get('yes') else []
 
         self.queue: List[str] = []  # self.F.QUEUE
 
-        self.caption: Union[str, None] = caption
+        self.caption: str = kwargs.get('caption')
 
-        self.timelimit: List[str] = self.F.timelimit(timeout)
+        self.timelimit: List[str] = self.F.timelimit(kwargs.get('timeout'))
 
-    def osparam(self):
+    def osparam(self, key: str):
         """load OS specific config"""
 
         C = ConfigParser(inline_comment_prefixes=('#', ';'))
         if self.inifn is None:
             self.inifn = utils.get_pkgfile('pylivestream.ini')
 
-        C.read_string(Path(self.inifn).expanduser().read_text(), source=self.inifn)
+        C.read_string(Path(self.inifn).expanduser().read_text(), source=str(self.inifn))
 
         if self.site not in C:
             raise ValueError(f'streaming site {self.site} not found in configuration file {self.inifn}')
@@ -99,27 +92,27 @@ class Stream:
                                                      fallback='ffmpeg'))
 
         if self.vidsource == 'camera':
-            self.res: Tuple[int, int] = C.get(self.site,
-                                              'webcam_res').split('x')
+            self.res: List[str] = C.get(self.site, 'webcam_res').split('x')
             self.fps: float = C.getint(self.site, 'webcam_fps')
             self.movingimage = self.staticimage = False
         elif self.vidsource == 'screen':
-            self.res: Tuple[int, int] = C.get(self.site,
-                                              'screencap_res').split('x')
+            self.res: List[str] = C.get(self.site, 'screencap_res').split('x')
             self.fps: float = C.getint(self.site, 'screencap_fps')
-            self.origin: Tuple[int, int] = C.get(self.site,
-                                                 'screencap_origin').split(',')
+            self.origin: List[str] = C.get(self.site, 'screencap_origin').split(',')
             self.movingimage = self.staticimage = False
         elif self.vidsource == 'file':  # streaming video from a file
-            self.res: Tuple[int, int] = utils.get_resolution(self.infn, self.probeexe)
+            self.res: List[str] = utils.get_resolution(self.infn, self.probeexe)
             self.fps: float = utils.get_framerate(self.infn, self.probeexe)
-        elif self.vidsource is None and self.image:  # audio-only stream with background image
-            self.res: Tuple[int, int] = utils.get_resolution(self.image, self.probeexe)
+        elif self.vidsource is None and self.image:  # audio-only stream + background image
+            self.res: List[str] = utils.get_resolution(self.image, self.probeexe)
             self.fps: float = utils.get_framerate(self.infn, self.probeexe)
         else:
             logging.warning('no video source selected')
 
-        self.audiofs: int = C.get(self.site, 'audiofs')  # not getint
+        if self.res is not None and len(self.res) != 2:
+            raise ValueError(f'need height, width of video resolution, I have: {self.res}')
+
+        self.audiofs: str = C.get(self.site, 'audiofs')
         self.preset: str = C.get(self.site, 'preset')
 
         if not self.timelimit:
@@ -139,13 +132,16 @@ class Stream:
         self.hcam: str = C.get(sys.platform, 'hcam')
 
         self.video_kbps: int = C.getint(self.site, 'video_kbps', fallback=None)
-        self.audio_bps: int = C.get(self.site, 'audio_bps')
+        self.audio_bps: str = C.get(self.site, 'audio_bps')
 
         self.keyframe_sec: int = C.getint(self.site, 'keyframe_sec')
 
         self.server: str = C.get(self.site, 'server', fallback=None)
 # %% Key (hexaecimal stream ID)
-        self.key: str = utils.getstreamkey(C.get(self.site, 'key', fallback=None))
+        if key:
+            self.key: str = utils.getstreamkey(key)
+        else:
+            self.key = utils.getstreamkey(C.get(self.site, 'key', fallback=None))
 
     def videoIn(self, quick: bool = False) -> List[str]:
         """

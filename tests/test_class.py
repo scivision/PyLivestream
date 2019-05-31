@@ -41,7 +41,7 @@ def test_exe(rex):
 def test_attrs(inp):
     assert pls.utils.get_resolution(inp) is None
 
-    assert pls.utils.get_resolution(VIDFN) == (426, 240)
+    assert pls.utils.get_resolution(VIDFN) == [426, 240]
     assert pls.utils.get_framerate(VIDFN) == approx(24.0)
 
 

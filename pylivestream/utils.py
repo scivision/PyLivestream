@@ -83,7 +83,7 @@ def get_pkgfile(fn: Union[str, Path]) -> Path:
     return f2
 
 
-def getexe(exein: Path = None) -> Tuple[str, str]:
+def getexe(exein: str = None) -> Tuple[str, str]:
     """checks that host streaming program is installed"""
 
     if not exein:
@@ -106,7 +106,7 @@ def getexe(exein: Path = None) -> Tuple[str, str]:
     return exe, probeexe
 
 
-def get_meta(fn: Path, exein: Path = None) -> Union[None, dict]:
+def get_meta(fn: Path, exein: str = None) -> Union[None, dict]:
     if not fn:  # audio-only
         return None
 
@@ -143,7 +143,7 @@ def meta_caption(meta) -> str:
     return caption
 
 
-def get_resolution(fn: Path, exe: Path = None) -> Union[None, Tuple[int, int]]:
+def get_resolution(fn: Path, exe: str = None) -> List[str]:
     """
     get resolution (widthxheight) of video file
     http://trac.ffmpeg.org/wiki/FFprobeTips#WidthxHeight
@@ -170,13 +170,13 @@ def get_resolution(fn: Path, exe: Path = None) -> Union[None, Tuple[int, int]]:
     for s in meta['streams']:
         if s['codec_type'] != 'video':
             continue
-        res = (s['width'], s['height'])
+        res = [s['width'], s['height']]
         break
 
     return res
 
 
-def get_framerate(fn: Path, exe: Path = None) -> Union[None, float]:
+def get_framerate(fn: Path, exe: str = None) -> float:
     """
     get framerate of video file
     http://trac.ffmpeg.org/wiki/FFprobeTips#FrameRate
