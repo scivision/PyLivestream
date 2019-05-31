@@ -20,7 +20,7 @@ WSL = 'Microsoft' in platform.uname().release
 
 def test_props():
     S = pls.Microphone(inifn=None, websites=sites,
-                       image=LOGO)
+                       image=LOGO, key='abc')
 
     for s in S.streams:
         assert '-re' not in S.streams[s].cmd
@@ -35,7 +35,7 @@ def test_props():
 
 def test_4Kbg():
     S = pls.Microphone(inifn=None, websites=sites,
-                       image=IMG4K)
+                       image=IMG4K, key='abc')
 
     for s in S.streams:
         assert '-re' not in S.streams[s].cmd

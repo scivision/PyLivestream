@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Union, Dict, Sequence
+from typing import List, Dict, Sequence
 import logging
 #
 from . import stream
@@ -11,22 +11,12 @@ __all__ = ['FileIn', 'Microphone', 'SaveDisk', 'Screenshare', 'Webcam']
 class Livestream(stream.Stream):
 
     def __init__(self,
-                 inifn: Path, site: str, *,
-                 vidsource: str = None,
-                 image: Path = None,
-                 loop: bool = False,
-                 infn: Path = None,
-                 caption: str = None,
-                 yes: bool = False,
-                 timeout: int = None) -> None:
-        super().__init__(inifn, site, vidsource=vidsource,
-                         image=image, loop=loop,
-                         infn=infn, caption=caption, yes=yes,
-                         timeout=timeout)
+                 inifn: Path, site: str, **kwargs) -> None:
+        super().__init__(inifn, site, **kwargs)
 
         self.site = site.lower()
 
-        self.osparam()
+        self.osparam(kwargs.get('key'))
 
         self.video_bitrate()
 
@@ -134,22 +124,16 @@ class Livestream(stream.Stream):
 # %% operators
 class Screenshare(Livestream):
 
-    def __init__(self,
-                 inifn: Path,
-                 websites: Union[str, Sequence[str]],
-                 caption: str = None,
-                 yes: bool = False,
-                 timeout: int = None):
-
-        vidsource = 'screen'
+    def __init__(self,  inifn: Path,
+                 websites: Sequence[str], **kwargs):
 
         if isinstance(websites, str):
             websites = [websites]
 
         streams = {}
         for site in websites:
-            streams[site] = Livestream(inifn, site, vidsource=vidsource,
-                                       caption=caption, yes=yes, timeout=timeout)
+            streams[site] = Livestream(inifn, site, vidsource='screen',
+                                       **kwargs)
 
         self.streams: Dict[str, Livestream] = streams
 
@@ -166,23 +150,16 @@ class Screenshare(Livestream):
 
 class Webcam(Livestream):
 
-    def __init__(self,
-                 inifn: Path,
-                 websites: Union[str, Sequence[str]], *,
-                 caption: str = None,
-                 yes: bool = False,
-                 timeout: int = None):
-
-        vidsource = 'camera'
+    def __init__(self, inifn: Path,
+                 websites: Sequence[str], **kwargs):
 
         if isinstance(websites, str):
             websites = [websites]
 
         streams = {}
         for site in websites:
-            streams[site] = Livestream(inifn, site, vidsource=vidsource,
-                                       caption=caption, yes=yes,
-                                       timeout=timeout)
+            streams[site] = Livestream(inifn, site, vidsource='camera',
+                                       **kwargs)
 
         self.streams: Dict[str, Livestream] = streams
 
@@ -201,20 +178,14 @@ class Microphone(Livestream):
 
     def __init__(self,
                  inifn: Path,
-                 websites: Union[str, Sequence[str]], *,
-                 image: Path,
-                 caption: str = None,
-                 yes: bool = False,
-                 timeout: int = None):
+                 websites: Sequence[str], **kwargs):
 
         if isinstance(websites, str):
             websites = [websites]
 
         streams = {}
         for site in websites:
-            streams[site] = Livestream(inifn, site, image=image,
-                                       loop=True,
-                                       caption=caption, yes=yes, timeout=timeout)
+            streams[site] = Livestream(inifn, site, **kwargs)
 
         self.streams: Dict[str, Livestream] = streams
 
@@ -234,24 +205,15 @@ class FileIn(Livestream):
 
     def __init__(self,
                  inifn: Path,
-                 websites: Union[str, Sequence[str]], *,
-                 infn: Path,
-                 loop: bool = False,
-                 image: Path = None,
-                 caption: str = None,
-                 yes: bool = False,
-                 timeout: int = None):
-
-        vidsource = 'file'
+                 websites: Sequence[str], **kwargs):
 
         if isinstance(websites, str):
             websites = [websites]
 
         streams = {}
         for site in websites:
-            streams[site] = Livestream(inifn, site, vidsource=vidsource, image=image,
-                                       loop=loop, infn=infn,
-                                       caption=caption, yes=yes, timeout=timeout)
+            streams[site] = Livestream(inifn, site, vidsource='file',
+                                       **kwargs)
 
         self.streams: Dict[str, Livestream] = streams
 
@@ -269,24 +231,18 @@ class FileIn(Livestream):
 class SaveDisk(stream.Stream):
 
     def __init__(self,
-                 inifn: Path, outfn: Path = None, *,
-                 caption: str = None,
-                 yes: bool = False,
-                 timeout: int = None):
+                 inifn: Path, outfn: Path = None, **kwargs):
         """
         records to disk screen capture with audio
 
         if not outfn, just cite command that would have run
         """
-        site = 'file'
-        vidsource = 'screen'
-
-        super().__init__(inifn, site,
-                         vidsource=vidsource, caption=caption, timeout=timeout)
+        super().__init__(inifn, site='file', vidsource='screen',
+                         **kwargs)
 
         self.outfn = Path(outfn).expanduser() if outfn else None
 
-        self.osparam()
+        self.osparam(kwargs.get('key'))
 
         vidIn: List[str] = self.videoIn()
         vidOut: List[str] = self.videoOut()

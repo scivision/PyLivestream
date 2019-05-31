@@ -18,7 +18,7 @@ CI = os.environ.get('CI', None) in ('true', 'True')
 
 
 def test_props():
-    S = pls.FileIn(inifn=None, websites=sites, infn=VIDFN)
+    S = pls.FileIn(inifn=None, websites=sites, infn=VIDFN, key='abc')
     for s in S.streams:
         assert '-re' in S.streams[s].cmd
         assert S.streams[s].fps == approx(24.)
@@ -35,7 +35,7 @@ def test_props():
 def test_audio():
     flist = list(R.glob('*.ogg'))
 
-    S = pls.FileIn(inifn=None, websites=sites, infn=flist[0], image=LOGO)
+    S = pls.FileIn(inifn=None, websites=sites, infn=flist[0], image=LOGO, key='abc')
     for s in S.streams:
         assert '-re' in S.streams[s].cmd
         assert S.streams[s].fps is None

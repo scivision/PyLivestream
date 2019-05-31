@@ -4,7 +4,7 @@ import logging
 import os
 import sys
 from configparser import ConfigParser
-from typing import Tuple, List, Union
+from typing import Tuple, List
 #
 from . import utils
 from .ffmpeg import Ffmpeg
@@ -44,42 +44,35 @@ FPS: float = 30.  # default frames/sec if not defined otherwise
 # %% top level
 class Stream:
 
-    def __init__(self, inifn: Path, site: str, *,
-                 vidsource: str = None,
-                 image: Path = None,
-                 loop: bool = False, infn: Path = None,
-                 caption: str = None,
-                 yes: bool = False,
-                 timeout: int = None,
-                 verbose: bool = False) -> None:
+    def __init__(self, inifn: Path, site: str, **kwargs) -> None:
 
         self.F = Ffmpeg()
 
-        self.loglevel: List[str] = self.F.INFO if verbose else self.F.ERROR
+        self.loglevel: List[str] = self.F.INFO if kwargs.get('verbose') else self.F.ERROR
 
         self.inifn: Path = inifn
 
         self.site: str = site
-        self.vidsource = vidsource
+        self.vidsource = kwargs.get('vidsource')
 
-        if image:
-            self.image = Path(image).expanduser()
+        if kwargs.get('image'):
+            self.image = Path(kwargs['image']).expanduser()
         else:
             # Must be pathlib.Path for detection
             self.image = utils.get_pkgfile('data/logo.png')
 
-        self.loop: bool = loop
+        self.loop: bool = kwargs.get('loop')
 
-        self.infn = Path(infn).expanduser() if infn else None
-        self.yes: List[str] = self.F.YES if yes else []
+        self.infn = Path(kwargs['infn']).expanduser() if kwargs.get('infn') else None
+        self.yes: List[str] = self.F.YES if kwargs.get('yes') else []
 
         self.queue: List[str] = []  # self.F.QUEUE
 
-        self.caption: Union[str, None] = caption
+        self.caption: str = kwargs.get('caption')
 
-        self.timelimit: List[str] = self.F.timelimit(timeout)
+        self.timelimit: List[str] = self.F.timelimit(kwargs.get('timeout'))
 
-    def osparam(self):
+    def osparam(self, key: str):
         """load OS specific config"""
 
         C = ConfigParser(inline_comment_prefixes=('#', ';'))
@@ -145,7 +138,10 @@ class Stream:
 
         self.server: str = C.get(self.site, 'server', fallback=None)
 # %% Key (hexaecimal stream ID)
-        self.key: str = utils.getstreamkey(C.get(self.site, 'key', fallback=None))
+        if key:
+            self.key: str = utils.getstreamkey(key)
+        else:
+            self.key = utils.getstreamkey(C.get(self.site, 'key', fallback=None))
 
     def videoIn(self, quick: bool = False) -> List[str]:
         """
