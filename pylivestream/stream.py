@@ -4,7 +4,7 @@ import logging
 import os
 import sys
 from configparser import ConfigParser
-from typing import Tuple, List
+from typing import List
 #
 from . import utils
 from .ffmpeg import Ffmpeg
@@ -50,7 +50,7 @@ class Stream:
 
         self.loglevel: List[str] = self.F.INFO if kwargs.get('verbose') else self.F.ERROR
 
-        self.inifn: Path = inifn
+        self.inifn: Path = Path(inifn).expanduser() if inifn else None
 
         self.site: str = site
         self.vidsource = kwargs.get('vidsource')
@@ -79,7 +79,7 @@ class Stream:
         if self.inifn is None:
             self.inifn = utils.get_pkgfile('pylivestream.ini')
 
-        C.read_string(Path(self.inifn).expanduser().read_text(), source=self.inifn)
+        C.read_string(Path(self.inifn).expanduser().read_text(), source=str(self.inifn))
 
         if self.site not in C:
             raise ValueError(f'streaming site {self.site} not found in configuration file {self.inifn}')
@@ -92,27 +92,27 @@ class Stream:
                                                      fallback='ffmpeg'))
 
         if self.vidsource == 'camera':
-            self.res: Tuple[int, int] = C.get(self.site,
-                                              'webcam_res').split('x')
+            self.res: List[str] = C.get(self.site, 'webcam_res').split('x')
             self.fps: float = C.getint(self.site, 'webcam_fps')
             self.movingimage = self.staticimage = False
         elif self.vidsource == 'screen':
-            self.res: Tuple[int, int] = C.get(self.site,
-                                              'screencap_res').split('x')
+            self.res: List[str] = C.get(self.site, 'screencap_res').split('x')
             self.fps: float = C.getint(self.site, 'screencap_fps')
-            self.origin: Tuple[int, int] = C.get(self.site,
-                                                 'screencap_origin').split(',')
+            self.origin: List[str] = C.get(self.site, 'screencap_origin').split(',')
             self.movingimage = self.staticimage = False
         elif self.vidsource == 'file':  # streaming video from a file
-            self.res: Tuple[int, int] = utils.get_resolution(self.infn, self.probeexe)
+            self.res: List[str] = utils.get_resolution(self.infn, self.probeexe)
             self.fps: float = utils.get_framerate(self.infn, self.probeexe)
-        elif self.vidsource is None and self.image:  # audio-only stream with background image
-            self.res: Tuple[int, int] = utils.get_resolution(self.image, self.probeexe)
+        elif self.vidsource is None and self.image:  # audio-only stream + background image
+            self.res: List[str] = utils.get_resolution(self.image, self.probeexe)
             self.fps: float = utils.get_framerate(self.infn, self.probeexe)
         else:
             logging.warning('no video source selected')
 
-        self.audiofs: int = C.get(self.site, 'audiofs')  # not getint
+        if self.res is not None and len(self.res) != 2:
+            raise ValueError(f'need height, width of video resolution, I have: {self.res}')
+
+        self.audiofs: str = C.get(self.site, 'audiofs')
         self.preset: str = C.get(self.site, 'preset')
 
         if not self.timelimit:
@@ -132,7 +132,7 @@ class Stream:
         self.hcam: str = C.get(sys.platform, 'hcam')
 
         self.video_kbps: int = C.getint(self.site, 'video_kbps', fallback=None)
-        self.audio_bps: int = C.get(self.site, 'audio_bps')
+        self.audio_bps: str = C.get(self.site, 'audio_bps')
 
         self.keyframe_sec: int = C.getint(self.site, 'keyframe_sec')
 

@@ -25,7 +25,7 @@ def test_props():
     for s in S.streams:
         assert '-re' not in S.streams[s].cmd
         assert S.streams[s].fps is None
-        assert S.streams[s].res == (720, 540)
+        assert S.streams[s].res == [720, 540]
 
         if s == 'periscope':
             assert S.streams[s].video_kbps == 800
@@ -40,7 +40,7 @@ def test_4Kbg():
     for s in S.streams:
         assert '-re' not in S.streams[s].cmd
         assert S.streams[s].fps is None
-        assert S.streams[s].res == (3840, 2160)
+        assert S.streams[s].res == [3840, 2160]
 
         if s == 'periscope':
             assert S.streams[s].video_kbps == 800
