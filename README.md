@@ -34,6 +34,12 @@ FFmpeg is used from Python `subprocess` to stream to sites including:
 * is not intended for bidirectional robust streaming--consider a program/system based on Jitsi for that.
 * generally does not work from Windows Subsystem for Linux 1 because of lack of hardware interface in WSL1. It works fine from native Windows.
 
+### Design rationale
+
+Why not do things without the command line, via linking libffmpeg, libgstreamer or libav? 
+
+* the command-line approach does not require a compiler or OS-dependent libraries
+* once you get a setup working once, you don't even need Python anymore--just copy and paste the command line
 
 
 ## Install
