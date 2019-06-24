@@ -44,7 +44,7 @@ FPS: float = 30.  # default frames/sec if not defined otherwise
 # %% top level
 class Stream:
 
-    def __init__(self, inifn: Path, site: str, **kwargs) -> None:
+    def __init__(self, inifn: Path, site: str, **kwargs):
 
         self.F = Ffmpeg()
 
