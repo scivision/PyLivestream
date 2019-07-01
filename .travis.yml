@@ -20,6 +20,16 @@ addons:
 matrix:
   include:
   - os: linux
+    name: Integration install
+    python: 3.7
+    install:
+    - python setup.py install
+    - pip install $(basename $TRAVIS_REPO_SLUG)[tests]
+    script:
+    - cd $HOME
+    - python -m pytest $TRAVIS_BUILD_DIR/tests
+  - os: linux
+    name: PEP8 MyPy Cov
     python: 3.7
     install: pip install -e .[tests,cov]
     script:
@@ -43,5 +53,5 @@ matrix:
 
 install: pip install -e .[tests]
 
-script: pytest -rsv
+script: pytest -r a -v
 

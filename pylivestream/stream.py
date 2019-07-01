@@ -116,9 +116,7 @@ class Stream:
         self.preset: str = C.get(self.site, 'preset')
 
         if not self.timelimit:
-            self.timelimit: List[str] = self.F.timelimit(C.get(self.site,
-                                                               'timelimit',
-                                                               fallback=None))
+            self.timelimit = self.F.timelimit(C.get(self.site, 'timelimit', fallback=None))
 
         # NOTE: This used to be 'videochan' but that was too generic.
         self.webcamchan: str = C.get(sys.platform, 'webcamchan', fallback=None)
@@ -317,8 +315,8 @@ class Stream:
         """
         # assumes GIF is animated
         if isinstance(self.image, Path):
-            self.movingimage: bool = self.image.suffix in ('.gif', '.avi', '.ogv', '.mp4')
-            self.staticimage: bool = not self.movingimage
+            self.movingimage = self.image.suffix in ('.gif', '.avi', '.ogv', '.mp4')
+            self.staticimage = not self.movingimage
         else:
             self.movingimage = self.staticimage = False
 # %% throttle software-only sources
