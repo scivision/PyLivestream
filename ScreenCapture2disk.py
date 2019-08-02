@@ -2,7 +2,7 @@
 """
 Save to disk screen capture for upload to YOUTUBE using FFMPEG
 
-https://www.scivision.co/youtube-ffmpeg-screen-capture-with-audio/
+https://www.scivision.dev/youtube-ffmpeg-screen-capture-with-audio/
 https://trac.ffmpeg.org/wiki/Capture/Desktop
 https://support.google.com/youtube/answer/2853702
 

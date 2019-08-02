@@ -1,0 +1,122 @@
+variables:
+  CI: true
+
+stages:
+
+- stage: SyntaxChecks
+  jobs:
+
+  - job: PEP8_MyPy_Python37
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '3.7'
+        addToPath: true
+    - script: pip install -e .[tests,cov]
+      displayName: 'Dev install'
+    - script: flake8
+      displayName: PEP8
+    - script: mypy .
+      displayName: Type Check
+
+- stage: PackageInstall
+  jobs:
+
+  - job: Ubuntu
+    pool:
+      vmImage: ubuntu-latest
+
+    steps:
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '3.7'
+        addToPath: true
+    - script: |
+        python setup.py install
+        pip install $(project_name)[tests]
+      displayName: 'hard install'
+    - script: |
+        cd $HOME
+        python -m pytest $(Build.SourcesDirectory) -r a -v
+      displayName: 'Build Python'
+
+- stage: IntegrationTests
+  jobs:
+
+  - job: Ubuntu
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '3.6'
+        addToPath: true
+    - script: sudo apt install -yq --no-install-recommends ffmpeg
+      displayName: 'Install Prereqs'
+    - script: pip install -e .[tests]
+      displayName: 'Dev install'
+    - script: pytest -r a -v
+      displayName: PyTest
+
+  - job: MacOS
+    pool:
+      vmImage: macos-latest
+    steps:
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '3.6'
+        addToPath: true
+    - script: brew install ffmpeg
+      displayName: 'Install Prereqs'
+    - script: pip install -e .[tests]
+      displayName: 'Dev install'
+    - script: pytest -r a -v
+      displayName: PyTest
+
+  - job: Windows
+    pool:
+      vmImage: windows-latest
+    steps:
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '3.6'
+        addToPath: true
+    - script: cinst -y ffmpeg
+      displayName: 'Install Prereqs'
+    - script: pip install -e .[tests]
+      displayName: 'Dev install'
+    - script: pytest -r a -v
+      displayName: PyTest
+
+- stage: CoverageTests
+
+  jobs:
+  - job: Coverage
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '3.7'
+        addToPath: true
+    - script: sudo apt install -yq --no-install-recommends ffmpeg
+      displayName: 'Install Prereqs'
+    - script: pip install -e .[tests,cov]
+      displayName: 'Dev install'
+    - script: pytest --junitxml=junit/test-results.xml --cov --cov-report=xml --cov-report=html
+      displayName: Coverage
+
+    - task: PublishTestResults@2
+      condition: succeededOrFailed()
+      inputs:
+        testResultsFiles: '**/test-*.xml'
+        testRunTitle: 'Publish test results for Python $(python.version)'
+# https://docs.microsoft.com/en-us/azure/devops/pipelines/languages/python?view=azure-devops#publish-code-coverage-results
+    - task: PublishCodeCoverageResults@1
+      condition: succeeded()
+      inputs:
+        codeCoverageTool: Cobertura
+        summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
+        reportDirectory: '$(System.DefaultWorkingDirectory)/**/htmlcov'

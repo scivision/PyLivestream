@@ -2,7 +2,7 @@
 """
 LIVE STREAM using FFmpeg -- webcam
 
-https://www.scivision.co/youtube-live-ffmpeg-livestream/
+https://www.scivision.dev/youtube-live-ffmpeg-livestream/
 
 Windows: get DirectShow device list from::
 

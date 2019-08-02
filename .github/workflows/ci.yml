@@ -1,0 +1,99 @@
+name: ci
+
+on: [push, pull_request]
+
+jobs:
+
+  lint:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 3
+      matrix:
+        python-version: [3.6, 3.7]
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: pip install -e .[lint]
+    - name: Lint
+      run: flake8
+    - name: Type check
+      run: mypy .
+
+  linux:
+    needs: [lint]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7
+    - name: Install dependencies
+      run: pip install -e .[tests]
+    - name: Install packages
+      run: sudo apt install -yq --no-install-recommends ffmpeg
+    - name: run Pytest
+      run: pytest -r a -v
+      env:
+        CI: true
+
+  macos:
+    needs: [lint]
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7
+    - name: Install dependencies
+      run: pip install -e .[tests]
+    - name: Install packages
+      run: brew install ffmpeg
+    - name: run Pytest
+      run: pytest -r a -v
+      env:
+        CI: true
+
+  windows:
+    needs: [lint]
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7
+    - name: Install dependencies
+      run: pip install -e .[tests]
+    - name: Install packages
+      run: cinst -y ffmpeg
+    - name: run Pytest
+      run: pytest -r a -v
+      env:
+        CI: true
+
+  install:
+    needs: [lint]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7
+    - name: Install Python package
+      run: python setup.py install
+    - name: Install packages
+      run: sudo apt install -yq --no-install-recommends ffmpeg
+    - name: run Pytest
+      run: |
+        cd ${HOME}
+        python -m pip install pytest
+        python -m pytest ${GITHUB_WORKSPACE} -r a -v
+      env:
+        CI: true

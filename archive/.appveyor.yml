@@ -21,4 +21,3 @@ init:
 install: pip install -e .[tests]
 
 test_script: pytest -r a -v
-
