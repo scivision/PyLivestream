@@ -4,96 +4,49 @@ on: [push, pull_request]
 
 jobs:
 
-  lint:
+  linux:
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: 3
       matrix:
-        python-version: [3.6, 3.7]
+        python-version: [3.6, '3.x']
     steps:
     - uses: actions/checkout@v1
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
+    - uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: pip install -e .[lint]
-    - name: Lint
-      run: flake8
-    - name: Type check
-      run: mypy .
-
-  linux:
-    needs: [lint]
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v1
-    - name: Set up Python
-      uses: actions/setup-python@v1
-      with:
-        python-version: 3.7
-    - name: Install dependencies
-      run: pip install -e .[tests]
-    - name: Install packages
-      run: sudo apt install -yq --no-install-recommends ffmpeg
-    - name: run Pytest
-      run: pytest -r a -v
+    - run: pip install .[tests,lint]
+    - run: flake8
+    - run: mypy .
+    - run: sudo apt install -yq --no-install-recommends ffmpeg
+    - run: pytest -r a -v
+      working-directory: tests
       env:
         CI: true
 
   macos:
-    needs: [lint]
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v1
-    - name: Set up Python
-      uses: actions/setup-python@v1
+    - uses: actions/setup-python@v1
       with:
-        python-version: 3.7
-    - name: Install dependencies
-      run: pip install -e .[tests]
-    - name: Install packages
-      run: brew install ffmpeg
-    - name: run Pytest
-      run: pytest -r a -v
+        python-version: '3.x'
+    - run: pip install .[tests]
+    - run: brew install ffmpeg
+    - run: pytest -r a -v
+      working-directory: tests
       env:
         CI: true
 
   windows:
-    needs: [lint]
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v1
-    - name: Set up Python
-      uses: actions/setup-python@v1
+    - uses: actions/setup-python@v1
       with:
-        python-version: 3.7
-    - name: Install dependencies
-      run: pip install -e .[tests]
-    - name: Install packages
-      run: cinst -y ffmpeg
-    - name: run Pytest
-      run: pytest -r a -v
-      env:
-        CI: true
-
-  install:
-    needs: [lint]
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v1
-    - name: Set up Python
-      uses: actions/setup-python@v1
-      with:
-        python-version: 3.7
-    - name: Install Python package
-      run: python setup.py install
-    - name: Install packages
-      run: sudo apt install -yq --no-install-recommends ffmpeg
-    - name: run Pytest
-      run: |
-        cd ${HOME}
-        python -m pip install pytest
-        python -m pytest ${GITHUB_WORKSPACE} -r a -v
+        python-version: '3.x'
+    - run: pip install .[tests]
+    - run: cinst -y ffmpeg
+    - run: pytest -r a -v
+      working-directory: tests
       env:
         CI: true
