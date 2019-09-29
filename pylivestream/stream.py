@@ -76,7 +76,8 @@ class Stream:
 
         C = ConfigParser(inline_comment_prefixes=('#', ';'))
         if self.inifn is None:
-            self.inifn = utils.get_pkgfile('pylivestream.ini')
+            logging.info('using package default pylivestream.ini')
+            self.inifn = utils.get_inifile('pylivestream.ini')
 
         C.read_string(Path(self.inifn).expanduser().read_text(), source=str(self.inifn))
 

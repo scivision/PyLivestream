@@ -8,6 +8,11 @@ R = Path(__file__).parent
 VIDFN = R / 'bunny.avi'
 
 
+@pytest.mark.parametrize('fn', ['pylivestream.ini'])
+def test_get_ini_file(fn):
+    assert pls.utils.get_inifile(fn).is_file()
+
+
 @pytest.mark.parametrize('keyin,keyout', [('abc123', 'abc123'),
                                           (R/'periscope.key', 'abcd1234')])
 def test_key(keyin, keyout):

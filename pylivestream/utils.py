@@ -49,38 +49,28 @@ def check_device(cmd: List[str]) -> bool:
     return ok
 
 
-def check_display(fn: Path = None) -> bool:
+def check_display(fn: str = None) -> bool:
     """see if it's possible to display something with a test file"""
-    if isinstance(fn, Path) and not fn.is_file():
-        raise FileNotFoundError(fn)
 
-    if fn is None:
-        fn = get_pkgfile('logo.png')
+    if not fn:
+        fn = pkg_resources.resource_filename(__name__, 'logo.png')
 
-    cmd = ['ffplay', '-v', 'error', '-t', '1.0', '-autoexit', str(fn)]
+    cmd = ['ffplay', '-v', 'error', '-t', '1.0', '-autoexit', fn]
 
     ret = subprocess.run(cmd, timeout=10).returncode
 
     return ret == 0
 
 
-def get_pkgfile(fn: Union[str, Path]) -> Path:
-    fn = Path(fn).expanduser()
-
-    flist: List[Union[str, Path]] = [fn, fn.name]
-    for f1 in flist:
-        f2 = Path(pkg_resources.resource_filename(__name__, str(f1)))
-        if f2.is_file():
+def get_inifile(fn: str) -> Path:
+    for file in [fn, '~/pylivestream.ini', pkg_resources.resource_filename(__name__, 'pylivestream.ini')]:
+        if not file:
+            continue
+        inifn = Path(file).expanduser()
+        if inifn.is_file():
             break
 
-        f2 = Path(sys.prefix) / 'share/pylivestream' / f1
-        if f2.is_file():
-            break
-
-    if not f2.is_file():
-        raise FileNotFoundError(fn)
-
-    return f2
+    return inifn
 
 
 def getexe(exein: str = None) -> Tuple[str, str]:
