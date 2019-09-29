@@ -7,7 +7,7 @@ from configparser import ConfigParser
 from typing import List
 #
 from . import utils
-from .ffmpeg import Ffmpeg
+from .ffmpeg import Ffmpeg, get_exe
 
 # %%  Col0: vertical pixels (height). Col1: video kbps. Interpolates.
 # NOTE: Python >= 3.6 has guaranteed dict() order.
@@ -81,15 +81,15 @@ class Stream:
 
         C.read_string(Path(self.inifn).expanduser().read_text(), source=str(self.inifn))
 
+        self.exe = get_exe(C.get(sys.platform, 'exe', fallback='ffmpeg'))
+        self.probeexe = get_exe(C.get(sys.platform, 'ffprobe_exe', fallback='ffprobe'))
+
         if self.site not in C:
             raise ValueError(f'streaming site {self.site} not found in configuration file {self.inifn}')
 
         if 'XDG_SESSION_TYPE' in os.environ:
             if os.environ['XDG_SESSION_TYPE'] == 'wayland':
                 logging.error('Wayland may only give black output. Try X11')
-
-        self.exe, self.probeexe = utils.getexe(C.get(sys.platform, 'exe',
-                                                     fallback='ffmpeg'))
 
         if self.vidsource == 'camera':
             self.res: List[str] = C.get(self.site, 'webcam_res').split('x')

@@ -5,6 +5,7 @@ import os
 #
 from . import stream
 from . import utils
+from . import ffmpeg
 
 __all__ = ['FileIn', 'Microphone', 'SaveDisk', 'Screenshare', 'Webcam']
 

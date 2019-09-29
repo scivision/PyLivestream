@@ -33,15 +33,10 @@ def test_bad_key(key, excp):
         assert pls.utils.getstreamkey(key) is None
 
 
-@pytest.mark.parametrize('rex', (None, '', 'ffmpeg'))
+@pytest.mark.parametrize('rex', ('ffmpeg', 'ffprobe'))
 def test_exe(rex):
-    exe, pexe = pls.utils.getexe()
-    assert 'ffmpeg' in exe
-    assert 'ffprobe' in pexe
-
-    exe, pexe = pls.utils.getexe(rex)
-    assert 'ffmpeg' in exe
-    assert 'ffprobe' in pexe
+    exe = pls.ffmpeg.get_exe(rex)
+    assert rex in exe
 
 
 @pytest.mark.parametrize('inp', (None, ''))

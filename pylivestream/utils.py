@@ -1,16 +1,13 @@
-import json
 import logging
 import subprocess
 from pathlib import Path
 import sys
-import shutil
-from typing import Tuple, Union, List
+import typing
 import pkg_resources
+from .ffmpeg import get_meta
 
-DEVNULL = subprocess.DEVNULL
 
-
-def run(cmd: List[str]):
+def run(cmd: typing.Sequence[str]):
     """
     FIXME: shell=True for Windows seems necessary to specify devices enclosed by "" quotes
     """
@@ -38,7 +35,7 @@ Better to let users know there's a problem.
 """
 
 
-def check_device(cmd: List[str]) -> bool:
+def check_device(cmd: typing.Sequence[str]) -> bool:
     try:
         run(cmd)
         ok = True
@@ -55,7 +52,7 @@ def check_display(fn: str = None) -> bool:
     if not fn:
         fn = pkg_resources.resource_filename(__name__, 'logo.png')
 
-    cmd = ['ffplay', '-v', 'error', '-t', '1.0', '-autoexit', fn]
+    cmd = ['ffplay', '-loglevel', 'error', '-t', '1.0', '-autoexit', fn]
 
     ret = subprocess.run(cmd, timeout=10).returncode
 
@@ -71,49 +68,6 @@ def get_inifile(fn: str) -> Path:
             break
 
     return inifn
-
-
-def getexe(exein: str = None) -> Tuple[str, str]:
-    """checks that host streaming program is installed"""
-
-    if not exein:
-        exe = 'ffmpeg'
-        probeexe = 'ffprobe'
-    else:
-        exe = str(Path(exein).expanduser())
-        probeexe = str(Path(exein).expanduser().parent / 'ffprobe')
-# %% verify
-    if not shutil.which(exe):
-        print('\n\n *** Must have FFmpeg installed to use PyLivestream.', file=sys.stderr)
-        print('https://www.ffmpeg.org/download.html \n\n', file=sys.stderr)
-        raise FileNotFoundError(exe)
-
-    if not shutil.which(probeexe):
-        print('\n\n *** You must have FFmpeg + FFprobe installed to use PyLivestream.', file=sys.stderr)
-        print('https://www.ffmpeg.org/download.html \n\n', file=sys.stderr)
-        raise FileNotFoundError(probeexe)
-
-    return exe, probeexe
-
-
-def get_meta(fn: Path, exein: str = None) -> Union[None, dict]:
-    if not fn:  # audio-only
-        return None
-
-    fn = Path(fn).expanduser()
-
-    if not fn.is_file():
-        raise FileNotFoundError(fn)
-
-    exe = getexe()[1] if exein is None else exein
-
-    cmd = [str(exe), '-v', 'error', '-print_format', 'json',
-           '-show_streams',
-           '-show_format', str(fn)]
-
-    ret = subprocess.check_output(cmd, universal_newlines=True)
-# %% decode JSON from FFprobe
-    return json.loads(ret)
 
 
 def meta_caption(meta) -> str:
@@ -133,7 +87,7 @@ def meta_caption(meta) -> str:
     return caption
 
 
-def get_resolution(fn: Path, exe: str = None) -> List[str]:
+def get_resolution(fn: Path, exe: str = None) -> typing.List[str]:
     """
     get resolution (widthxheight) of video file
     http://trac.ffmpeg.org/wiki/FFprobeTips#WidthxHeight
