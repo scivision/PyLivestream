@@ -18,7 +18,7 @@ jobs:
     - run: flake8
     - run: mypy .
     - run: sudo apt install -yq --no-install-recommends ffmpeg
-    - run: pytest -r a -v
+    - run: pytest
       working-directory: tests
       env:
         CI: true
@@ -32,7 +32,7 @@ jobs:
         python-version: '3.x'
     - run: pip install .[tests]
     - run: brew install ffmpeg
-    - run: pytest -r a -v
+    - run: pytest
       working-directory: tests
       env:
         CI: true
@@ -46,7 +46,7 @@ jobs:
         python-version: '3.x'
     - run: pip install .[tests]
     - run: cinst -y ffmpeg
-    - run: pytest -r a -v
+    - run: pytest
       working-directory: tests
       env:
         CI: true

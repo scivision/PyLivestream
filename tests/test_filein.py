@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import sys
 from pathlib import Path
 import pylivestream as pls
 import pytest
@@ -6,7 +7,7 @@ from pytest import approx
 import subprocess
 import os
 
-R = Path(__file__).parent
+R = Path(__file__).resolve().parent
 
 sites = ['periscope', 'youtube', 'facebook']
 
@@ -61,11 +62,11 @@ def test_simple():
 
 @pytest.mark.skipif(CI, reason='CI has no audio hardware typically')
 def test_script():
-    subprocess.check_call(['FileGlobLivestream',
+    subprocess.check_call([sys.executable, 'Glob.py',
                            str(VIDFN),
                            'localhost',
                            '--yes', '--timeout', '5'],
-                          timeout=TIMEOUT)
+                          timeout=TIMEOUT, cwd=R.parent)
 
 
 if __name__ == '__main__':

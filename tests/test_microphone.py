@@ -2,6 +2,7 @@
 """
 timeout= parameter needs to be at least 10 seconds for audio stream to show in FFplay
 """
+import sys
 from pathlib import Path
 import pylivestream as pls
 import pytest
@@ -9,7 +10,7 @@ import subprocess
 import os
 import platform
 
-R = Path(__file__).parent
+R = Path(__file__).resolve().parent
 
 sites = ['periscope', 'youtube', 'facebook']
 
@@ -61,9 +62,9 @@ def test_stream():
 
 @pytest.mark.skipif(CI or WSL, reason='has no audio hardware typically')
 def test_script():
-    subprocess.check_call(['MicrophoneLivestream',
+    subprocess.check_call([sys.executable, 'Microphone.py',
                            'localhost', '--yes', '--timeout', '10'],
-                          timeout=TIMEOUT)
+                          timeout=TIMEOUT, cwd=R.parent)
 
 
 if __name__ == '__main__':
