@@ -23,7 +23,10 @@ jobs:
     - run: pip install .[tests,lint]
     - run: flake8
     - run: mypy .
-    - run: sudo apt install -yq --no-install-recommends ffmpeg
+    - name: install prereqs
+      run: |
+        sudo apt update -yq
+        sudo apt install -yq --no-install-recommends ffmpeg
     - run: pytest
       working-directory: tests
       env:
