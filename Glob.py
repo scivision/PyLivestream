@@ -28,7 +28,7 @@ def playonce(flist: List[Path], image: Path, site: str, inifn: Path,
     for f in flist:
         if usemeta and TinyTag:
             try:
-                caption = pls.utils.meta_caption(TinyTag.get(str(f)))
+                caption = pls.meta_caption(TinyTag.get(str(f)))
                 print(caption)
             except LookupError:
                 caption = None

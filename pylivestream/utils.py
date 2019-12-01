@@ -4,6 +4,7 @@ from pathlib import Path
 import sys
 import typing
 import pkg_resources
+
 from .ffmpeg import get_meta
 
 
