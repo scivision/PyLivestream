@@ -198,15 +198,23 @@ class Stream:
 
         NOTE: -ac 2 NOT -ac 1 to avoid "non monotonous DTS in output stream" errors
         """
-        if not self.audio_bps or not self.acap or not self.audiochan:
+        if not(self.audio_bps and self.acap and self.audiochan and self.audiofs):
             return []
 
-        if not self.vidsource == 'file':
+        if self.audiochan == 'null' or self.acap == 'null':
+            self.acap = 'null'
+            if not self.audio_bps:
+                self.audio_bps = '128000'
+            if not self.audiofs:
+                self.audiofs = '48000'
+            self.audiochan = f'anullsrc=sample_rate={self.audiofs}:channel_layout=stereo'
+
+        if self.vidsource == 'file':
+            a: List[str] = []
+        elif self.acap == 'null':
+            a = ['-f', 'lavfi', '-i', self.audiochan]
+        else:
             a = ['-f', self.acap, '-i', self.audiochan]
-        else:  # file input
-            a = []
-#        else: #  file input
-#            a = ['-ac','2']
 
         return a
 
@@ -219,7 +227,7 @@ class Stream:
         https://www.facebook.com/facebookmedia/get-started/live
         """
 
-        if not self.audio_bps or not self.acap or not self.audiochan:
+        if not(self.audio_bps and self.acap and self.audiochan and self.audiofs):
             return []
 
         return ['-codec:a', 'aac',
