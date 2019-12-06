@@ -1,3 +1,4 @@
+[![DOI](https://zenodo.org/badge/91214767.svg)](https://zenodo.org/badge/latestdoi/91214767)
 [![Actions Status](https://github.com/scivision/pylivestream/workflows/ci/badge.svg)](https://github.com/scivision/pylivestream/actions)
 
 [![pypi versions](https://img.shields.io/pypi/pyversions/PyLivestream.svg)](https://pypi.python.org/pypi/PyLivestream)
