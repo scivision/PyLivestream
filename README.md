@@ -1,11 +1,11 @@
+# Python scripted livestreaming using FFmpeg
+
 [![DOI](https://zenodo.org/badge/91214767.svg)](https://zenodo.org/badge/latestdoi/91214767)
 [![Actions Status](https://github.com/scivision/pylivestream/workflows/ci/badge.svg)](https://github.com/scivision/pylivestream/actions)
 
 [![pypi versions](https://img.shields.io/pypi/pyversions/PyLivestream.svg)](https://pypi.python.org/pypi/PyLivestream)
 [![Maintainability](https://api.codeclimate.com/v1/badges/b6557d474ec050e74629/maintainability)](https://codeclimate.com/github/scivision/ffmpeg-youtube-live/maintainability)
 [![PyPi Download stats](http://pepy.tech/badge/pylivestream)](http://pepy.tech/project/pylivestream)
-
-# Python scripted livestreaming using FFmpeg
 
 Streams to one or **multiple** streaming sites simultaneously, using pure object-oriented Python (no extra packages) and FFmpeg.
 Tested with `flake8`, `mypy` type checking and `pytest`.
@@ -20,8 +20,7 @@ FFmpeg is used from Python `subprocess` to stream to sites including:
 
 ![PyLivestream diagram showing screen capture or webcam simultaneously livestreaming to multiple services.](./doc/logo.png)
 
-
-### PyLivestream benefits
+## PyLivestream benefits
 
 * Python scripts compute good streaming parameters, and emit the command used to copy and paste if desired.
 * Works on any OS (Mac, Linux, Windows) and computing platform, including PC, Mac, and Raspberry Pi.
@@ -41,7 +40,6 @@ Why not do things without the command line, via linking libffmpeg, libgstreamer 
 * the command-line approach does not require a compiler or OS-dependent libraries
 * once you get a setup working once, you don't even need Python anymore--just copy and paste the command line
 
-
 ## Install
 
 Requirements:
@@ -50,7 +48,6 @@ Requirements:
 * Python &ge; 3.6
 
 Python &ge; 3.6 is required due to extensive use of type hinting to ensure program quality.
-
 
 Latest release:
 
@@ -102,10 +99,9 @@ Likewise, YouTube expects a file `~/youtube.key` with the hexadecimal stream key
 
 ### YouTube Live
 
-1.  [configure](https://www.youtube.com/live_dashboard) YouTube Live.
-2.  Edit file `youtube.key` to have the YouTube hexadecimal stream key
-3.  Run Python script and chosen input will stream on YouTube Live.
-
+1. [configure](https://www.youtube.com/live_dashboard) YouTube Live.
+2. Edit file `youtube.key` to have the YouTube hexadecimal stream key
+3. Run Python script and chosen input will stream on YouTube Live.
 
     ScreenshareLivestream youtube
 
@@ -113,27 +109,25 @@ Likewise, YouTube expects a file `~/youtube.key` with the hexadecimal stream key
 
 Facebook Live requires FFmpeg >= 4.2 due to mandatory RTMPS
 
-1.  configure your Facebook Live stream
-2.  Put stream ID from
+1. configure your Facebook Live stream
+2. Put stream ID from
     [<https://www.facebook.com/live/create>](https://www.facebook.com/live/create)
     into the file `facebook.key`
-3.  Run Python script for Facebook with chosen input
-
+3. Run Python script for Facebook with chosen input
 
     ScreenshareLivestream facebook
 
 ### Periscope
 
-1.  create a new stream by EITHER:
+1. create a new stream by EITHER:
 
     * from phone Periscope app, go to Profile -&gt; Settings -&gt; Periscope Producer and see your Stream Key.
       The "checking source" button will go to "preview stream" once you do step #2.
     * from computer web browser, go to
     [<https://www.periscope.tv/account/producer>](https://www.periscope.tv/account/producer)
     and Create New Source.
-2.  Put the hexadecimal stream key into `periscope.key`
-3.  Run Python script for Periscope with chosen input
-
+2. Put the hexadecimal stream key into `periscope.key`
+3. Run Python script for Periscope with chosen input
 
     ScreenshareLivestream periscope
 
@@ -143,13 +137,11 @@ come back in, I can comment from my phone etc.
 
 ### Twitch
 
-1.  create stream from [Twitch Dashboard](http://www.twitch.tv/broadcast/dashboard). If you are not in the Northeast US, edit [pylivestream.ini](./pylivestream/pylivestream.ini) to have the [closest server](http://bashtech.net/twitch/ingest.php).
-2.  put Twitch stream key into file `twitch.key`
-3.  Run Python script for Twitch with chosen input
-
+1. create stream from [Twitch Dashboard](http://www.twitch.tv/broadcast/dashboard). If you are not in the Northeast US, edit [pylivestream.ini](./pylivestream/pylivestream.ini) to have the [closest server](http://bashtech.net/twitch/ingest.php).
+2. put Twitch stream key into file `twitch.key`
+3. Run Python script for Twitch with chosen input
 
     ScreenshareLivestream twitch
-
 
 ## Usage
 
@@ -171,22 +163,23 @@ Config:
 
 Find webcam name by:
 
-* Windows:
+#### Windows
 
-    ```sh
-    ffmpeg -list_devices true -f dshow -i dummy
-    ```
-* MacOS:
+```sh
+ffmpeg -list_devices true -f dshow -i dummy
+```
 
-    ```sh
-    ffmpeg -f avfoundation -list_devices true -i ""
+#### MacOS
 
-* Linux:
+```sh
+ffmpeg -f avfoundation -list_devices true -i ""
+```
 
-    ```sh
-    v4l2-ctl --list-devices
-    ```
+#### Linux
 
+```sh
+v4l2-ctl --list-devices
+```
 
 Stream to multiple sites, in this example Periscope and YouTube Live simultaneously:
 
@@ -199,7 +192,6 @@ or from devlopment code:
 ```sh
 python Webcam.py youtube periscope
 ```
-
 
 ### Screen Share Livestream
 
@@ -214,7 +206,6 @@ or from development code:
 ```sh
 python Screenshare.py youtube periscope
 ```
-
 
 ### Image + Audio Livestream
 
@@ -291,15 +282,19 @@ FileGlobLivestream path site -glob glob_pattern -image image
 * `-image` filename of image to use as stream background (REQUIRED for most websites)
 
 Example: stream all .mp3 audio under `~/music` directory:
+
 ```sh
 FileGlobLivestream ~/music youtube -glob "*.mp3" -image mylogo.jpg
 ```
 
 Example: stream all .mp3 audio in `~/music` with an animated GIF or video clip repeating:
+
 ```sh
 FileGlobLivestream ~/music youtube -glob "*.mp3" -image myclip.avi
 ```
+
 or
+
 ```sh
 FileGlobLivestream ~/music youtube -glob "*.mp3" -image animated.gif
 ```
@@ -311,7 +306,6 @@ This script saves your screen capture to a file on your disk:
     ScreenCapture2disk myvid.avi
 
 ## Utilities
-
 
 * `PyLivestream.get_framerate(vidfn)` gives the frames/sec of a video file.
 * `PyLivestream.get_resolution(vidfn)` gives the resolution (width x height) of video file.
@@ -386,4 +380,3 @@ DirectShow didn't work for me on Windows 10, so I used gdigrab instead.
 * YouTube: YouTube Brand Resources
 * Facebook: Wikimedia Commons
 * [Periscope](periscope.tv/press)
-

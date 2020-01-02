@@ -11,4 +11,4 @@ def test_props(site):
 
 
 if __name__ == '__main__':
-    pytest.main(['-x', __file__])
+    pytest.main([__file__])

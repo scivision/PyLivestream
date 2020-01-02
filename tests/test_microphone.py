@@ -22,7 +22,7 @@ CI = os.environ.get('CI', None) in ('true', 'True')
 WSL = 'Microsoft' in platform.uname().release
 
 
-def test_props():
+def test_props(periscope_kbps):
     S = pls.Microphone(inifn=None, websites=sites,
                        image=LOGO, key='abc')
 
@@ -32,12 +32,12 @@ def test_props():
         assert S.streams[s].res == [720, 540]
 
         if s == 'periscope':
-            assert S.streams[s].video_kbps == 800
+            assert S.streams[s].video_kbps == periscope_kbps
         else:
             assert S.streams[s].video_kbps == 800
 
 
-def test_4Kbg():
+def test_4Kbg(periscope_kbps):
     S = pls.Microphone(inifn=None, websites=sites,
                        image=IMG4K, key='abc')
 
@@ -47,7 +47,7 @@ def test_4Kbg():
         assert S.streams[s].res == [3840, 2160]
 
         if s == 'periscope':
-            assert S.streams[s].video_kbps == 800
+            assert S.streams[s].video_kbps == periscope_kbps
         else:
             assert S.streams[s].video_kbps == 4000
 
@@ -68,4 +68,4 @@ def test_script():
 
 
 if __name__ == '__main__':
-    pytest.main(['-x', __file__])
+    pytest.main([__file__])

@@ -17,14 +17,14 @@ CI = os.environ.get('CI', None) in ('true', 'True')
 WSL = 'Microsoft' in platform.uname().release
 
 
-def test_props():
+def test_props(periscope_kbps):
     S = pls.Webcam(inifn=None, websites=sites, key='abc')
     for s in S.streams:
         assert '-re' not in S.streams[s].cmd
         assert S.streams[s].fps == approx(30.)
 
         if s == 'periscope':
-            assert S.streams[s].video_kbps == 800
+            assert S.streams[s].video_kbps == periscope_kbps
         else:
             if int(S.streams[s].res[1]) == 480:
                 assert S.streams[s].video_kbps == 500
@@ -49,4 +49,4 @@ def test_script():
 
 
 if __name__ == '__main__':
-    pytest.main(['-x', __file__])
+    pytest.main([__file__])
