@@ -57,21 +57,23 @@ def check_display(fn: Path = None) -> bool:
     if fn:
         ret = _check_disp(fn)
     else:
-        with importlib.resources.path(__name__, 'logo.png') as fn:
+        with importlib.resources.path('pylivestream.data', 'logo.png') as fn:
             ret = _check_disp(fn)
 
     return ret == 0
 
 
 def get_inifile(fn: str) -> Path:
-    for file in [fn, '~/pylivestream.ini', str(importlib.resources.path(__name__, 'pylivestream.ini'))]:
+
+    for file in (fn, '~/pylivestream.ini'):
         if not file:
             continue
         inifn = Path(file).expanduser()
         if inifn.is_file():
-            break
+            return inifn
 
-    return inifn
+    with importlib.resources.path('pylivestream', 'pylivestream.ini') as inifn:
+        return inifn
 
 
 def meta_caption(meta) -> str:
