@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import sys
 from pathlib import Path
 import pylivestream as pls
 import pytest
@@ -42,7 +41,7 @@ def test_stream():
 
 @pytest.mark.skipif(CI or WSL, reason='has no vidoe hardware typically')
 def test_script():
-    subprocess.check_call([sys.executable, 'Webcam.py',
+    subprocess.check_call(['WebcamLivestream',
                            'localhost', '--yes',
                            '--timeout', '5'],
                           timeout=TIMEOUT, cwd=R)

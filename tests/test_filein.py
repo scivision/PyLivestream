@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import sys
+
 from pathlib import Path
 import pylivestream as pls
 import pytest
@@ -62,7 +62,7 @@ def test_simple():
 
 @pytest.mark.skipif(CI, reason='CI has no audio hardware typically')
 def test_script():
-    subprocess.check_call([sys.executable, 'Glob.py',
+    subprocess.check_call(['FileGlobLivestream',
                            str(VIDFN),
                            'localhost',
                            '--yes', '--timeout', '5'],
