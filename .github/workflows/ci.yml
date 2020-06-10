@@ -4,9 +4,6 @@ on:
   push:
     paths:
     - "**.py"
-  pull_request:
-    paths:
-    - "**.py"
 
 jobs:
 
@@ -14,48 +11,49 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.6, '3.x']
+        python-version: [3.7, '3.x']
     steps:
-    - uses: actions/checkout@v1
-    - uses: actions/setup-python@v1
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+
     - run: pip install .[tests,lint]
+
     - run: flake8
     - run: mypy .
+
     - name: install prereqs
       run: |
         sudo apt update -yq
         sudo apt install -yq --no-install-recommends ffmpeg
+
     - run: pytest
-      working-directory: tests
-      env:
-        CI: true
 
   macos:
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v1
-    - uses: actions/setup-python@v1
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
       with:
         python-version: '3.x'
+
     - run: pip install .[tests]
+
     - run: brew install ffmpeg
+
     - run: pytest
-      working-directory: tests
-      env:
-        CI: true
 
   windows:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v1
-    - uses: actions/setup-python@v1
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
       with:
         python-version: '3.x'
+
     - run: pip install .[tests]
+
     - run: cinst -y ffmpeg
+
     - run: pytest
-      working-directory: tests
-      env:
-        CI: true
