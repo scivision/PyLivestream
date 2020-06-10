@@ -67,20 +67,21 @@ def check_display(fn: Path = None) -> bool:
     return ret == 0
 
 
-def get_inifile(fn: str) -> Path:
+def get_inifile(fn: str) -> str:
 
     for file in (fn, "~/pylivestream.ini"):
         if not file:
             continue
         inifn = Path(file).expanduser()
         if inifn.is_file():
-            return inifn
+            return inifn.read_text(errors="ignore")
 
     try:
-        with importlib.resources.path("pylivestream", "pylivestream.ini") as inifn:
-            return inifn
+        return importlib.resources.read_text("pylivestream", "pylivestream.ini", errors="ignore")
     except NameError:
-        return Path(pkg_resources.resource_filename(__name__, "logo.png"))
+        return pkg_resources.resource_string(__name__, "pylivestream.ini").decode(
+            "utf8", errors="ignore"
+        )
 
 
 def meta_caption(meta) -> str:

@@ -59,9 +59,11 @@ class Stream:
         C = ConfigParser(inline_comment_prefixes=("#", ";"))
         if self.inifn is None:
             logging.info("using package default pylivestream.ini")
-            self.inifn = utils.get_inifile("pylivestream.ini")
+            cfg = utils.get_inifile("pylivestream.ini")
+        else:
+            cfg = Path(self.inifn).expanduser().read_text()
 
-        C.read_string(Path(self.inifn).expanduser().read_text(), source=str(self.inifn))
+        C.read_string(cfg)
 
         self.exe = get_exe(C.get(sys.platform, "exe", fallback="ffmpeg"))
         self.probeexe = get_exe(C.get(sys.platform, "ffprobe_exe", fallback="ffprobe"))

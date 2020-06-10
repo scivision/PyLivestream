@@ -10,7 +10,10 @@ VIDFN = R / "bunny.avi"
 
 @pytest.mark.parametrize("fn", ["pylivestream.ini"])
 def test_get_ini_file(fn):
-    assert pls.utils.get_inifile(fn).is_file()
+
+    cfg = pls.utils.get_inifile(fn)
+
+    assert isinstance(cfg, str)
 
 
 @pytest.mark.parametrize("keyin,keyout", [("abc123", "abc123"), (R / "periscope.key", "abcd1234")])
