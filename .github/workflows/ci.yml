@@ -4,19 +4,35 @@ on:
   push:
     paths:
     - "**.py"
+    - .github/workflows/ci.yml
 
 jobs:
 
-  linux:
+  linux_py36:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.6, '3.x']
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: 3.6
+
+    - run: pip install .[tests]
+
+    - name: install prereqs
+      run: |
+        sudo apt update -yq
+        sudo apt install -yq --no-install-recommends ffmpeg
+
+    - run: pytest
+
+
+  linux_py3x:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with:
+        python-version: 3.x
 
     - run: pip install .[tests,lint]
 
@@ -29,6 +45,7 @@ jobs:
         sudo apt install -yq --no-install-recommends ffmpeg
 
     - run: pytest
+
 
   macos:
     runs-on: macos-latest
