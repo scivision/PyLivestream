@@ -47,7 +47,10 @@ class Ffmpeg:
         x = "x=(w-text_w)/2"
         y = "y=(h-text_h)*3/4"
 
-        return ["-vf", f"drawtext=text='{text}':{fontcolor}:{fontsize}:{box}:{boxcolor}:{border}:{x}:{y}"]
+        return [
+            "-vf",
+            f"drawtext=text='{text}':{fontcolor}:{fontsize}:{box}:{boxcolor}:{border}:{x}:{y}",
+        ]
 
     def listener(self):
         """
@@ -68,7 +71,11 @@ class Ffmpeg:
 
         cmd = [FFPLAY, "-loglevel", "error", "-timeout", "5", "-autoexit", "rtmp://localhost"]
 
-        print("starting Localhost RTMP listener. \n\n", " ".join(cmd), "\n\n Press   q   in this terminal to end stream.")
+        print(
+            "starting Localhost RTMP listener. \n\n",
+            " ".join(cmd),
+            "\n\n Press   q   in this terminal to end stream.",
+        )
 
         proc = subprocess.Popen(cmd)
 
@@ -121,7 +128,16 @@ def get_meta(fn: Path, exein: str = None) -> Union[None, dict]:
 
     exe = get_exe("ffprobe") if exein is None else exein
 
-    cmd = [str(exe), "-loglevel", "error", "-print_format", "json", "-show_streams", "-show_format", str(fn)]
+    cmd = [
+        str(exe),
+        "-loglevel",
+        "error",
+        "-print_format",
+        "json",
+        "-show_streams",
+        "-show_format",
+        str(fn),
+    ]
 
     ret = subprocess.check_output(cmd, universal_newlines=True)
     # %% decode JSON from FFprobe

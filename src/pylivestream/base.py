@@ -2,24 +2,23 @@ from pathlib import Path
 import typing
 import logging
 import os
+
 #
 from .stream import Stream
 from .utils import run, check_device
 
-__all__ = ['FileIn', 'Microphone', 'SaveDisk', 'Screenshare', 'Webcam']
+__all__ = ["FileIn", "Microphone", "SaveDisk", "Screenshare", "Webcam"]
 
 
 class Livestream(Stream):
-
-    def __init__(self,
-                 inifn: Path, site: str, **kwargs) -> None:
+    def __init__(self, inifn: Path, site: str, **kwargs) -> None:
         super().__init__(inifn, site, **kwargs)
 
         self.site = site.lower()
 
-        self.osparam(kwargs.get('key'))
+        self.osparam(kwargs.get("key"))
 
-        self.docheck = kwargs.get('docheck')
+        self.docheck = kwargs.get("docheck")
 
         self.video_bitrate()
 
@@ -30,14 +29,14 @@ class Livestream(Stream):
         audOut: typing.List[str] = self.audioOut()
 
         buf: typing.List[str] = self.buffer(self.server)
-# %% begin to setup command line
+        # %% begin to setup command line
         cmd: typing.List[str] = []
         cmd.append(self.exe)
 
         cmd += self.loglevel
         cmd += self.yes
 
-#        cmd += self.timelimit  # terminate input after N seconds, IF specified
+        #        cmd += self.timelimit  # terminate input after N seconds, IF specified
 
         cmd += self.queue
 
@@ -51,29 +50,31 @@ class Livestream(Stream):
 
         cmd.extend(self.timelimit)  # terminate output after N seconds, IF specified
 
-        streamid: str = self.key if self.key else ''
+        streamid: str = self.key if self.key else ""
 
         # cannot have double quotes for Mac/Linux,
         #    but need double quotes for Windows
         sink: str = self.server + streamid
-        if os.name == 'nt':
+        if os.name == "nt":
             sink = '"' + sink + '"'
 
         self.sink = sink
         cmd.append(sink)
 
         self.cmd: typing.List[str] = cmd
-# %% quick check command, to verify device exists
+        # %% quick check command, to verify device exists
         # 0.1 seems OK, spurious buffer error on Windows that wasn't helped by any bigger size
-        CHECKTIMEOUT = '0.1'
+        CHECKTIMEOUT = "0.1"
 
-        self.checkcmd: typing.List[str] = ([self.exe] +
-                                           self.loglevel + ['-t', CHECKTIMEOUT] +
-                                           self.videoIn(quick=True) +
-                                           self.audioIn(quick=True) +
-                                           ['-t', CHECKTIMEOUT] +  # webcam needs at output
-                                           ['-f', 'null', '-']
-                                           )
+        self.checkcmd: typing.List[str] = (
+            [self.exe]
+            + self.loglevel
+            + ["-t", CHECKTIMEOUT]
+            + self.videoIn(quick=True)
+            + self.audioIn(quick=True)
+            + ["-t", CHECKTIMEOUT]
+            + ["-f", "null", "-"]  # webcam needs at output
+        )
 
     def startlive(self, sinks: typing.Sequence[str] = None):
         """finally start the stream(s)"""
@@ -82,24 +83,26 @@ class Livestream(Stream):
             self.check_device()
 
         proc = None
-# %% special cases for localhost tests
-        if self.key is None and self.site != 'localhost-test':
-            if self.site == 'localhost':
+        # %% special cases for localhost tests
+        if self.key is None and self.site != "localhost-test":
+            if self.site == "localhost":
                 proc = self.F.listener()  # start own RTMP server
             else:
-                print('A livestream key was not provided or found. Here is the command I would have run:')
-                print('\n', ' '.join(self.cmd), '\n', flush=True)
+                print(
+                    "A livestream key was not provided or found. Here is the command I would have run:"
+                )
+                print("\n", " ".join(self.cmd), "\n", flush=True)
                 return
 
         if proc is not None and proc.poll() is not None:
             # listener stopped prematurely, probably due to error
-            raise RuntimeError(f'listener stopped with code {proc.poll()}')
-# %% RUN STREAM
+            raise RuntimeError(f"listener stopped with code {proc.poll()}")
+        # %% RUN STREAM
         if not sinks:  # single stream
             run(self.cmd)
         elif self.movingimage:
             if len(sinks) > 1:
-                logging.warning(f'streaming only to {sinks[0]}')
+                logging.warning(f"streaming only to {sinks[0]}")
 
             run(self.cmd)
         elif len(sinks) == 1:
@@ -107,38 +110,37 @@ class Livestream(Stream):
         else:  # multi-stream output tee
             cmdstem: typing.List[str] = self.cmd[:-3]
             # +global_header is necessary to tee to multiple services
-            cmd: typing.List[str] = cmdstem + ['-flags:v', '+global_header',
-                                               '-f', 'tee']
+            cmd: typing.List[str] = cmdstem + ["-flags:v", "+global_header", "-f", "tee"]
 
             if self.image:
                 #  connect image to video stream, audio file to audio stream
-                cmd += ['-map', '0:v', '-map', '1:a']
+                cmd += ["-map", "0:v", "-map", "1:a"]
             else:
-                if self.vidsource == 'file':
+                if self.vidsource == "file":
                     # picks first video and audio stream, often correct
-                    cmd += ['-map', '0:v', '-map', '0:a:0']
+                    cmd += ["-map", "0:v", "-map", "0:a:0"]
                 else:  # device (webcam)
                     # connect video device to video stream,
                     # audio device to audio stream
-                    cmd += ['-map', '0:v', '-map', '1:a']
+                    cmd += ["-map", "0:v", "-map", "1:a"]
 
             # cannot have double quotes for Mac/Linux,
             #    but need double quotes for Windows
-            if os.name == 'nt':
+            if os.name == "nt":
                 sink = f'"[f=flv]{sinks[0][1:-1]}'
                 for s in sinks[1:]:
-                    sink += f'|[f=flv]{s[1:-1]}'
+                    sink += f"|[f=flv]{s[1:-1]}"
                 sink += '"'
             else:
-                sink = f'[f=flv]{sinks[0]}'
+                sink = f"[f=flv]{sinks[0]}"
                 for s in sinks[1:]:
-                    sink += f'|[f=flv]{s}'
+                    sink += f"|[f=flv]{s}"
 
             cmd.append(sink)
 
             run(cmd)
 
-# %% stop the listener before starting the next process, or upon final process closing.
+        # %% stop the listener before starting the next process, or upon final process closing.
         if proc is not None and proc.poll() is None:
             proc.terminate()
         yield
@@ -163,25 +165,21 @@ class Livestream(Stream):
 
 
 # %% operators
-class Screenshare():
-
-    def __init__(self,  inifn: Path,
-                 websites: typing.Sequence[str], **kwargs):
+class Screenshare:
+    def __init__(self, inifn: Path, websites: typing.Sequence[str], **kwargs):
 
         if isinstance(websites, str):
             websites = [websites]
 
         streams = {}
         for site in websites:
-            streams[site] = Livestream(inifn, site, vidsource='screen',
-                                       **kwargs)
+            streams[site] = Livestream(inifn, site, vidsource="screen", **kwargs)
 
         self.streams: typing.Dict[str, Livestream] = streams
 
     def golive(self):
 
-        sinks: typing.List[str] = [self.streams[stream].sink
-                                   for stream in self.streams]
+        sinks: typing.List[str] = [self.streams[stream].sink for stream in self.streams]
 
         try:
             next(self.streams[unify_streams(self.streams)].startlive(sinks))
@@ -189,25 +187,21 @@ class Screenshare():
             pass
 
 
-class Webcam():
-
-    def __init__(self, inifn: Path,
-                 websites: typing.Sequence[str], **kwargs):
+class Webcam:
+    def __init__(self, inifn: Path, websites: typing.Sequence[str], **kwargs):
 
         if isinstance(websites, str):
             websites = [websites]
 
         streams = {}
         for site in websites:
-            streams[site] = Livestream(inifn, site, vidsource='camera',
-                                       **kwargs)
+            streams[site] = Livestream(inifn, site, vidsource="camera", **kwargs)
 
         self.streams: typing.Dict[str, Livestream] = streams
 
     def golive(self):
 
-        sinks: typing.List[str] = [self.streams[stream].sink
-                                   for stream in self.streams]
+        sinks: typing.List[str] = [self.streams[stream].sink for stream in self.streams]
 
         try:
             next(self.streams[unify_streams(self.streams)].startlive(sinks))
@@ -215,11 +209,8 @@ class Webcam():
             pass
 
 
-class Microphone():
-
-    def __init__(self,
-                 inifn: Path,
-                 websites: typing.Sequence[str], **kwargs):
+class Microphone:
+    def __init__(self, inifn: Path, websites: typing.Sequence[str], **kwargs):
 
         if isinstance(websites, str):
             websites = [websites]
@@ -232,8 +223,7 @@ class Microphone():
 
     def golive(self):
 
-        sinks: typing.List[str] = [self.streams[stream].sink
-                                   for stream in self.streams]
+        sinks: typing.List[str] = [self.streams[stream].sink for stream in self.streams]
 
         try:
             next(self.streams[unify_streams(self.streams)].startlive(sinks))
@@ -242,26 +232,21 @@ class Microphone():
 
 
 # %% File-based inputs
-class FileIn():
-
-    def __init__(self,
-                 inifn: Path,
-                 websites: typing.Sequence[str], **kwargs):
+class FileIn:
+    def __init__(self, inifn: Path, websites: typing.Sequence[str], **kwargs):
 
         if isinstance(websites, str):
             websites = [websites]
 
         streams = {}
         for site in websites:
-            streams[site] = Livestream(inifn, site, vidsource='file',
-                                       **kwargs)
+            streams[site] = Livestream(inifn, site, vidsource="file", **kwargs)
 
         self.streams: typing.Dict[str, Livestream] = streams
 
     def golive(self):
 
-        sinks: typing.List[str] = [self.streams[stream].sink
-                                   for stream in self.streams]
+        sinks: typing.List[str] = [self.streams[stream].sink for stream in self.streams]
 
         try:
             next(self.streams[unify_streams(self.streams)].startlive(sinks))
@@ -270,20 +255,17 @@ class FileIn():
 
 
 class SaveDisk(Stream):
-
-    def __init__(self,
-                 inifn: Path, outfn: Path = None, **kwargs):
+    def __init__(self, inifn: Path, outfn: Path = None, **kwargs):
         """
         records to disk screen capture with audio
 
         if not outfn, just cite command that would have run
         """
-        super().__init__(inifn, site='file', vidsource='screen',
-                         **kwargs)
+        super().__init__(inifn, site="file", vidsource="screen", **kwargs)
 
         self.outfn = Path(outfn).expanduser() if outfn else None
 
-        self.osparam(kwargs.get('key'))
+        self.osparam(kwargs.get("key"))
 
         vidIn: typing.List[str] = self.videoIn()
         vidOut: typing.List[str] = self.videoOut()
@@ -297,12 +279,12 @@ class SaveDisk(Stream):
 
         # ffmpeg relies on suffix for container type, this is a fallback.
         if self.outfn and not self.outfn.suffix:
-            self.cmd += ['-f', 'flv']
+            self.cmd += ["-f", "flv"]
 
         self.cmd += [str(self.outfn)]
 
-#        if sys.platform == 'win32':  # doesn't seem to be needed.
-#            cmd += ['-copy_ts']
+    #        if sys.platform == 'win32':  # doesn't seem to be needed.
+    #            cmd += ['-copy_ts']
 
     def save(self):
 
@@ -310,7 +292,7 @@ class SaveDisk(Stream):
             run(self.cmd)
 
         else:
-            print('specify filename to save screen capture w/ audio to disk.')
+            print("specify filename to save screen capture w/ audio to disk.")
 
 
 def unify_streams(streams: typing.Dict[str, Stream]) -> str:

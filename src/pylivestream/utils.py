@@ -3,6 +3,7 @@ import subprocess
 from pathlib import Path
 import sys
 import typing as T
+
 try:
     import importlib.resources
 except ImportError:
@@ -16,10 +17,10 @@ def run(cmd: T.Sequence[str]):
     FIXME: shell=True for Windows seems necessary to specify devices enclosed by "" quotes
     """
 
-    print('\n', ' '.join(cmd), '\n')
+    print("\n", " ".join(cmd), "\n")
 
-    if sys.platform == 'win32':
-        subprocess.run(' '.join(cmd), shell=True)
+    if sys.platform == "win32":
+        subprocess.run(" ".join(cmd), shell=True)
     else:
         subprocess.run(cmd)
 
@@ -54,13 +55,13 @@ def check_display(fn: Path = None) -> bool:
     """see if it's possible to display something with a test file"""
 
     def _check_disp(fn: Path) -> int:
-        cmd = ['ffplay', '-loglevel', 'error', '-t', '1.0', '-autoexit', str(fn)]
+        cmd = ["ffplay", "-loglevel", "error", "-t", "1.0", "-autoexit", str(fn)]
         return subprocess.run(cmd, timeout=10).returncode
 
     if fn:
         ret = _check_disp(fn)
     else:
-        with importlib.resources.path('pylivestream.data', 'logo.png') as fn:
+        with importlib.resources.path("pylivestream.data", "logo.png") as fn:
             ret = _check_disp(fn)
 
     return ret == 0
@@ -68,7 +69,7 @@ def check_display(fn: Path = None) -> bool:
 
 def get_inifile(fn: str) -> Path:
 
-    for file in (fn, '~/pylivestream.ini'):
+    for file in (fn, "~/pylivestream.ini"):
         if not file:
             continue
         inifn = Path(file).expanduser()
@@ -76,18 +77,18 @@ def get_inifile(fn: str) -> Path:
             return inifn
 
     try:
-        with importlib.resources.path('pylivestream', 'pylivestream.ini') as inifn:
+        with importlib.resources.path("pylivestream", "pylivestream.ini") as inifn:
             return inifn
     except NameError:
-        return Path(pkg_resources.resource_filename(__name__, 'logo.png'))
+        return Path(pkg_resources.resource_filename(__name__, "logo.png"))
 
 
 def meta_caption(meta) -> str:
     """makes text from metadata for captioning video"""
-    caption = ''
+    caption = ""
 
     try:
-        caption += meta.title + ' - '
+        caption += meta.title + " - "
     except (TypeError, LookupError, AttributeError):
         pass
 
@@ -123,10 +124,10 @@ def get_resolution(fn: Path, exe: str = None) -> T.List[str]:
 
     res = None
 
-    for s in meta['streams']:
-        if s['codec_type'] != 'video':
+    for s in meta["streams"]:
+        if s["codec_type"] != "video":
             continue
-        res = [s['width'], s['height']]
+        res = [s["width"], s["height"]]
         break
 
     return res
@@ -158,16 +159,16 @@ def get_framerate(fn: Path, exe: str = None) -> float:
 
     fps = None
 
-    for s in meta['streams']:
-        if s['codec_type'] != 'video':
+    for s in meta["streams"]:
+        if s["codec_type"] != "video":
             continue
         # https://www.ffmpeg.org/faq.html#toc-AVStream_002er_005fframe_005
-        fps = s['avg_frame_rate']
-        fps = list(map(int, fps.split('/')))
+        fps = s["avg_frame_rate"]
+        fps = list(map(int, fps.split("/")))
         try:
             fps = fps[0] / fps[1]
         except ZeroDivisionError:
-            logging.error(f'FPS not available: {fn}. Is it a video/audio file?')
+            logging.error(f"FPS not available: {fn}. Is it a video/audio file?")
             fps = None
         break
 
@@ -187,8 +188,8 @@ def getstreamkey(keyfn: str) -> str:
     keyp = Path(keyfn).expanduser().resolve(strict=False)
     if keyp.is_file():
         # read only first line in case of trailing blank line
-        key = keyp.read_text().split('\n')[0].strip()
-    elif keyp.suffix == '.key':
+        key = keyp.read_text().split("\n")[0].strip()
+    elif keyp.suffix == ".key":
         raise FileNotFoundError(keyp)
     elif keyp.is_dir():
         raise IsADirectoryError(keyp)

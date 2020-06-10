@@ -3,12 +3,12 @@ import pylivestream as pls
 import pytest
 
 
-@pytest.mark.parametrize('site', ['periscope', 'youtube', 'facebook'])
+@pytest.mark.parametrize("site", ["periscope", "youtube", "facebook"])
 def test_props(site):
-    p = pls.SaveDisk(inifn=None, outfn='')
-    assert p.site == 'file'
+    p = pls.SaveDisk(inifn=None, outfn="")
+    assert p.site == "file"
     assert p.video_kbps == 2000
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pytest.main([__file__])

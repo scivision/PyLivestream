@@ -11,8 +11,15 @@ except ImportError:
     TinyTag = None
 
 
-def playonce(flist: T.List[Path], image: Path, site: str, inifn: Path,
-             shuffle: bool, usemeta: bool, yes: bool):
+def playonce(
+    flist: T.List[Path],
+    image: Path,
+    site: str,
+    inifn: Path,
+    shuffle: bool,
+    usemeta: bool,
+    yes: bool,
+):
 
     if shuffle:
         random.shuffle(flist)
@@ -29,8 +36,7 @@ def playonce(flist: T.List[Path], image: Path, site: str, inifn: Path,
         else:
             caption = None
 
-        s = FileIn(inifn, site, infn=f, loop=False, image=image,
-                   caption=caption, yes=yes)
+        s = FileIn(inifn, site, infn=f, loop=False, image=image, caption=caption, yes=yes)
 
         s.golive()
 
@@ -49,6 +55,6 @@ def fileglob(path: T.Union[str, Path], glob: str) -> T.List[Path]:
         flist = [path]
 
     if not flist:
-        raise FileNotFoundError(f'did not find files with {path} {glob}')
+        raise FileNotFoundError(f"did not find files with {path} {glob}")
 
     return flist
