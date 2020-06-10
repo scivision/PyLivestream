@@ -3,7 +3,10 @@ import subprocess
 from pathlib import Path
 import sys
 import typing as T
-import importlib.resources
+try:
+    import importlib.resources
+except ImportError:
+    import pkg_resources
 
 from .ffmpeg import get_meta
 
@@ -72,8 +75,11 @@ def get_inifile(fn: str) -> Path:
         if inifn.is_file():
             return inifn
 
-    with importlib.resources.path('pylivestream', 'pylivestream.ini') as inifn:
-        return inifn
+    try:
+        with importlib.resources.path('pylivestream', 'pylivestream.ini') as inifn:
+            return inifn
+    except NameError:
+        return Path(pkg_resources.resource_filename(__name__, 'logo.png'))
 
 
 def meta_caption(meta) -> str:
