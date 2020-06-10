@@ -21,7 +21,7 @@ jobs:
     - run: pip install .[tests,lint]
 
     - run: flake8
-    - run: mypy .
+    - run: mypy . src
 
     - name: install prereqs
       run: |
