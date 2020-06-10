@@ -2,13 +2,13 @@ import logging
 import subprocess
 from pathlib import Path
 import sys
-import typing
-import pkg_resources
+import typing as T
+import importlib.resources
 
 from .ffmpeg import get_meta
 
 
-def run(cmd: typing.Sequence[str]):
+def run(cmd: T.Sequence[str]):
     """
     FIXME: shell=True for Windows seems necessary to specify devices enclosed by "" quotes
     """
@@ -36,7 +36,7 @@ Better to let users know there's a problem.
 """
 
 
-def check_device(cmd: typing.Sequence[str]) -> bool:
+def check_device(cmd: T.Sequence[str]) -> bool:
     try:
         run(cmd)
         ok = True
@@ -47,21 +47,24 @@ def check_device(cmd: typing.Sequence[str]) -> bool:
     return ok
 
 
-def check_display(fn: str = None) -> bool:
+def check_display(fn: Path = None) -> bool:
     """see if it's possible to display something with a test file"""
 
-    if not fn:
-        fn = pkg_resources.resource_filename(__name__, 'logo.png')
+    def _check_disp(fn: Path) -> int:
+        cmd = ['ffplay', '-loglevel', 'error', '-t', '1.0', '-autoexit', str(fn)]
+        return subprocess.run(cmd, timeout=10).returncode
 
-    cmd = ['ffplay', '-loglevel', 'error', '-t', '1.0', '-autoexit', fn]
-
-    ret = subprocess.run(cmd, timeout=10).returncode
+    if fn:
+        ret = _check_disp(fn)
+    else:
+        with importlib.resources.path(__name__, 'logo.png') as fn:
+            ret = _check_disp(fn)
 
     return ret == 0
 
 
 def get_inifile(fn: str) -> Path:
-    for file in [fn, '~/pylivestream.ini', pkg_resources.resource_filename(__name__, 'pylivestream.ini')]:
+    for file in [fn, '~/pylivestream.ini', str(importlib.resources.path(__name__, 'pylivestream.ini'))]:
         if not file:
             continue
         inifn = Path(file).expanduser()
@@ -88,7 +91,7 @@ def meta_caption(meta) -> str:
     return caption
 
 
-def get_resolution(fn: Path, exe: str = None) -> typing.List[str]:
+def get_resolution(fn: Path, exe: str = None) -> T.List[str]:
     """
     get resolution (widthxheight) of video file
     http://trac.ffmpeg.org/wiki/FFprobeTips#WidthxHeight
