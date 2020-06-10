@@ -1,7 +1,7 @@
 # Python scripted livestreaming using FFmpeg
 
 [![DOI](https://zenodo.org/badge/91214767.svg)](https://zenodo.org/badge/latestdoi/91214767)
-[![Actions Status](https://github.com/scivision/pylivestream/workflows/ci/badge.svg)](https://github.com/scivision/pylivestream/actions)
+![Actions Status](https://github.com/scivision/pylivestream/workflows/ci/badge.svg)
 
 [![pypi versions](https://img.shields.io/pypi/pyversions/PyLivestream.svg)](https://pypi.python.org/pypi/PyLivestream)
 [![Maintainability](https://api.codeclimate.com/v1/badges/b6557d474ec050e74629/maintainability)](https://codeclimate.com/github/scivision/ffmpeg-youtube-live/maintainability)
@@ -187,12 +187,6 @@ Stream to multiple sites, in this example Periscope and YouTube Live simultaneou
 WebcamLivestream youtube periscope
 ```
 
-or from devlopment code:
-
-```sh
-python Webcam.py youtube periscope
-```
-
 ### Screen Share Livestream
 
 Stream to multiple sites, in this example Periscope and YouTube Live simultaneously:
@@ -201,18 +195,12 @@ Stream to multiple sites, in this example Periscope and YouTube Live simultaneou
 ScreenshareLivestream youtube periscope
 ```
 
-or from development code:
-
-```sh
-python Screenshare.py youtube periscope
-```
-
 ### Image + Audio Livestream
 
 Microphone audio + static image is accomplished by
 
 ```sh
-python Microphone.py youtube periscope -image doc/logo.jpg
+MicrophoneLivestream youtube periscope -image doc/logo.jpg
 ```
 or wherever your image file is.
 
@@ -222,7 +210,7 @@ Audio-only streaming is not typically allowed by the Video streaming sites.
 You can test it to your own computer by:
 
 ```sh
-python Microphone.py localhost
+MicrophoneLivestream localhost
 ```
 
 ### File Livestream
@@ -241,12 +229,6 @@ Glob list of video files to stream:
 
 ```sh
 FileGlobLivestream path site -glob glob_pattern
-```
-
-or from development code:
-
-```sh
-python Glob.py path site -glob glob_pattern
 ```
 
 * `-glob` glob pattern of files to stream e.g. "*.avi"
