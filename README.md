@@ -24,7 +24,7 @@ FFmpeg is used from Python `subprocess` to stream to sites including:
 
 * Python scripts compute good streaming parameters, and emit the command used to copy and paste if desired.
 * Works on any OS (Mac, Linux, Windows) and computing platform, including PC, Mac, and Raspberry Pi.
-* Uses a [pylivestream.ini](./pylivestream/pylivestream.ini) file to adjust all parameters.
+* Uses a [pylivestream.ini](./src/pylivestream/pylivestream.ini) file to adjust all parameters.
 
 ### PyLivestream limitations
 
@@ -66,7 +66,7 @@ Development version:
 You can skip past this section to "stream start" if it's confusing.
 The defaults might work to get you started.
 
-The [pylivestream.ini](./pylivestream/pylivestream.ini) file contains parameters relevant to your stream.
+The [pylivestream.ini](./src/pylivestream/pylivestream.ini) file contains parameters relevant to your stream.
 This file is copied into your `sys.prefix`/share/pylivestream directory upon `pip install pylivestream`.
 
 We suggest copying this file to another location on your hard drive and editing, then specifying it for your streams.
@@ -83,13 +83,13 @@ The `[DEFAULT]` section has parameters that can be overridden for each site, if 
 Next are `sys.platform` specific parameters.
 
 Seek help in FFmpeg documentation, try capturing to a file first and then update
-[pylivestream.ini](./pylivestream/pylivestream.ini) for your `sys.platform`.
+[pylivestream.ini](./src/pylivestream/pylivestream.ini) for your `sys.platform`.
 
 * exe: override path to desired FFmpeg executable. In case you have multiple FFmpeg versions installed (say, from Anaconda Python).
 
 Finally are the per-site parameters.
 The only thing you would possibly need to change here is the `server` for best performance for your geographic region.
-The included [pylivestream.ini](./pylivestream/pylivestream.ini) is with default servers for the Northeastern USA.
+The included [pylivestream.ini](./src/pylivestream/pylivestream.ini) is with default servers for the Northeastern USA.
 
 ## Stream Start
 
@@ -137,7 +137,7 @@ come back in, I can comment from my phone etc.
 
 ### Twitch
 
-1. create stream from [Twitch Dashboard](http://www.twitch.tv/broadcast/dashboard). If you are not in the Northeast US, edit [pylivestream.ini](./pylivestream/pylivestream.ini) to have the [closest server](http://bashtech.net/twitch/ingest.php).
+1. create stream from [Twitch Dashboard](http://www.twitch.tv/broadcast/dashboard). If you are not in the Northeast US, edit [pylivestream.ini](./src/pylivestream/pylivestream.ini) to have the [closest server](http://bashtech.net/twitch/ingest.php).
 2. put Twitch stream key into file `twitch.key`
 3. Run Python script for Twitch with chosen input
 
@@ -147,7 +147,7 @@ come back in, I can comment from my phone etc.
 
 Due to the complexity of streaming and the non-specific error codes FFmpeg emits, the default behavior is that if FFmpeg detects one stream has failed, ALL streams will stop streaming and the program ends.
 
-* [pylivestream.ini](./pylivestream/pylivestream.ini) is setup for your computer and desired parameters
+* [pylivestream.ini](./src/pylivestream/pylivestream.ini) is setup for your computer and desired parameters
 * `site` is `facebook`, `periscope`, `youtube`, etc.
 * For `WebcamLivestream` and `ScreenshareLivestream`, more than one `site` can be specified for simultaneous multi-streaming
 * remember to setup a `*.key` file with the hexadecimal stream key for EACH site first, OR input the stream key into the "key:" field of your `*.ini` file.
