@@ -2,9 +2,7 @@
 
 [![DOI](https://zenodo.org/badge/91214767.svg)](https://zenodo.org/badge/latestdoi/91214767)
 ![Actions Status](https://github.com/scivision/pylivestream/workflows/ci/badge.svg)
-
 [![pypi versions](https://img.shields.io/pypi/pyversions/PyLivestream.svg)](https://pypi.python.org/pypi/PyLivestream)
-[![Maintainability](https://api.codeclimate.com/v1/badges/b6557d474ec050e74629/maintainability)](https://codeclimate.com/github/scivision/ffmpeg-youtube-live/maintainability)
 [![PyPi Download stats](http://pepy.tech/badge/pylivestream)](http://pepy.tech/project/pylivestream)
 
 Streams to one or **multiple** streaming sites simultaneously, using pure object-oriented Python (no extra packages) and FFmpeg.
@@ -16,7 +14,7 @@ FFmpeg is used from Python `subprocess` to stream to sites including:
 * [YouTube Live](#youtube-live)
 * [Periscope](#periscope)
 * [Twitch](#twitch)
-* also Mixer, Ustream, Vimeo, Restream.io and more for streaming broadcasts.
+* also Ustream, Vimeo, Restream.io and more for streaming broadcasts.
 
 ![PyLivestream diagram showing screen capture or webcam simultaneously livestreaming to multiple services.](./doc/logo.png)
 
@@ -123,9 +121,7 @@ Facebook Live requires FFmpeg >= 4.2 due to mandatory RTMPS
 
     * from phone Periscope app, go to Profile -&gt; Settings -&gt; Periscope Producer and see your Stream Key.
       The "checking source" button will go to "preview stream" once you do step #2.
-    * from computer web browser, go to
-    [<https://www.periscope.tv/account/producer>](https://www.periscope.tv/account/producer)
-    and Create New Source.
+    * from computer web browser, go to  [Periscope Producer](https://www.periscope.tv/account/producer) and Create New Source.
 2. Put the hexadecimal stream key into `periscope.key`
 3. Run Python script for Periscope with chosen input
 
@@ -350,8 +346,6 @@ DirectShow didn't work for me on Windows 10, so I used gdigrab instead.
 * [Periscope parameters](https://www.pscp.tv/help/external-encoders)
 * [YouTube Live parameters](https://support.google.com/youtube/answer/2853702)
 * [Facebook Live parameters](https://www.facebook.com/facebookmedia/get-started/live)
-* [Mixer parameters](https://watchbeam.zendesk.com/hc/en-us/articles/210090606-Stream-Settings-the-basics)
-* Mixer [server list](https://watchbeam.zendesk.com/hc/en-us/articles/209659883-How-to-change-your-Ingest-Server)
 * [Ustream parameters](https://support.ustream.tv/hc/en-us/articles/207852117-Internet-connection-and-recommended-encoding-settings)
 * Vimeo [config](https://help.vimeo.com/hc/en-us/articles/115012811168)
 * Vimeo [parameters](https://help.vimeo.com/hc/en-us/articles/115012811208-Encoder-guides)
