@@ -230,7 +230,9 @@ audio/video files.
 
 #### Loop single video endlessly
 
-    FileLoopLivestream site videofile
+```sh
+FileLoopLivestream videofile site
+```
 
 #### several video files
 
