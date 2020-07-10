@@ -41,20 +41,18 @@ def playonce(
         s.golive()
 
 
-def fileglob(path: T.Union[str, Path], glob: str) -> T.List[Path]:
+def fileglob(path: Path, glob: str) -> T.List[Path]:
 
     path = Path(path).expanduser()
 
-    if glob:
-        if not path.is_dir():
-            raise NotADirectoryError(path)
-        flist = list(path.glob(glob))
-    else:  # assume single file
-        if not path.is_file():
-            raise FileNotFoundError(path)
-        flist = [path]
+    if not glob:
+        glob = "*.avi"
 
-    if not flist:
-        raise FileNotFoundError(f"did not find files with {path} {glob}")
+    if path.is_dir():
+        flist = list(path.glob(glob))
+    elif path.is_file():
+        flist = [path]
+    else:
+        raise FileNotFoundError(path)
 
     return flist
