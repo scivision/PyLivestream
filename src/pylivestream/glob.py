@@ -49,7 +49,7 @@ def fileglob(path: Path, glob: str) -> T.List[Path]:
         glob = "*.avi"
 
     if path.is_dir():
-        flist = list(path.glob(glob))
+        flist = sorted(path.glob(glob))
     elif path.is_file():
         flist = [path]
     else:
