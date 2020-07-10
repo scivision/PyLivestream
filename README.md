@@ -42,22 +42,26 @@ Why not do things without the command line, via linking libffmpeg, libgstreamer 
 
 Requirements:
 
-* FFmpeg &ge; 3.0
+* FFmpeg &ge; 3.0 (&ge; 4.2 for Facebook Live RTMPS)
 * Python &ge; 3.6
 
 Python &ge; 3.6 is required due to extensive use of type hinting to ensure program quality.
 
 Latest release:
 
-    python3 -m pip install PyLivestream
+```sh
+python3 -m pip install PyLivestream
+```
 
 Development version:
 
-    git clone https://github.com/scivision/PyLivestream
+```sh
+git clone https://github.com/scivision/PyLivestream
 
-    cd PyLivestream
+cd PyLivestream
 
-    python3 -m pip install -e .
+python3 -m pip install -e .
+```
 
 ## Configuration: pylivestream.ini
 
@@ -88,6 +92,35 @@ Seek help in FFmpeg documentation, try capturing to a file first and then update
 Finally are the per-site parameters.
 The only thing you would possibly need to change here is the `server` for best performance for your geographic region.
 The included [pylivestream.ini](./src/pylivestream/pylivestream.ini) is with default servers for the Northeastern USA.
+
+### Deduce inputs
+
+Each computer will need distinct pylivestream.ini device input parameters:
+
+* audiochan: audio device
+* webcamchan: webcam device
+* screenchan: desktop capture software port name
+
+Loopback devices that let you "record what you hear" are operating system dependent.
+You may need to search documentation for your operating system to enable such a virtual loopback device.
+
+#### Windows
+
+```sh
+ffmpeg -list_devices true -f dshow -i dummy
+```
+
+#### MacOS
+
+```sh
+ffmpeg -f avfoundation -list_devices true -i ""
+```
+
+#### Linux
+
+```sh
+v4l2-ctl --list-devices
+```
 
 ## Stream Start
 
@@ -156,26 +189,6 @@ Config:
 
 * `webcam_res`: webcam resolution -- find from `v4l2-ctl --list-formats-ext` or webcam spec sheet.
 * `webcam_fps`: webcam fps -- found from command above or webcam spec sheet
-
-Find webcam name by:
-
-#### Windows
-
-```sh
-ffmpeg -list_devices true -f dshow -i dummy
-```
-
-#### MacOS
-
-```sh
-ffmpeg -f avfoundation -list_devices true -i ""
-```
-
-#### Linux
-
-```sh
-v4l2-ctl --list-devices
-```
 
 Stream to multiple sites, in this example Periscope and YouTube Live simultaneously:
 
