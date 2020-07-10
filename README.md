@@ -78,6 +78,8 @@ The `[DEFAULT]` section has parameters that can be overridden for each site, if 
 * `screencap_origin`: origin (upper left corner) of screen capture region in pixels.
 * `screencap_res`: resolution of screen capture (area to capture, starting from origin)
 * `screencap_fps`: frames/sec of screen capture
+* `video_kbps`: override automatic video bitrate in kbps
+
 * `audiofs`: audio sampling frequency. Typically 44100 Hz (CD quality).
 * `audio_bps`: audio data rate--**leave blank if you want no audio** (usually used for "file", to make an animated GIF in  post-processing)
 * `preset`: `veryfast` or `ultrafast` if CPU not able to keep up.
