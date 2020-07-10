@@ -49,7 +49,7 @@ Python &ge; 3.6 is required due to extensive use of type hinting to ensure progr
 
 Latest release:
 
-    python -m pip install PyLivestream
+    python3 -m pip install PyLivestream
 
 Development version:
 
@@ -57,7 +57,7 @@ Development version:
 
     cd PyLivestream
 
-    python -m pip install -e .
+    python3 -m pip install -e .
 
 ## Configuration: pylivestream.ini
 
