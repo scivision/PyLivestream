@@ -2,6 +2,7 @@
 
 [![DOI](https://zenodo.org/badge/91214767.svg)](https://zenodo.org/badge/latestdoi/91214767)
 ![Actions Status](https://github.com/scivision/pylivestream/workflows/ci/badge.svg)
+![CodeQL](https://github.com/scivision/pylivestream/workflows/CodeQL/badge.svg)
 [![pypi versions](https://img.shields.io/pypi/pyversions/PyLivestream.svg)](https://pypi.python.org/pypi/PyLivestream)
 [![PyPi Download stats](http://pepy.tech/badge/pylivestream)](http://pepy.tech/project/pylivestream)
 
