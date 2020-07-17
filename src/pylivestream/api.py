@@ -15,16 +15,23 @@ from pathlib import Path
 from .base import FileIn, Microphone, Screenshare, SaveDisk, Webcam
 from .glob import fileglob, playonce
 
-__all__ = ["stream_file", "stream_files", "stream_microphone", "stream_webcam", "stream_screen", "capture_screen"]
+__all__ = [
+    "stream_file",
+    "stream_files",
+    "stream_microphone",
+    "stream_webcam",
+    "stream_screen",
+    "capture_screen",
+]
 
 
 def stream_file(
     ini_file: Path,
     websites: T.Sequence[str],
     video_file: Path,
-    loop: bool,
-    assume_yes: bool,
-    timeout: float,
+    loop: bool = None,
+    assume_yes: bool = False,
+    timeout: float = None,
 ):
     S = FileIn(ini_file, websites, infn=video_file, loop=loop, yes=assume_yes, timeout=timeout)
     sites: T.List[str] = list(S.streams.keys())
@@ -42,13 +49,13 @@ def stream_files(
     ini_file: Path,
     websites: T.Sequence[str],
     *,
-    assume_yes: bool,
-    loop: bool,
     video_path: Path,
     glob: str,
-    shuffle: bool,
-    still_image: Path,
-    no_meta: bool,
+    assume_yes: bool = False,
+    loop: bool = None,
+    shuffle: bool = None,
+    still_image: Path = None,
+    no_meta: bool = None,
 ):
     # %% file / glob wranging
     flist = fileglob(video_path, glob)
@@ -75,9 +82,9 @@ def stream_microphone(
     ini_file: Path,
     websites: T.Sequence[str],
     *,
-    still_image: Path,
-    assume_yes: bool,
-    timeout: float,
+    still_image: Path = None,
+    assume_yes: bool = False,
+    timeout: float = None,
 ):
     """
     livestream audio, with still image background
@@ -94,7 +101,9 @@ def stream_microphone(
     s.golive()
 
 
-def stream_screen(ini_file: Path, websites: T.Sequence[str], *, assume_yes: bool, timeout: float):
+def stream_screen(
+    ini_file: Path, websites: T.Sequence[str], *, assume_yes: bool = False, timeout: float = None
+):
 
     S = Screenshare(ini_file, websites, yes=assume_yes, timeout=timeout)
     sites: T.List[str] = list(S.streams.keys())
@@ -107,7 +116,10 @@ def stream_screen(ini_file: Path, websites: T.Sequence[str], *, assume_yes: bool
     S.golive()
 
 
-def capture_screen(ini_file: Path, *, out_file: Path, assume_yes: bool, timeout: float):
+def capture_screen(
+    ini_file: Path, *, out_file: Path, assume_yes: bool = False, timeout: float = None
+):
+
     s = SaveDisk(ini_file, out_file, yes=assume_yes, timeout=timeout)
     # %%
     if assume_yes:
