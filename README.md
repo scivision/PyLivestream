@@ -125,7 +125,26 @@ ffmpeg -f avfoundation -list_devices true -i ""
 v4l2-ctl --list-devices
 ```
 
-## Stream Start
+## API
+
+There are two ways to start a stream (assuming you've configured as per following sections).
+Both do the same thing.
+
+* command line via Python entry_points
+    * FileGlobLivestream
+    * ScreenshareLivestream
+    * FileLoopLivestream
+    * ScreenCapture2disk
+    * WebcamLivestream
+    * MicrophoneLivestream
+* `import pylivestream.api as pls` from within your Python script. For more information type `help(pls)` or `help(pls.stream_microphone)`
+    * pls.stream_file()
+    * pls.stream_microphone()
+    * pls.stream_webcam()
+
+
+## Authentication
+
 
 The program will load a `*.key` file according to the configuration file key for the website.
 For example, Periscope expects to see the stream hexadecimal key in `~/periscope.key`, as obtained from phone Periscope app.
@@ -146,7 +165,7 @@ Facebook Live requires FFmpeg >= 4.2 due to mandatory RTMPS
 1. configure your Facebook Live stream
 2. Put stream ID from
     [<https://www.facebook.com/live/create>](https://www.facebook.com/live/create)
-    into the file `facebook.key`
+    into the file `~/facebook.key`
 3. Run Python script for Facebook with chosen input
 
     ScreenshareLivestream facebook
@@ -158,7 +177,7 @@ Facebook Live requires FFmpeg >= 4.2 due to mandatory RTMPS
     * from phone Periscope app, go to Profile -&gt; Settings -&gt; Periscope Producer and see your Stream Key.
       The "checking source" button will go to "preview stream" once you do step #2.
     * from computer web browser, go to  [Periscope Producer](https://www.periscope.tv/account/producer) and Create New Source.
-2. Put the hexadecimal stream key into `periscope.key`
+2. Put the hexadecimal stream key into `~/periscope.key`
 3. Run Python script for Periscope with chosen input
 
     ScreenshareLivestream periscope
@@ -170,7 +189,7 @@ come back in, I can comment from my phone etc.
 ### Twitch
 
 1. create stream from [Twitch Dashboard](http://www.twitch.tv/broadcast/dashboard). If you are not in the Northeast US, edit [pylivestream.ini](./src/pylivestream/pylivestream.ini) to have the [closest server](http://bashtech.net/twitch/ingest.php).
-2. put Twitch stream key into file `twitch.key`
+2. put Twitch stream key into file `~/twitch.key`
 3. Run Python script for Twitch with chosen input
 
     ScreenshareLivestream twitch
