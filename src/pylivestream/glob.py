@@ -14,7 +14,7 @@ except ImportError:
 def playonce(
     flist: T.List[Path],
     image: Path,
-    site: str,
+    sites: T.Sequence[str],
     inifn: Path,
     shuffle: bool,
     usemeta: bool,
@@ -36,7 +36,7 @@ def playonce(
         else:
             caption = None
 
-        s = FileIn(inifn, site, infn=f, loop=False, image=image, caption=caption, yes=yes)
+        s = FileIn(inifn, sites, infn=f, loop=False, image=image, caption=caption, yes=yes)
 
         s.golive()
 
