@@ -8,24 +8,6 @@ on:
 
 jobs:
 
-  linux_py36:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
-      with:
-        python-version: 3.6
-
-    - run: pip install .[tests]
-
-    - name: install prereqs
-      run: |
-        sudo apt update -yq
-        sudo apt install -yq --no-install-recommends ffmpeg
-
-    - run: pytest
-
-
   linux_py3x:
     runs-on: ubuntu-latest
     steps:
@@ -61,6 +43,7 @@ jobs:
 
     - run: pytest
 
+
   windows:
     runs-on: windows-latest
     steps:
@@ -69,7 +52,7 @@ jobs:
       with:
         python-version: '3.x'
 
-    - run: pip install .[tests]
+    - run: pip install -e .[tests]
 
     - run: cinst -y ffmpeg
 
