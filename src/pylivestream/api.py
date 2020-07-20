@@ -50,12 +50,13 @@ def stream_files(
     websites: T.Sequence[str],
     *,
     video_path: Path,
-    glob: str,
+    glob: str = None,
     assume_yes: bool = False,
     loop: bool = None,
     shuffle: bool = None,
     still_image: Path = None,
     no_meta: bool = None,
+    timeout: float = None,
 ):
     # %% file / glob wranging
     flist = fileglob(video_path, glob)

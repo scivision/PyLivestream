@@ -61,7 +61,7 @@ def check_display(fn: Path = None) -> bool:
     if fn:
         ret = _check_disp(fn)
     else:
-        with importlib.resources.path("pylivestream.data", "logo.png") as fn:
+        with importlib.resources.path(f"{__package__}.data", "logo.png") as fn:
             ret = _check_disp(fn)
 
     return ret == 0
@@ -77,7 +77,7 @@ def get_inifile(fn: str) -> str:
             return inifn.read_text(errors="ignore")
 
     try:
-        return importlib.resources.read_text("pylivestream", "pylivestream.ini", errors="ignore")
+        return importlib.resources.read_text(__package__, "pylivestream.ini", errors="ignore")
     except NameError:
         return pkg_resources.resource_string(__name__, "pylivestream.ini").decode(
             "utf8", errors="ignore"
