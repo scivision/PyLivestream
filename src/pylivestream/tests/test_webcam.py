@@ -1,13 +1,9 @@
-#!/usr/bin/env python
-from pathlib import Path
 import pylivestream as pls
 import pytest
 from pytest import approx
 import subprocess
 import os
 import platform
-
-R = Path(__file__).parents[1]
 
 sites = ["localhost", "periscope", "youtube", "facebook"]
 
@@ -42,9 +38,5 @@ def test_stream():
 @pytest.mark.skipif(CI or WSL, reason="has no vidoe hardware typically")
 def test_script():
     subprocess.check_call(
-        ["WebcamLivestream", "localhost", "--yes", "--timeout", "5"], timeout=TIMEOUT, cwd=R
+        ["WebcamLivestream", "localhost", "--yes", "--timeout", "5"], timeout=TIMEOUT
     )
-
-
-if __name__ == "__main__":
-    pytest.main([__file__])
