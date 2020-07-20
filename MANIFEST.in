@@ -1,2 +1,2 @@
 include src/pylivestream/pylivestream.ini
-graft src/pylivestream/data/
+graft src/pylivestream/data

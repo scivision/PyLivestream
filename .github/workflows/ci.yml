@@ -52,7 +52,7 @@ jobs:
       with:
         python-version: '3.x'
 
-    - run: pip install -e .[tests]
+    - run: pip install .[tests]
 
     - run: cinst -y ffmpeg
 
