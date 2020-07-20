@@ -1,18 +1,16 @@
-#!/usr/bin/env python
-import pylivestream as pls
 import pytest
-from pathlib import Path
 from pytest import approx
 import subprocess
 import os
 import platform
+
+import pylivestream as pls
 
 sites = ["periscope", "youtube", "facebook"]
 
 TIMEOUT = 30
 CI = os.environ.get("CI", None) in ("true", "True")
 WSL = "Microsoft" in platform.uname().release
-R = Path(__file__).resolve().parent
 
 
 def test_props(periscope_kbps):
@@ -38,11 +36,5 @@ def test_stream():
 @pytest.mark.skipif(CI or WSL, reason="no GUI typically")
 def test_script():
     subprocess.check_call(
-        ["ScreenshareLivestream", "localhost", "--yes", "--timeout", "5"],
-        timeout=TIMEOUT,
-        cwd=R.parent,
+        ["ScreenshareLivestream", "localhost", "--yes", "--timeout", "5"], timeout=TIMEOUT
     )
-
-
-if __name__ == "__main__":
-    pytest.main([__file__])

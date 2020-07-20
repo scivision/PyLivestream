@@ -59,6 +59,5 @@ def test_stream():
 @pytest.mark.skipif(CI or WSL, reason="has no audio hardware typically")
 def test_script():
     subprocess.check_call(
-        ["MicrophoneLivestream", "localhost", "--yes", "--timeout", "10"],
-        timeout=TIMEOUT
+        ["MicrophoneLivestream", "localhost", "--yes", "--timeout", "10"], timeout=TIMEOUT
     )
