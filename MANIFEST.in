@@ -1,1 +1,2 @@
-include src/pylivestream/pylivestream.ini src/pylivestream/data/logo.png
+include src/pylivestream/pylivestream.ini
+graft src/pylivestream/data/

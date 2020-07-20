@@ -6,8 +6,10 @@ plays several tests to localhost for testing.
 
 ffmpeg -ss 00:00:30 -i BigBuckBunny_DivX_HD720p_ASP.divx -t 7 -vf scale=-2:240 -c:v libx264 -c:a aac bunny.avi
 """
+
 from pathlib import Path
 import subprocess
+import importlib.resources
 
 R = Path(__file__).parent
 VIDPATH = R / "tests"
@@ -26,15 +28,17 @@ def main():
 
     # %% Microphone
     print("PyLivestream splash with live microphone audio")
-    subprocess.check_call(["MicrophoneLivestream", "-y", HOST, "-image", str(STATIC)])
+    with importlib.resources.path("pylivestream.data", "logo.png") as fn:
+        subprocess.check_call(["MicrophoneLivestream", "-y", HOST, "-image", str(fn)])
 
     print("1990s vector graphics with live microphone audio")
     subprocess.check_call(["MicrophoneLivestream", "-y", HOST, "-image", str(MOVING)])
     # %%  Music
     print("PyLivestream splash with orchestra music  (caption)")
-    subprocess.check_call(
-        ["FileGlobLivestream", "-y", "-image", str(STATIC), str(VIDPATH), HOST, "-glob", "orch.ogg"]
-    )
+    with importlib.resources.path("pylivestream.data", "logo.png") as fn:
+        subprocess.check_call(
+            ["FileGlobLivestream", "-y", "-image", str(fn), HOST, "-glob", "orch.ogg"]
+        )
 
     print("1990s vector graphics with orchestra music (NO caption")
     subprocess.check_call(["FileGlobLivestream", "-y", "-image", str(MOVING), str(MUSIC), HOST])
