@@ -3,11 +3,7 @@ import subprocess
 from pathlib import Path
 import sys
 import typing as T
-
-try:
-    import importlib.resources
-except ImportError:
-    import pkg_resources
+import importlib.resources
 
 from .ffmpeg import get_meta
 
@@ -76,12 +72,7 @@ def get_inifile(fn: str) -> str:
         if inifn.is_file():
             return inifn.read_text(errors="ignore")
 
-    try:
-        return importlib.resources.read_text(__package__, "pylivestream.ini", errors="ignore")
-    except NameError:
-        return pkg_resources.resource_string(__name__, "pylivestream.ini").decode(
-            "utf8", errors="ignore"
-        )
+    return importlib.resources.read_text(__package__, "pylivestream.ini", errors="ignore")
 
 
 def meta_caption(meta) -> str:
