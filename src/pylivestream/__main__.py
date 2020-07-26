@@ -143,6 +143,7 @@ def glob_run():
         timeout=P.timeout,
         loop=P.loop,
         video_path=P.path,
+        glob=P.glob,
         shuffle=P.shuffle,
         still_image=P.image,
         no_meta=P.nometa,
