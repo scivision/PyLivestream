@@ -4,7 +4,7 @@
 ![Actions Status](https://github.com/scivision/pylivestream/workflows/ci/badge.svg)
 ![CodeQL](https://github.com/scivision/pylivestream/workflows/CodeQL/badge.svg)
 [![pypi versions](https://img.shields.io/pypi/pyversions/PyLivestream.svg)](https://pypi.python.org/pypi/PyLivestream)
-[![PyPi Download stats](http://pepy.tech/badge/pylivestream)](http://pepy.tech/project/pylivestream)
+[![PyPi Download stats](https://static.pepy.tech/badge/pylivestream)](https://pepy.tech/project/pylivestream)
 
 Streams to one or **multiple** streaming sites simultaneously, using pure object-oriented Python (no extra packages) and FFmpeg.
 Tested with `flake8`, `mypy` type checking and `pytest`.
@@ -18,6 +18,8 @@ FFmpeg is used from Python `subprocess` to stream to sites including:
 * also Ustream, Vimeo, Restream.io and more for streaming broadcasts.
 
 ![PyLivestream diagram showing screen capture or webcam simultaneously livestreaming to multiple services.](./doc/logo.png)
+
+[Troubleshooting](./Troubleshooting.md)
 
 ## PyLivestream benefits
 
@@ -188,7 +190,7 @@ come back in, I can comment from my phone etc.
 
 ### Twitch
 
-1. create stream from [Twitch Dashboard](http://www.twitch.tv/broadcast/dashboard). If you are not in the Northeast US, edit [pylivestream.ini](./src/pylivestream/pylivestream.ini) to have the [closest server](http://bashtech.net/twitch/ingest.php).
+1. create stream from [Twitch Dashboard](https://dashboard.twitch.tv/settings/channel#stream-preferences). Edit [pylivestream.ini](./src/pylivestream/pylivestream.ini) to have the [closest ingest server](https://stream.twitch.tv/ingests/).
 2. put Twitch stream key into file `~/twitch.key`
 3. Run Python script for Twitch with chosen input
 
@@ -330,34 +332,6 @@ This script saves your screen capture to a file on your disk:
 * Linux requires X11, not Wayland (choose at login)
 * `x11grab` was deprecated in FFmpeg 3.3, was previously replaced by `xcbgrab`
 * Reference [webpage](https://www.scivision.dev/youtube-live-ffmpeg-livestream/)
-* [Test videos](http://www.divx.com/en/devices/profiles/video) for looping/globbing
-
-Comments on dropouts / lag for livestreaming in general (not just with this program):
-
-* Low CPU machines (like Raspberry Pi) may need to cut back on resolution.
-* live streaming takes an excellent quality (not necessarily high
-    speed) Internet connection in general. Some DSL / wireless internet
-    provider have really spotty performance. You might not notice this
-    with HD Netflix due to deep buffering, but it will show up on livestreaming.
-* Do Skype / Duo / FaceTime work excellently for you on your network?
-    If not, live streaming will not work well.
-* Try a wired (Ethernet) connection to the Internet.
-    I have seen very expensive consumer WiFi APs that had bad performance in real world strenuous use (like live streaming).
-
-### Troubleshooting
-
-Black / Blank desktop sharing video.
-In general since this program generates command lines that are run by FFmpeg, try just using FFmpeg by itself to write to a video file.
-This is a known issue with Wayland--instead use X11.
-See [FFmpeg Desktop capture docs](https://trac.ffmpeg.org/wiki/Capture/Desktop).
-
-### YouTube stream health
-
-Particularly when streaming with a static background `-image`, YouTube will often warn in "Stream Health":
-
-> The stream's current bitrate is lower than the recommended bitrate.
-
-Disregard this warning as long as your image looks OK.
 
 ### FFmpeg References
 
@@ -377,7 +351,7 @@ DirectShow didn't work for me on Windows 10, so I used gdigrab instead.
 ### Stream References
 
 * [Twitch parameters](https://help.twitch.tv/customer/portal/articles/1253460-broadcast-requirements)
-* Twitch [servers](http://bashtech.net/twitch/ingest.php)
+* Twitch [ingest servers](https://stream.twitch.tv/ingests/)
 * Twitch [encoding](https://stream.twitch.tv/encoding/)
 
 * [Periscope parameters](https://www.pscp.tv/help/external-encoders)
