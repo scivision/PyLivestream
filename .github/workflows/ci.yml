@@ -8,7 +8,7 @@ on:
 
 jobs:
 
-  linux_py3x:
+  linux:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -19,7 +19,7 @@ jobs:
     - run: pip install .[tests,lint]
 
     - run: flake8
-    - run: mypy . src
+    - run: mypy
 
     - name: install prereqs
       run: |
@@ -30,6 +30,7 @@ jobs:
 
 
   macos:
+    needs: linux
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
@@ -45,6 +46,7 @@ jobs:
 
 
   windows:
+    needs: linux
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2

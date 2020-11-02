@@ -47,8 +47,7 @@ def test_audio(periscope_kbps):
 @pytest.mark.timeout(TIMEOUT)
 @pytest.mark.skipif(CI, reason="CI has no audio hardware typically")
 def test_simple():
-    """stream to localhost
-    """
+    """stream to localhost"""
     with importlib.resources.path(
         "pylivestream.data", "logo.png"
     ) as logo, importlib.resources.path("pylivestream.data", "orch_short.ogg") as fn:
