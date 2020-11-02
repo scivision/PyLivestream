@@ -3,6 +3,7 @@
 [![DOI](https://zenodo.org/badge/91214767.svg)](https://zenodo.org/badge/latestdoi/91214767)
 ![Actions Status](https://github.com/scivision/pylivestream/workflows/ci/badge.svg)
 ![CodeQL](https://github.com/scivision/pylivestream/workflows/CodeQL/badge.svg)
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/scivision/PyLivestream.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/scivision/PyLivestream/context:python)
 [![pypi versions](https://img.shields.io/pypi/pyversions/PyLivestream.svg)](https://pypi.python.org/pypi/PyLivestream)
 [![PyPi Download stats](https://static.pepy.tech/badge/pylivestream)](https://pepy.tech/project/pylivestream)
 
