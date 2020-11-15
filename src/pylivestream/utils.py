@@ -4,6 +4,7 @@ from pathlib import Path
 import sys
 import typing as T
 import importlib.resources
+import shutil
 
 from .ffmpeg import get_meta
 
@@ -50,8 +51,13 @@ def check_device(cmd: T.Sequence[str]) -> bool:
 def check_display(fn: Path = None) -> bool:
     """see if it's possible to display something with a test file"""
 
+    exe = shutil.which("ffplay")
+
+    if not exe:
+        raise FileNotFoundError("FFplay not found")
+
     def _check_disp(fn: Path) -> int:
-        cmd = ["ffplay", "-loglevel", "error", "-t", "1.0", "-autoexit", str(fn)]
+        cmd = [exe, "-loglevel", "error", "-t", "1.0", "-autoexit", str(fn)]
         return subprocess.run(cmd, timeout=10).returncode
 
     if fn:

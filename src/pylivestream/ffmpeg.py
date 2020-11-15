@@ -65,11 +65,11 @@ class Ffmpeg:
 
         TIMEOUT = 0.5
 
-        FFPLAY = shutil.which("ffplay")
-        if not FFPLAY:
+        exe = shutil.which("ffplay")
+        if not exe:
             raise FileNotFoundError("FFplay not found, cannot start listener")
 
-        cmd = [FFPLAY, "-loglevel", "error", "-timeout", "5", "-autoexit", "rtmp://localhost"]
+        cmd = [exe, "-loglevel", "error", "-timeout", "5", "-autoexit", "rtmp://localhost"]
 
         print(
             "starting Localhost RTMP listener. \n\n",
