@@ -135,15 +135,18 @@ class Stream:
 
         if self.vidsource == "screen":
             v = self.screengrab(quick)
+            if sys.platform == "darwin":
+                # not for files "option pixel_format not found"
+                v = ["-pix_fmt", "uyvy422"] + v
         elif self.vidsource == "camera":
             v = self.webcam(quick)
+            if sys.platform == "darwin":
+                # not for files "option pixel_format not found"
+                v = ["-pix_fmt", "uyvy422"] + v
         elif self.vidsource is None or self.vidsource == "file":
             v = self.filein(quick)
         else:
             raise ValueError(f"unknown vidsource {self.vidsource}")
-
-        if sys.platform == "darwin":
-            v = ["-pix_fmt", "uyvy422"] + v
 
         return v
 
