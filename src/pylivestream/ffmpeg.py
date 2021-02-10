@@ -1,5 +1,6 @@
+from __future__ import annotations
+import typing as T
 import subprocess
-from typing import List, Union
 from time import sleep
 import os
 from pathlib import Path
@@ -21,7 +22,7 @@ class Ffmpeg:
 
         self.THROTTLE = "-re"
 
-    def timelimit(self, t: Union[str, int, float]) -> List[str]:
+    def timelimit(self, t: str | int | float) -> list[str]:
         if t is None:
             return []
 
@@ -34,7 +35,7 @@ class Ffmpeg:
         else:
             return []
 
-    def drawtext(self, text: str = None) -> List[str]:
+    def drawtext(self, text: str = None) -> list[str]:
         # fontfile=/path/to/font.ttf:
         if not text:  # None or '' or [] etc.
             return []
@@ -87,7 +88,7 @@ class Ffmpeg:
 
         return proc
 
-    def movingBG(self, bgfn: Path = None) -> List[str]:
+    def movingBG(self, bgfn: Path = None) -> list[str]:
         if not bgfn:
             return []
 
@@ -117,7 +118,7 @@ could not find {exein}
     return exe
 
 
-def get_meta(fn: Path, exein: str = None) -> Union[None, dict]:
+def get_meta(fn: Path, exein: str = None) -> dict[str, T.Any]:
     if not fn:  # audio-only
         return None
 

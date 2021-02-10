@@ -1,15 +1,15 @@
+from __future__ import annotations
 import logging
 import subprocess
 from pathlib import Path
 import sys
-import typing as T
 import importlib.resources
 import shutil
 
 from .ffmpeg import get_meta
 
 
-def run(cmd: T.Sequence[str]):
+def run(cmd: list[str]):
     """
     FIXME: shell=True for Windows seems necessary to specify devices enclosed by "" quotes
     """
@@ -37,7 +37,7 @@ Better to let users know there's a problem.
 """
 
 
-def check_device(cmd: T.Sequence[str]) -> bool:
+def check_device(cmd: list[str]) -> bool:
     try:
         run(cmd)
         ok = True
@@ -98,7 +98,7 @@ def meta_caption(meta) -> str:
     return caption
 
 
-def get_resolution(fn: Path, exe: str = None) -> T.List[str]:
+def get_resolution(fn: Path, exe: str = None) -> list[str]:
     """
     get resolution (widthxheight) of video file
     http://trac.ffmpeg.org/wiki/FFprobeTips#WidthxHeight

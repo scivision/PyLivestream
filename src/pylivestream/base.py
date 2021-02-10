@@ -1,5 +1,5 @@
+from __future__ import annotations
 from pathlib import Path
-import typing
 import logging
 import os
 
@@ -22,15 +22,15 @@ class Livestream(Stream):
 
         self.video_bitrate()
 
-        vidIn: typing.List[str] = self.videoIn()
-        vidOut: typing.List[str] = self.videoOut()
+        vidIn: list[str] = self.videoIn()
+        vidOut: list[str] = self.videoOut()
 
-        audIn: typing.List[str] = self.audioIn()
-        audOut: typing.List[str] = self.audioOut()
+        audIn: list[str] = self.audioIn()
+        audOut: list[str] = self.audioOut()
 
-        buf: typing.List[str] = self.buffer(self.server)
+        buf: list[str] = self.buffer(self.server)
         # %% begin to setup command line
-        cmd: typing.List[str] = []
+        cmd: list[str] = []
         cmd.append(self.exe)
 
         cmd += self.loglevel
@@ -61,12 +61,12 @@ class Livestream(Stream):
         self.sink = sink
         cmd.append(sink)
 
-        self.cmd: typing.List[str] = cmd
+        self.cmd: list[str] = cmd
         # %% quick check command, to verify device exists
         # 0.1 seems OK, spurious buffer error on Windows that wasn't helped by any bigger size
         CHECKTIMEOUT = "0.1"
 
-        self.checkcmd: typing.List[str] = (
+        self.checkcmd: list[str] = (
             [self.exe]
             + self.loglevel
             + ["-t", CHECKTIMEOUT]
@@ -76,7 +76,7 @@ class Livestream(Stream):
             + ["-f", "null", "-"]  # webcam needs at output
         )
 
-    def startlive(self, sinks: typing.Sequence[str] = None):
+    def startlive(self, sinks: list[str] = None):
         """finally start the stream(s)"""
 
         if self.docheck:
@@ -108,9 +108,9 @@ class Livestream(Stream):
         elif len(sinks) == 1:
             run(self.cmd)
         else:  # multi-stream output tee
-            cmdstem: typing.List[str] = self.cmd[:-3]
+            cmdstem: list[str] = self.cmd[:-3]
             # +global_header is necessary to tee to multiple services
-            cmd: typing.List[str] = cmdstem + ["-flags:v", "+global_header", "-f", "tee"]
+            cmd: list[str] = cmdstem + ["-flags:v", "+global_header", "-f", "tee"]
 
             if self.image:
                 #  connect image to video stream, audio file to audio stream
@@ -166,7 +166,7 @@ class Livestream(Stream):
 
 # %% operators
 class Screenshare:
-    def __init__(self, inifn: Path, websites: typing.Sequence[str], **kwargs):
+    def __init__(self, inifn: Path, websites: list[str], **kwargs):
 
         if isinstance(websites, str):
             websites = [websites]
@@ -175,11 +175,11 @@ class Screenshare:
         for site in websites:
             streams[site] = Livestream(inifn, site, vidsource="screen", **kwargs)
 
-        self.streams: typing.Dict[str, Livestream] = streams
+        self.streams: dict[str, Livestream] = streams
 
     def golive(self):
 
-        sinks: typing.List[str] = [self.streams[stream].sink for stream in self.streams]
+        sinks: list[str] = [self.streams[stream].sink for stream in self.streams]
 
         try:
             next(self.streams[unify_streams(self.streams)].startlive(sinks))
@@ -188,7 +188,7 @@ class Screenshare:
 
 
 class Webcam:
-    def __init__(self, inifn: Path, websites: typing.Sequence[str], **kwargs):
+    def __init__(self, inifn: Path, websites: list[str], **kwargs):
 
         if isinstance(websites, str):
             websites = [websites]
@@ -197,11 +197,11 @@ class Webcam:
         for site in websites:
             streams[site] = Livestream(inifn, site, vidsource="camera", **kwargs)
 
-        self.streams: typing.Dict[str, Livestream] = streams
+        self.streams: dict[str, Livestream] = streams
 
     def golive(self):
 
-        sinks: typing.List[str] = [self.streams[stream].sink for stream in self.streams]
+        sinks: list[str] = [self.streams[stream].sink for stream in self.streams]
 
         try:
             next(self.streams[unify_streams(self.streams)].startlive(sinks))
@@ -210,7 +210,7 @@ class Webcam:
 
 
 class Microphone:
-    def __init__(self, inifn: Path, websites: typing.Sequence[str], **kwargs):
+    def __init__(self, inifn: Path, websites: list[str], **kwargs):
 
         if isinstance(websites, str):
             websites = [websites]
@@ -219,11 +219,11 @@ class Microphone:
         for site in websites:
             streams[site] = Livestream(inifn, site, **kwargs)
 
-        self.streams: typing.Dict[str, Livestream] = streams
+        self.streams: dict[str, Livestream] = streams
 
     def golive(self):
 
-        sinks: typing.List[str] = [self.streams[stream].sink for stream in self.streams]
+        sinks: list[str] = [self.streams[stream].sink for stream in self.streams]
 
         try:
             next(self.streams[unify_streams(self.streams)].startlive(sinks))
@@ -233,7 +233,7 @@ class Microphone:
 
 # %% File-based inputs
 class FileIn:
-    def __init__(self, inifn: Path, websites: typing.Sequence[str], **kwargs):
+    def __init__(self, inifn: Path, websites: list[str], **kwargs):
 
         if isinstance(websites, str):
             websites = [websites]
@@ -242,11 +242,11 @@ class FileIn:
         for site in websites:
             streams[site] = Livestream(inifn, site, vidsource="file", **kwargs)
 
-        self.streams: typing.Dict[str, Livestream] = streams
+        self.streams: dict[str, Livestream] = streams
 
     def golive(self):
 
-        sinks: typing.List[str] = [self.streams[stream].sink for stream in self.streams]
+        sinks: list[str] = [self.streams[stream].sink for stream in self.streams]
 
         try:
             next(self.streams[unify_streams(self.streams)].startlive(sinks))
@@ -267,13 +267,13 @@ class SaveDisk(Stream):
 
         self.osparam(kwargs.get("key"))
 
-        vidIn: typing.List[str] = self.videoIn()
-        vidOut: typing.List[str] = self.videoOut()
+        vidIn: list[str] = self.videoIn()
+        vidOut: list[str] = self.videoOut()
 
-        audIn: typing.List[str] = self.audioIn()
-        audOut: typing.List[str] = self.audioOut()
+        audIn: list[str] = self.audioIn()
+        audOut: list[str] = self.audioOut()
 
-        self.cmd: typing.List[str] = [str(self.exe)]
+        self.cmd: list[str] = [str(self.exe)]
         self.cmd += vidIn + audIn
         self.cmd += vidOut + audOut
 
@@ -295,7 +295,7 @@ class SaveDisk(Stream):
             print("specify filename to save screen capture w/ audio to disk.")
 
 
-def unify_streams(streams: typing.Dict[str, Stream]) -> str:
+def unify_streams(streams: dict[str, Stream]) -> str:
     """
     find least common denominator stream settings,
         so "tee" output can generate multiple streams.
@@ -306,7 +306,7 @@ def unify_streams(streams: typing.Dict[str, Stream]) -> str:
     fast native Python argmin()
     https://stackoverflow.com/a/11825864
     """
-    vid_bw: typing.List[int] = [streams[s].video_kbps for s in streams]
+    vid_bw: list[int] = [streams[s].video_kbps for s in streams]
 
     argmin: int = min(range(len(vid_bw)), key=vid_bw.__getitem__)
 

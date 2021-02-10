@@ -4,7 +4,6 @@ import logging
 import os
 import sys
 from configparser import ConfigParser
-from typing import List
 
 #
 from . import utils
@@ -30,7 +29,7 @@ class Stream:
 
         self.F = Ffmpeg()
 
-        self.loglevel: List[str] = self.F.INFO if kwargs.get("verbose") else self.F.ERROR
+        self.loglevel: list[str] = self.F.INFO if kwargs.get("verbose") else self.F.ERROR
 
         self.inifn: Path = Path(inifn).expanduser() if inifn else None
 
@@ -45,13 +44,13 @@ class Stream:
         self.loop: bool = kwargs.get("loop")
 
         self.infn = Path(kwargs["infn"]).expanduser() if kwargs.get("infn") else None
-        self.yes: List[str] = self.F.YES if kwargs.get("yes") else []
+        self.yes: list[str] = self.F.YES if kwargs.get("yes") else []
 
-        self.queue: List[str] = []  # self.F.QUEUE
+        self.queue: list[str] = []  # self.F.QUEUE
 
         self.caption: str = kwargs.get("caption")
 
-        self.timelimit: List[str] = self.F.timelimit(kwargs.get("timeout"))
+        self.timelimit: list[str] = self.F.timelimit(kwargs.get("timeout"))
 
     def osparam(self, key: str):
         """load OS specific config"""
@@ -78,13 +77,13 @@ class Stream:
                 logging.error("Wayland may only give black output. Try X11")
 
         if self.vidsource == "camera":
-            self.res: List[str] = C.get(self.site, "webcam_res").split("x")
+            self.res: list[str] = C.get(self.site, "webcam_res").split("x")
             self.fps: float = C.getint(self.site, "webcam_fps")
             self.movingimage = self.staticimage = False
         elif self.vidsource == "screen":
             self.res = C.get(self.site, "screencap_res").split("x")
             self.fps = C.getint(self.site, "screencap_fps")
-            self.origin: List[str] = C.get(self.site, "screencap_origin").split(",")
+            self.origin: list[str] = C.get(self.site, "screencap_origin").split(",")
             self.movingimage = self.staticimage = False
         elif self.vidsource == "file":  # streaming video from a file
             self.res = utils.get_resolution(self.infn, self.probeexe)
@@ -128,7 +127,7 @@ class Stream:
         else:
             self.key = utils.getstreamkey(C.get(self.site, "key", fallback=None))
 
-    def videoIn(self, quick: bool = False) -> List[str]:
+    def videoIn(self, quick: bool = False) -> list[str]:
         """
         config video input
         """
@@ -150,13 +149,13 @@ class Stream:
 
         return v
 
-    def videoOut(self) -> List[str]:
+    def videoOut(self) -> list[str]:
         """
         configure video output
         """
 
         vid_format = "uyvy422" if sys.platform == "darwin" else "yuv420p"
-        v: List[str] = ["-codec:v", "libx264", "-pix_fmt", vid_format]
+        v: list[str] = ["-codec:v", "libx264", "-pix_fmt", vid_format]
         # %% set frames/sec, bitrate and keyframe interval
         """
          DON'T DO THIS.
@@ -180,7 +179,7 @@ class Stream:
 
         return v
 
-    def audioIn(self, quick: bool = False) -> List[str]:
+    def audioIn(self, quick: bool = False) -> list[str]:
         """
         -ac 2 doesn't seem to be needed, so it was removed.
 
@@ -198,7 +197,7 @@ class Stream:
             self.audiochan = f"anullsrc=sample_rate={self.audiofs}:channel_layout=stereo"
 
         if self.vidsource == "file":
-            a: List[str] = []
+            a: list[str] = []
         elif self.acap == "null":
             a = ["-f", "lavfi", "-i", self.audiochan]
         else:
@@ -206,7 +205,7 @@ class Stream:
 
         return a
 
-    def audioOut(self) -> List[str]:
+    def audioOut(self) -> list[str]:
         """
         select audio codec
 
@@ -246,13 +245,13 @@ class Stream:
         else:
             self.video_kbps: int = list(BR60.values())[bisect.bisect_left(list(BR60.keys()), x)]
 
-    def screengrab(self, quick: bool = False) -> List[str]:
+    def screengrab(self, quick: bool = False) -> list[str]:
         """
         grab video from desktop.
         May not work for Wayland desktop.
         """
 
-        v: List[str] = ["-f", self.vcap]
+        v: list[str] = ["-f", self.vcap]
 
         # FIXME: explict frame rate is problematic for MacOS with screenshare. Just leave it off?
         # if not quick:
@@ -277,7 +276,7 @@ class Stream:
 
         return v
 
-    def webcam(self, quick: bool = False) -> List[str]:
+    def webcam(self, quick: bool = False) -> list[str]:
         """
         configure webcam
 
@@ -289,13 +288,13 @@ class Stream:
             if not webcam_chan:
                 webcam_chan = "default"
 
-        v: List[str] = ["-f", self.hcam, "-i", webcam_chan]
+        v: list[str] = ["-f", self.hcam, "-i", webcam_chan]
 
         #  '-r', str(self.fps),  # -r causes bad dropouts
 
         return v
 
-    def filein(self, quick: bool = False) -> List[str]:
+    def filein(self, quick: bool = False) -> list[str]:
         """
         used for:
 
@@ -303,7 +302,7 @@ class Stream:
         * microphone-only
         """
 
-        v: List[str] = []
+        v: list[str] = []
 
         """
         -re is NOT for actual streaming devices (webcam, microphone)
@@ -334,7 +333,7 @@ class Stream:
 
         return v
 
-    def buffer(self, server: str) -> List[str]:
+    def buffer(self, server: str) -> list[str]:
         """configure network buffer. Tradeoff: latency vs. robustness"""
         # constrain to single thread, default is multi-thread
         # buf = ['-threads', '1']

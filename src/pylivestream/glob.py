@@ -1,6 +1,6 @@
+from __future__ import annotations
 import random
 from pathlib import Path
-import typing as T
 
 from .base import FileIn
 from .utils import meta_caption
@@ -12,9 +12,9 @@ except ImportError:
 
 
 def playonce(
-    flist: T.List[Path],
+    flist: list[Path],
     image: Path,
-    sites: T.Sequence[str],
+    sites: list[str],
     inifn: Path,
     shuffle: bool,
     usemeta: bool,
@@ -24,7 +24,7 @@ def playonce(
     if shuffle:
         random.shuffle(flist)
 
-    caption: T.Union[str, None]
+    caption: str
 
     for f in flist:
         if usemeta and TinyTag:
@@ -41,7 +41,7 @@ def playonce(
         s.golive()
 
 
-def fileglob(path: Path, glob: str) -> T.List[Path]:
+def fileglob(path: Path, glob: str) -> list[Path]:
 
     path = Path(path).expanduser()
 
