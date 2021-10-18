@@ -1,3 +1,4 @@
+from __future__ import annotations
 import bisect
 from pathlib import Path
 import logging
