@@ -42,12 +42,7 @@ Why not do things without the command line, via linking libffmpeg, libgstreamer 
 
 ## Install
 
-Requirements:
-
-* FFmpeg &ge; 3.0 (&ge; 4.2 for Facebook Live RTMPS)
-* Python &ge; 3.6
-
-Python &ge; 3.6 is required due to extensive use of type hinting to ensure program quality.
+Requires FFmpeg &ge; 3.0 (&ge; 4.2 for Facebook Live RTMPS)
 
 Latest release:
 
