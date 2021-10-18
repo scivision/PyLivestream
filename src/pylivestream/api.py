@@ -55,8 +55,7 @@ def stream_files(
     loop: bool = None,
     shuffle: bool = None,
     still_image: Path = None,
-    no_meta: bool = None,
-    timeout: float = None,
+    no_meta: bool = None
 ):
     # %% file / glob wranging
     flist = fileglob(video_path, glob)
