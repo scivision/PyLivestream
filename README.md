@@ -265,7 +265,7 @@ Glob list of video files to stream:
 FileGlobLivestream path site -glob glob_pattern
 ```
 
-* `-glob` glob pattern of files to stream e.g. "*.avi"
+* `-glob` glob pattern of files to stream e.g. "*.avi".  For [recursive globbing](https://docs.python.org/3/library/pathlib.html#pathlib.Path.glob), do like "**/*.avi".
 * `-loop` optionally loop endlessly the globbed file list
 * `-shuffle` optionally shuffle the globbed file list
 * `-image` if you have AUDIO files, you should normally set an image to display, as most/all streaming sites REQUIRE a video feed--even a static image.
