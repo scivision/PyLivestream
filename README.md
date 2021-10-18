@@ -235,6 +235,8 @@ or wherever your image file is.
 ### Audio-only Livestream
 
 Audio-only streaming is not typically allowed by the Video streaming sites.
+It may fail to work altogether, or may fail when one file is done and another starts.
+That's not something we can fix within the scope of this project.
 You can test it to your own computer by:
 
 ```sh
