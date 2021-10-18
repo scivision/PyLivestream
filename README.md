@@ -32,7 +32,6 @@ FFmpeg is used from Python `subprocess` to stream to sites including:
 * does *not* auto-restart if network connection glitches
 * is intended as a bare minimum command generator to run the FFmpeg program
 * is not intended for bidirectional robust streaming--consider a program/system based on Jitsi for that.
-* generally does not work from Windows Subsystem for Linux 1 because of lack of hardware interface in WSL1. It works fine from native Windows.
 
 ### Design rationale
 
