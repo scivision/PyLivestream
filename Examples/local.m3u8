@@ -1,0 +1,7 @@
+#EXTM3U
+
+#EXTINF:1, Big Bunny
+src/pylivestream/data/bunny.avi
+
+#EXTINF:2, Orchestra
+src/pylivestream/data/orch.ogg

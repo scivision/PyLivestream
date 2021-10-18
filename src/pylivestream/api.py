@@ -27,7 +27,7 @@ __all__ = [
 
 def stream_file(
     ini_file: Path,
-    websites: list[str],
+    websites: str | list[str],
     video_file: Path,
     loop: bool = None,
     assume_yes: bool = False,
@@ -55,7 +55,7 @@ def stream_files(
     loop: bool = None,
     shuffle: bool = None,
     still_image: Path = None,
-    no_meta: bool = None
+    no_meta: bool = None,
 ):
     # %% file / glob wranging
     flist = fileglob(video_path, glob)

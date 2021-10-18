@@ -233,7 +233,7 @@ class Microphone:
 
 # %% File-based inputs
 class FileIn:
-    def __init__(self, inifn: Path, websites: list[str], **kwargs):
+    def __init__(self, inifn: Path, websites: str | list[str], **kwargs):
 
         if isinstance(websites, str):
             websites = [websites]

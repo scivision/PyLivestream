@@ -14,7 +14,7 @@ def test_get_ini_file(fn):
 
 
 def test_key(tmp_path):
-    """ tests reading of stream key: string and file """
+    """tests reading of stream key: string and file"""
     assert pls.utils.getstreamkey("abc123") == "abc123"
     fn = tmp_path / "peri.key"
     fn.write_text("abc432")
