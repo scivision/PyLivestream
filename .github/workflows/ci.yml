@@ -10,11 +10,16 @@ jobs:
 
   linux:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ '3.7', '3.10' ]
+    name: Lint Python ${{ matrix.python-version }}
+
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v2
       with:
-        python-version: 3.x
+        python-version: ${{ matrix.python-version }}
 
     - run: pip install .[tests,lint]
 
