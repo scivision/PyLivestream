@@ -37,9 +37,9 @@ def stream_file(
     sites: list[str] = list(S.streams.keys())
     # %% Go live
     if assume_yes:
-        print(f"going live on {sites} looping file {video_file}")
+        print(f"going live on {sites} with file {video_file}")
     else:
-        input(f"Press Enter to go live on {sites}," f"looping file {video_file}")
+        input(f"Press Enter to go live on {sites} with file {video_file}")
         print("Or Ctrl C to abort.")
 
     S.golive()
