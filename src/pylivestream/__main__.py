@@ -148,3 +148,35 @@ def glob_run():
         still_image=P.image,
         no_meta=P.nometa,
     )
+
+def playlist():
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
+
+    p = ArgumentParser(description="Livestream a globbed input file list")
+    p.add_argument("path", help="path to discover files from")
+    p.add_argument(
+        "websites",
+        help="site to stream, e.g. localhost youtube periscope facebook twitch",
+        nargs="+",
+    )
+    p.add_argument("-i", "--ini", help="*.ini file with stream parameters")
+    p.add_argument("-image", help="static image to display, for audio-only files.")
+    p.add_argument("-shuffle", help="shuffle the globbed file list", action="store_true")
+    p.add_argument("-loop", help="repeat the globbed file list endlessly", action="store_true")
+    p.add_argument("-y", "--yes", help="no confirmation dialog", action="store_true")
+    p.add_argument("-nometa", help="do not add metadata caption to video", action="store_false")
+    p.add_argument("-t", "--timeout", help="stop streaming after --timeout seconds", type=int)
+    P = p.parse_args()
+
+    stream_playlist(
+        ini_file=P.ini,
+        websites=P.websites,
+        assume_yes=P.yes,
+        timeout=P.timeout,
+        loop=P.loop,
+        video_path=P.path,
+        glob=P.glob,
+        shuffle=P.shuffle,
+        still_image=P.image,
+        no_meta=P.nometa,
+    )

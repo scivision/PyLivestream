@@ -35,6 +35,8 @@ class Livestream(Stream):
 
         cmd += self.loglevel
         cmd += self.yes
+        if self.loop:
+            cmd += ["-stream_loop", "-1"]
 
         #        cmd += self.timelimit  # terminate input after N seconds, IF specified
 

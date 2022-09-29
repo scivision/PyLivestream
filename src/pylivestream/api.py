@@ -13,7 +13,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from .base import FileIn, Microphone, Screenshare, SaveDisk, Webcam
-from .glob import fileglob, playonce
+from .glob import fileglob, playmulti, playonce
 
 __all__ = [
     "stream_file",
@@ -77,6 +77,37 @@ def stream_files(
     else:
         playonce(flist, still_image, websites, ini_file, shuffle, usemeta, assume_yes)
 
+def stream_playlist(
+    ini_file: Path,
+    websites: list[str],
+    *,
+    video_path: Path,
+    glob: str = None,
+    assume_yes: bool = False,
+    loop: bool = None,
+    shuffle: bool = None,
+    still_image: Path = None,
+    no_meta: bool = None,
+    timeout: float = None,
+):
+    # %% file / glob wranging
+    flist = fileglob(video_path, glob)
+    
+    print("streaming these files. Be sure list is correct! \n")
+    print("\n".join(map(str, flist)))
+    print()
+
+    if assume_yes:
+        print("going live on", websites)
+    else:
+        input(f"Press Enter to go live on {websites}.    Or Ctrl C to abort.")
+
+    usemeta = no_meta
+
+    # if loop:
+    #     while True:
+    #         playmulti(flist, still_image, websites, ini_file, shuffle, usemeta, assume_yes)
+    playmulti(flist, still_image, websites, ini_file, shuffle, usemeta, assume_yes, loop)
 
 def stream_microphone(
     ini_file: Path,
