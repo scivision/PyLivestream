@@ -40,6 +40,25 @@ def playonce(
 
         s.golive()
 
+def playmulti(
+    flist: list[Path],
+    image: Path,
+    sites: list[str],
+    inifn: Path,
+    shuffle: bool,
+    usemeta: bool,
+    yes: bool,
+    loop: bool
+):
+
+    if shuffle:
+        random.shuffle(flist)
+
+    f = "\n".join(map(str, flist))
+
+    s = FileIn(inifn, sites, infn=f, loop=loop, image=image, caption="", yes=yes)
+
+    s.golive()
 
 def fileglob(path: Path, glob: str) -> list[Path]:
 
