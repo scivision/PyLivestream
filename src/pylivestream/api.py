@@ -104,9 +104,6 @@ def stream_playlist(
 
     usemeta = no_meta
 
-    # if loop:
-    #     while True:
-    #         playmulti(flist, still_image, websites, ini_file, shuffle, usemeta, assume_yes)
     playmulti(flist, still_image, websites, ini_file, shuffle, usemeta, assume_yes, loop)
 
 def stream_microphone(
