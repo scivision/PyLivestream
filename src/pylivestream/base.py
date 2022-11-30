@@ -16,7 +16,7 @@ class Livestream(Stream):
 
         self.site = site.lower()
 
-        self.osparam(kwargs.get("key"))
+        self.osparam()
 
         self.docheck = kwargs.get("docheck")
 
@@ -50,11 +50,10 @@ class Livestream(Stream):
 
         cmd.extend(self.timelimit)  # terminate output after N seconds, IF specified
 
-        streamid: str = self.key if self.key else ""
-
+        streamid = self.streamid if hasattr(self, "streamid") else ""
         # cannot have double quotes for Mac/Linux,
         #    but need double quotes for Windows
-        sink: str = self.server + streamid
+        sink: str = self.url + "/" + streamid
         if os.name == "nt":
             sink = '"' + sink + '"'
 
@@ -84,15 +83,10 @@ class Livestream(Stream):
 
         proc = None
         # %% special cases for localhost tests
-        if self.key is None and self.site != "localhost-test":
-            if self.site == "localhost":
-                proc = self.F.listener()  # start own RTMP server
-            else:
-                print(
-                    "A livestream key was not provided or found. Here is the command I would have run:"
-                )
-                print("\n", " ".join(self.cmd), "\n", flush=True)
-                return
+        if self.site == "localhost-test":
+            pass
+        elif self.site == "localhost":
+            proc = self.F.listener()  # start own RTMP server
 
         if proc is not None and proc.poll() is not None:
             # listener stopped prematurely, probably due to error
@@ -265,7 +259,7 @@ class SaveDisk(Stream):
 
         self.outfn = Path(outfn).expanduser() if outfn else None
 
-        self.osparam(kwargs.get("key"))
+        self.osparam()
 
         vidIn: list[str] = self.videoIn()
         vidOut: list[str] = self.videoOut()
@@ -301,7 +295,7 @@ def unify_streams(streams: typing.Mapping[str, Stream]) -> str:
         so "tee" output can generate multiple streams.
     First try: use stream with lowest video bitrate.
 
-    Exploits that Python >= 3.6 has guaranteed dict() ordering.
+    Exploits that Python has guaranteed dict() ordering.
 
     fast native Python argmin()
     https://stackoverflow.com/a/11825864

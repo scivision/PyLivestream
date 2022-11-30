@@ -108,7 +108,7 @@ def cli():
         nargs="+",
     )
     p.add_argument("-glob", help="file glob pattern to stream.")
-    p.add_argument("-i", "--ini", help="*.ini file with stream parameters")
+    p.add_argument("json", help="JSON file with stream parameters such as key")
     p.add_argument("-image", help="static image to display, for audio-only files.")
     p.add_argument("-shuffle", help="shuffle the globbed file list", action="store_true")
     p.add_argument("-loop", help="repeat the globbed file list endlessly", action="store_true")
@@ -118,7 +118,7 @@ def cli():
     P = p.parse_args()
 
     stream_files(
-        ini_file=P.ini,
+        ini_file=P.json,
         websites=P.websites,
         assume_yes=P.yes,
         timeout=P.timeout,

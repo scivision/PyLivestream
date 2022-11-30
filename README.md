@@ -148,13 +148,13 @@ Both do the same thing.
 
 ## Authentication
 
-The program will load a `*.key` file according to the configuration file key for the website.
-For example, YouTube expects a file `~/youtube.key` with the hexadecimal stream key and so on.
+The program loads a JSON file with the stream URL and hexadecimal stream key for the website(s) used.
+The user must specify this JSON file location.
 
 ### YouTube Live
 
 1. [configure](https://www.youtube.com/live_dashboard) YouTube Live.
-2. Edit file `youtube.key` to have the YouTube hexadecimal stream key
+2. Edit file `youtube.json` to have the YouTube hexadecimal stream key
 3. Run Python script and chosen input will stream on YouTube Live.
 
 ```sh
@@ -168,7 +168,7 @@ Facebook Live requires FFmpeg >= 4.2 due to mandatory RTMPS
 1. configure your Facebook Live stream
 2. Put stream ID from
     [<https://www.facebook.com/live/create>](https://www.facebook.com/live/create)
-    into the file `~/facebook.key`
+    into the file `~/facebook.json`
 3. Run Python script for Facebook with chosen input
 
 ```sh
@@ -182,7 +182,7 @@ TODO
 ### Twitch
 
 1. create stream from [Twitch Dashboard](https://dashboard.twitch.tv/settings/channel#stream-preferences). Edit [pylivestream.ini](./src/pylivestream/pylivestream.ini) to have the [closest ingest server](https://stream.twitch.tv/ingests/).
-2. put Twitch stream key into file `~/twitch.key`
+2. put Twitch stream key into file `~/twitch.json`
 3. Run Python script for Twitch with chosen input
 
 ```sh
@@ -196,7 +196,20 @@ Due to the complexity of streaming and the non-specific error codes FFmpeg emits
 * [pylivestream.ini](./src/pylivestream/pylivestream.ini) is setup for your computer and desired parameters
 * `site` is `facebook`, `twitch`, `youtube`, etc.
 * For `pylivestream.camera` and `pylivestream.screen`, more than one `site` can be specified for simultaneous multi-streaming
-* remember to setup a `*.key` file with the hexadecimal stream key for EACH site first, OR input the stream key into the "key:" field of your `*.ini` file.
+* Setup a JSON file "pylivestream.json" with values you determine, not these dummy values:
+
+```json
+{
+  "facebook": {
+    "url": "rtmps://their.server",
+    "streamid": "your-facebook-key",
+  },
+  "youtube": {
+    "url": "rtmp://your.value",
+    "streamid": "your-key"
+  }
+}
+```
 
 [File-Streaming](./File-Streaming.md)
 

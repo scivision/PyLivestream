@@ -6,7 +6,7 @@ Example:
 import pylivestream.api as pls
 
 pls.microphone('localhost')
-pls.microphone('twitch', key='~/twitch.key')
+pls.microphone('twitch')
 """
 
 from __future__ import annotations

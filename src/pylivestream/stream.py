@@ -4,6 +4,7 @@ from pathlib import Path
 import logging
 import os
 import sys
+import json
 from configparser import ConfigParser
 
 from . import utils
@@ -31,7 +32,7 @@ class Stream:
 
         self.loglevel: list[str] = self.F.INFO if kwargs.get("verbose") else self.F.ERROR
 
-        self.inifn: Path = Path(inifn).expanduser() if inifn else None
+        self.inifn: Path = Path(inifn).expanduser().resolve(strict=True)
 
         self.site: str = site
         self.vidsource = kwargs.get("vidsource")
@@ -52,24 +53,20 @@ class Stream:
 
         self.timelimit: list[str] = self.F.timelimit(kwargs.get("timeout"))
 
-    def osparam(self, key: str):
+    def osparam(self) -> None:
         """load OS specific config"""
 
         C = ConfigParser(inline_comment_prefixes=("#", ";"))
-        if self.inifn is None:
-            logging.info("using package default pylivestream.ini")
-            cfg = utils.get_inifile("pylivestream.ini")
-        else:
-            cfg = Path(self.inifn).expanduser().read_text()
+        fn = utils.get_inifile("pylivestream.ini")
 
-        C.read_string(cfg)
+        C.read_string(fn.read_text())
 
         self.exe = get_exe(C.get(sys.platform, "exe", fallback="ffmpeg"))
         self.probeexe = get_exe(C.get(sys.platform, "ffprobe_exe", fallback="ffprobe"))
 
         if self.site not in C:
             raise ValueError(
-                f"streaming site {self.site} not found in configuration file {self.inifn}"
+                f"streaming site {self.site} not found in configuration files {fn}   {self.inifn}"
             )
 
         if "XDG_SESSION_TYPE" in os.environ:
@@ -120,12 +117,13 @@ class Stream:
 
         self.keyframe_sec: int = C.getint(self.site, "keyframe_sec")
 
-        self.server: str = C.get(self.site, "server", fallback=None)
-        # %% Key (hexaecimal stream ID)
-        if key:
-            self.key: str = utils.getstreamkey(key)
-        else:
-            self.key = utils.getstreamkey(C.get(self.site, "key", fallback=None))
+        self.url: str = C.get(self.site, "url", fallback=None)
+
+        # %% user JSON (overrides defaults)
+        cfg = json.loads(Path(self.inifn).expanduser().read_text())
+        scfg = cfg[self.site]
+        for k in scfg:
+            setattr(self, k, scfg[k])
 
     def videoIn(self, quick: bool = False) -> list[str]:
         """

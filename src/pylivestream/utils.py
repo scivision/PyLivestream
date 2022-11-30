@@ -69,16 +69,21 @@ def check_display(fn: Path = None) -> bool:
     return ret == 0
 
 
-def get_inifile(fn: str) -> str:
+def get_inifile(fn: str) -> Path:
 
+    inifn = None
     for file in (fn, "~/pylivestream.ini"):
         if not file:
             continue
-        inifn = Path(file).expanduser()
-        if inifn.is_file():
-            return inifn.read_text(errors="ignore")
+        ini = Path(file).expanduser()
+        if ini.is_file():
+            inifn = ini
+            break
 
-    return importlib.resources.read_text(__package__, "pylivestream.ini", errors="ignore")
+    if inifn is None:
+        inifn = importlib.resources.path(__package__, "pylivestream.ini")  # type: ignore
+
+    return inifn
 
 
 def meta_caption(meta) -> str:
@@ -171,28 +176,3 @@ def get_framerate(fn: Path, exe: str = None) -> float:
         break
 
     return fps
-
-
-def getstreamkey(keyfn: str) -> str:
-    """
-    1. read key from ini
-    2. if empty, None
-    3. if non-empty, see if it's a file to read, or just the key itself.
-    """
-
-    if not keyfn:
-        return None
-
-    keyp = Path(keyfn).expanduser().resolve(strict=False)
-    if keyp.is_file():
-        # read only first line in case of trailing blank line
-        key = keyp.read_text().split("\n")[0].strip()
-    elif keyp.suffix == ".key":
-        raise FileNotFoundError(keyp)
-    elif keyp.is_dir():
-        raise IsADirectoryError(keyp)
-    else:
-        # assume it's a text key
-        key = keyfn
-
-    return key

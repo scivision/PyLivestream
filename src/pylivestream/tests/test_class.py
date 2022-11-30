@@ -1,5 +1,6 @@
 import pytest
 from pytest import approx
+from pathlib import Path
 import importlib.resources
 
 import pylivestream as pls
@@ -10,29 +11,7 @@ def test_get_ini_file(fn):
 
     cfg = pls.utils.get_inifile(fn)
 
-    assert isinstance(cfg, str)
-
-
-def test_key(tmp_path):
-    """tests reading of stream key: string and file"""
-    assert pls.utils.getstreamkey("abc123") == "abc123"
-    fn = tmp_path / "peri.key"
-    fn.write_text("abc432")
-    assert pls.utils.getstreamkey(fn) == "abc432"
-
-
-@pytest.mark.parametrize("key", ["", None], ids=["empty string", "None"])
-def test_empty_key(key):
-    assert pls.utils.getstreamkey(key) is None
-
-
-def test_bad_key(tmp_path):
-
-    with pytest.raises(IsADirectoryError):
-        assert pls.utils.getstreamkey(tmp_path) is None
-
-    with pytest.raises(FileNotFoundError):
-        assert pls.utils.getstreamkey(tmp_path / "notAFile.key") is None
+    assert isinstance(cfg, Path)
 
 
 @pytest.mark.parametrize("rex", ("ffmpeg", "ffprobe"))

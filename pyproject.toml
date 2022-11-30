@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0.0", "wheel"]
 
 [project]
 name = "pylivestream"
-version = "1.11.4"
+version = "2.0.0"
 description = "Livestream using FFmpeg to YouTube Live, Twitter, Facebook Live, Twitch, and more"
 keywords = ["youtube", "ffmpeg", "twitch", "twitter live", "facebook live", "restream.io"]
 classifiers = [

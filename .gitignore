@@ -1,6 +1,7 @@
 .mypy_cache/
 .pytest_cache/
 *.key
+*.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

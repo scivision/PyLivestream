@@ -15,7 +15,7 @@ CI = os.environ.get("CI", None) in ("true", "True")
 def test_props():
 
     with importlib.resources.path("pylivestream.data", "bunny.avi") as fn:
-        S = pls.FileIn(inifn=None, websites=sites, infn=fn, key="abc")
+        S = pls.FileIn(inifn=None, websites=sites, infn=fn)
         for s in S.streams:
             assert "-re" in S.streams[s].cmd
             assert S.streams[s].fps == approx(24.0)
@@ -31,7 +31,7 @@ def test_audio():
     with importlib.resources.path(
         "pylivestream.data", "logo.png"
     ) as logo, importlib.resources.path("pylivestream.data", "orch_short.ogg") as fn:
-        S = pls.FileIn(inifn=None, websites=sites, infn=fn, image=logo, key="abc")
+        S = pls.FileIn(inifn=None, websites=sites, infn=fn, image=logo)
         for s in S.streams:
             assert "-re" in S.streams[s].cmd
             assert S.streams[s].fps is None
