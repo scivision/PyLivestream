@@ -7,7 +7,7 @@ Comments on dropouts / lag for livestreaming in general (not just with this prog
 * Do Skype / Duo / FaceTime work excellently for you on your network? If not, live streaming will not work well.
 * Try a wired (Ethernet) connection to the Internet. I have seen very expensive consumer WiFi APs that had bad performance in real world strenuous use (like live streaming).
 
-## Blank desktop sharing video.
+## Blank desktop sharing video
 
 In general since this program generates command lines that are run by FFmpeg, try just using FFmpeg by itself to write to a video file.
 This is a known issue with Wayland--instead use X11.

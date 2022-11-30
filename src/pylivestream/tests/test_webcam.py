@@ -1,5 +1,6 @@
 import pylivestream as pls
 import pytest
+import sys
 from pytest import approx
 import subprocess
 import os
@@ -28,15 +29,16 @@ def test_props(periscope_kbps):
 
 
 @pytest.mark.timeout(TIMEOUT)
-@pytest.mark.skipif(CI or WSL, reason="has no video hardware typically")
+@pytest.mark.skipif(CI or WSL, reason="has no camera typically")
 def test_stream():
     S = pls.Webcam(inifn=None, websites="localhost", timeout=5, key="abc")
 
     S.golive()
 
 
-@pytest.mark.skipif(CI or WSL, reason="has no vidoe hardware typically")
+@pytest.mark.skipif(CI or WSL, reason="has no camera typically")
 def test_script():
     subprocess.check_call(
-        ["WebcamLivestream", "localhost", "--yes", "--timeout", "5"], timeout=TIMEOUT
+        [sys.executable, "-m", "pylivestream.camera", "localhost", "--yes", "--timeout", "5"],
+        timeout=TIMEOUT,
     )

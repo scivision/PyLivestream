@@ -131,7 +131,7 @@ Both do the same thing.
   * python -m pylivestream.screen
   * python -m pylivestream.loopfile
   * ScreenCapture2disk
-  * WebcamLivestream
+  * python -m pylivestream.camera
   * python -m pylivestream.microphone
 * `import pylivestream.api as pls` from within your Python script. For more information type `help(pls)` or `help(pls.stream_microphone)`
   * pls.stream_file()
@@ -187,24 +187,24 @@ Due to the complexity of streaming and the non-specific error codes FFmpeg emits
 
 * [pylivestream.ini](./src/pylivestream/pylivestream.ini) is setup for your computer and desired parameters
 * `site` is `facebook`, `twitch`, `youtube`, etc.
-* For `WebcamLivestream` and `pylivestream.screen`, more than one `site` can be specified for simultaneous multi-streaming
+* For `pylivestream.camera` and `pylivestream.screen`, more than one `site` can be specified for simultaneous multi-streaming
 * remember to setup a `*.key` file with the hexadecimal stream key for EACH site first, OR input the stream key into the "key:" field of your `*.ini` file.
 
 [File-Streaming](./File-Streaming.md)
 
 ### Webcam
 
-Note: your system may not have a webcam, particularly if it's a virtual machine.
+Note: your system may not have a camera, particularly if it's a virtual machine.
 
 Config:
 
-* `webcam_res`: webcam resolution -- find from `v4l2-ctl --list-formats-ext` or webcam spec sheet.
-* `webcam_fps`: webcam fps -- found from command above or webcam spec sheet
+* `webcam_res`: camera resolution -- find from `v4l2-ctl --list-formats-ext` or camera spec sheet.
+* `webcam_fps`: camea fps -- found from command above or camera spec sheet
 
 Stream to multiple sites, in this example Facebook Live and YouTube Live simultaneously:
 
 ```sh
-WebcamLivestream youtube facebook
+python -m pylivestream.camera youtube facebook
 ```
 
 ### Screen Share Livestream
