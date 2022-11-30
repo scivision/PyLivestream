@@ -60,7 +60,7 @@ def main():
     subprocess.check_call([sys.executable, "-m", "pylivestream.glob", "-y", str(VIDEO), HOST])
     # %% Screenshare
     print("Screenshare + microphone")
-    subprocess.check_call(["ScreenshareLivestream", "-y", HOST])
+    subprocess.check_call([sys.executable, "-m", "pylivestream.screen", "-y", HOST])
     # %% loop video
     print("Looping video")
     subprocess.check_call(["FileLoopLivestream", "-y", str(VIDEO), HOST])

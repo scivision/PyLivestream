@@ -12,8 +12,9 @@ pls.microphone('twitch', key='~/twitch.key')
 from __future__ import annotations
 from pathlib import Path
 
-from .base import FileIn, Microphone, Screenshare, SaveDisk, Webcam
+from .base import FileIn, Microphone, SaveDisk, Webcam
 from .glob import stream_files
+from .screen import stream_screen
 
 __all__ = [
     "stream_file",
@@ -66,21 +67,6 @@ def stream_microphone(
         input(f"Press Enter to go live on {sites}.    Or Ctrl C to abort.")
 
     s.golive()
-
-
-def stream_screen(
-    ini_file: Path, websites: list[str], *, assume_yes: bool = False, timeout: float = None
-):
-
-    S = Screenshare(ini_file, websites, yes=assume_yes, timeout=timeout)
-    sites: list[str] = list(S.streams.keys())
-    # %% Go live
-    if assume_yes:
-        print("going live on", sites)
-    else:
-        input(f"Press Enter to go live on {sites}    Or Ctrl C to abort.")
-
-    S.golive()
 
 
 def capture_screen(

@@ -3,6 +3,7 @@ from pytest import approx
 import subprocess
 import os
 import platform
+import sys
 
 import pylivestream as pls
 
@@ -36,5 +37,6 @@ def test_stream():
 @pytest.mark.skipif(CI or WSL, reason="no GUI typically")
 def test_script():
     subprocess.check_call(
-        ["ScreenshareLivestream", "localhost", "--yes", "--timeout", "5"], timeout=TIMEOUT
+        [sys.executable, "-m", "pylivestream.screen", "localhost", "--yes", "--timeout", "5"],
+        timeout=TIMEOUT,
     )

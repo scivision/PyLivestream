@@ -13,7 +13,7 @@ FFmpeg is used from Python `subprocess` to stream to sites including:
 
 * [Facebook Live](#facebook-live)  (requires FFmpeg >= 4.2 due to mandatory RTMPS)
 * [YouTube Live](#youtube-live)
-* [Periscope](#periscope)
+* [Twitter Live](#twitter)
 * [Twitch](#twitch)
 * also Ustream, Vimeo, Restream.io and more for streaming broadcasts.
 
@@ -128,7 +128,7 @@ Both do the same thing.
 
 * command line
   * python -m pylivestream.glob
-  * ScreenshareLivestream
+  * python -m pylivestream.screen
   * FileLoopLivestream
   * ScreenCapture2disk
   * WebcamLivestream
@@ -141,8 +141,7 @@ Both do the same thing.
 ## Authentication
 
 The program will load a `*.key` file according to the configuration file key for the website.
-For example, Periscope expects to see the stream hexadecimal key in `~/periscope.key`, as obtained from phone Periscope app.
-Likewise, YouTube expects a file `~/youtube.key` with the hexadecimal stream key and so on.
+For example, YouTube expects a file `~/youtube.key` with the hexadecimal stream key and so on.
 
 ### YouTube Live
 
@@ -150,7 +149,9 @@ Likewise, YouTube expects a file `~/youtube.key` with the hexadecimal stream key
 2. Edit file `youtube.key` to have the YouTube hexadecimal stream key
 3. Run Python script and chosen input will stream on YouTube Live.
 
-    ScreenshareLivestream youtube
+```sh
+python -m pylivestream.screen youtube
+```
 
 ### Facebook Live
 
@@ -162,23 +163,13 @@ Facebook Live requires FFmpeg >= 4.2 due to mandatory RTMPS
     into the file `~/facebook.key`
 3. Run Python script for Facebook with chosen input
 
-    ScreenshareLivestream facebook
+```sh
+python -m pylivestream.screen facebook
+```
 
-### Periscope
+### Twitter
 
-1. create a new stream by EITHER:
-
-    * from phone Periscope app, go to Profile -&gt; Settings -&gt; Periscope Producer and see your Stream Key.
-      The "checking source" button will go to "preview stream" once you do step #2.
-    * from computer web browser, go to  [Periscope Producer](https://www.periscope.tv/account/producer) and Create New Source.
-2. Put the hexadecimal stream key into `~/periscope.key`
-3. Run Python script for Periscope with chosen input
-
-    ScreenshareLivestream periscope
-
-I prefer using the Phone method as then the phone is a "second screen"
-where I can see if the stream is lagging, and if I "leave broadcast" and
-come back in, I can comment from my phone etc.
+TODO
 
 ### Twitch
 
@@ -186,15 +177,17 @@ come back in, I can comment from my phone etc.
 2. put Twitch stream key into file `~/twitch.key`
 3. Run Python script for Twitch with chosen input
 
-    ScreenshareLivestream twitch
+```sh
+python -m pylivestream.screen twitch
+```
 
 ## Usage
 
 Due to the complexity of streaming and the non-specific error codes FFmpeg emits, the default behavior is that if FFmpeg detects one stream has failed, ALL streams will stop streaming and the program ends.
 
 * [pylivestream.ini](./src/pylivestream/pylivestream.ini) is setup for your computer and desired parameters
-* `site` is `facebook`, `periscope`, `youtube`, etc.
-* For `WebcamLivestream` and `ScreenshareLivestream`, more than one `site` can be specified for simultaneous multi-streaming
+* `site` is `facebook`, `twitch`, `youtube`, etc.
+* For `WebcamLivestream` and `pylivestream.screen`, more than one `site` can be specified for simultaneous multi-streaming
 * remember to setup a `*.key` file with the hexadecimal stream key for EACH site first, OR input the stream key into the "key:" field of your `*.ini` file.
 
 [File-Streaming](./File-Streaming.md)
@@ -208,18 +201,18 @@ Config:
 * `webcam_res`: webcam resolution -- find from `v4l2-ctl --list-formats-ext` or webcam spec sheet.
 * `webcam_fps`: webcam fps -- found from command above or webcam spec sheet
 
-Stream to multiple sites, in this example Periscope and YouTube Live simultaneously:
+Stream to multiple sites, in this example Facebook Live and YouTube Live simultaneously:
 
 ```sh
-WebcamLivestream youtube periscope
+WebcamLivestream youtube facebook
 ```
 
 ### Screen Share Livestream
 
-Stream to multiple sites, in this example Periscope and YouTube Live simultaneously:
+Stream to multiple sites, in this example Facebook Live and YouTube Live simultaneously:
 
 ```sh
-ScreenshareLivestream youtube periscope
+python -m pylivestream.screen youtube facebook
 ```
 
 ### Image + Audio Livestream
@@ -227,7 +220,7 @@ ScreenshareLivestream youtube periscope
 Microphone audio + static image is accomplished by
 
 ```sh
-MicrophoneLivestream youtube periscope -image doc/logo.jpg
+MicrophoneLivestream youtube facebook -image doc/logo.jpg
 ```
 
 or wherever your image file is.
@@ -283,7 +276,7 @@ DirectShow didn't work for me on Windows 10, so I used gdigrab instead.
 * Twitch [ingest servers](https://stream.twitch.tv/ingests/)
 * Twitch [encoding](https://stream.twitch.tv/encoding/)
 
-* [Periscope parameters](https://www.pscp.tv/help/external-encoders)
+* [Twitter Live parameters](https://help.twitter.com/en/using-twitter/twitter-live)
 * [YouTube Live parameters](https://support.google.com/youtube/answer/2853702)
 * [Facebook Live parameters](https://www.facebook.com/facebookmedia/get-started/live)
 * [Ustream parameters](https://support.ustream.tv/hc/en-us/articles/207852117-Internet-connection-and-recommended-encoding-settings)
@@ -295,4 +288,3 @@ DirectShow didn't work for me on Windows 10, so I used gdigrab instead.
 * Owl PC: Creative Commons no attrib. commercial
 * YouTube: YouTube Brand Resources
 * Facebook: Wikimedia Commons
-* [Periscope](periscope.tv/press)
