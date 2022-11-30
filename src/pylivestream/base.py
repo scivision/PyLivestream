@@ -4,7 +4,6 @@ import logging
 import os
 import typing
 
-#
 from .stream import Stream
 from .utils import run, check_device
 

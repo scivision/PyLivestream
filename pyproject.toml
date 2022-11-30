@@ -1,6 +1,33 @@
 [build-system]
 requires = ["setuptools>=61.0.0", "wheel"]
 
+[project]
+name = "pylivestream"
+version = "1.11.4"
+description = "Livestream using FFmpeg to YouTube Live, Twitter, Facebook Live, Twitch, and more"
+keywords = ["youtube", "ffmpeg", "twitch", "twitter live", "facebook live", "restream.io"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: Console",
+  "Intended Audience :: End Users/Desktop",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Topic :: Multimedia :: Graphics :: Capture :: Screen Capture",
+  "Topic :: Multimedia :: Sound/Audio :: Capture/Recording",
+  "Topic :: Multimedia :: Video :: Capture"
+]
+license = {file = "LICENSE.txt"}
+dynamic = ["readme"]
+requires-python = ">=3.7"
+
+[project.optional-dependencies]
+tests = ["pytest", "pytest-timeout"]
+lint = ["flake8", "flake8-bugbear", "flake8-builtins", "flake8-blind-except", "mypy"]
+captions = ["tinytag"]
+
+[tool.setuptools.dynamic]
+readme = {file = ["README.md"]}
+
 [tool.black]
 line-length = 100
 
