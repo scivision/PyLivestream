@@ -1,8 +1,13 @@
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools>=61.0.0", "wheel"]
 
 [tool.black]
 line-length = 100
 
-[tool.pytest.ini_options]
-addopts = "-ra -v"
+[tool.mypy]
+files = ["src"]
+ignore_missing_imports = true
+strict_optional = false
+allow_redefinition = true
+show_error_context = false
+show_column_numbers = true
