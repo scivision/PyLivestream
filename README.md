@@ -126,8 +126,8 @@ v4l2-ctl --list-devices
 There are two ways to start a stream (assuming you've configured as per following sections).
 Both do the same thing.
 
-* command line via Python entry_points
-  * FileGlobLivestream
+* command line
+  * python -m pylivestream.glob
   * ScreenshareLivestream
   * FileLoopLivestream
   * ScreenCapture2disk

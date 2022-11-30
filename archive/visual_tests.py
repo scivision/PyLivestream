@@ -10,6 +10,7 @@ ffmpeg -ss 00:00:30 -i BigBuckBunny_DivX_HD720p_ASP.divx -t 7 -vf scale=-2:240 -
 from pathlib import Path
 import subprocess
 import importlib.resources
+import sys
 
 R = Path(__file__).parent
 VIDPATH = R / "tests"
@@ -37,14 +38,26 @@ def main():
     print("PyLivestream splash with orchestra music  (caption)")
     with importlib.resources.path("pylivestream.data", "logo.png") as fn:
         subprocess.check_call(
-            ["FileGlobLivestream", "-y", "-image", str(fn), HOST, "-glob", "orch.ogg"]
+            [
+                sys.executable,
+                "-m",
+                "pylivestream.glob",
+                "-y",
+                "-image",
+                str(fn),
+                HOST,
+                "-glob",
+                "orch.ogg",
+            ]
         )
 
     print("1990s vector graphics with orchestra music (NO caption")
-    subprocess.check_call(["FileGlobLivestream", "-y", "-image", str(MOVING), str(MUSIC), HOST])
+    subprocess.check_call(
+        [sys.executable, "-m", "pylivestream.glob", "-y", "-image", str(MOVING), str(MUSIC), HOST]
+    )
     # video
     print("Looping video")
-    subprocess.check_call(["FileGlobLivestream", "-y", str(VIDEO), HOST])
+    subprocess.check_call([sys.executable, "-m", "pylivestream.glob", "-y", str(VIDEO), HOST])
     # %% Screenshare
     print("Screenshare + microphone")
     subprocess.check_call(["ScreenshareLivestream", "-y", HOST])

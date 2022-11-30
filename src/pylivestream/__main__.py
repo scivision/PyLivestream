@@ -4,7 +4,6 @@ from argparse import ArgumentParser
 from .api import (
     stream_microphone,
     stream_file,
-    stream_files,
     stream_screen,
     capture_screen,
     stream_webcam,
@@ -114,37 +113,3 @@ def webcam():
     P = p.parse_args()
 
     stream_webcam(ini_file=P.ini, websites=P.websites, assume_yes=P.yes, timeout=P.timeout)
-
-
-def glob_run():
-    signal.signal(signal.SIGINT, signal.SIG_DFL)
-
-    p = ArgumentParser(description="Livestream a globbed input file list")
-    p.add_argument("path", help="path to discover files from")
-    p.add_argument(
-        "websites",
-        help="site to stream, e.g. localhost youtube periscope facebook twitch",
-        nargs="+",
-    )
-    p.add_argument("-glob", help="file glob pattern to stream.")
-    p.add_argument("-i", "--ini", help="*.ini file with stream parameters")
-    p.add_argument("-image", help="static image to display, for audio-only files.")
-    p.add_argument("-shuffle", help="shuffle the globbed file list", action="store_true")
-    p.add_argument("-loop", help="repeat the globbed file list endlessly", action="store_true")
-    p.add_argument("-y", "--yes", help="no confirmation dialog", action="store_true")
-    p.add_argument("-nometa", help="do not add metadata caption to video", action="store_false")
-    p.add_argument("-t", "--timeout", help="stop streaming after --timeout seconds", type=int)
-    P = p.parse_args()
-
-    stream_files(
-        ini_file=P.ini,
-        websites=P.websites,
-        assume_yes=P.yes,
-        timeout=P.timeout,
-        loop=P.loop,
-        video_path=P.path,
-        glob=P.glob,
-        shuffle=P.shuffle,
-        still_image=P.image,
-        no_meta=P.nometa,
-    )

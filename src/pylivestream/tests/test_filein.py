@@ -2,6 +2,7 @@ import pytest
 from pytest import approx
 import subprocess
 import os
+import sys
 import importlib.resources
 
 import pylivestream as pls
@@ -60,5 +61,15 @@ def test_simple():
 def test_script():
     with importlib.resources.path("pylivestream.data", "bunny.avi") as fn:
         subprocess.check_call(
-            ["FileGlobLivestream", str(fn), "localhost", "--yes", "--timeout", "5"], timeout=TIMEOUT
+            [
+                sys.executable,
+                "-m",
+                "pylivestream.glob",
+                str(fn),
+                "localhost",
+                "--yes",
+                "--timeout",
+                "5",
+            ],
+            timeout=TIMEOUT,
         )

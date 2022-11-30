@@ -15,7 +15,7 @@ FileLoopLivestream videofile site
 Glob list of video files to stream:
 
 ```sh
-FileGlobLivestream path site -glob glob_pattern
+python -m pylivestream.glob path site -glob glob_pattern
 ```
 
 * `-glob` glob pattern of files to stream e.g. "*.avi".  For [recursive globbing](https://docs.python.org/3/library/pathlib.html#pathlib.Path.glob), do like "**/*.avi".
@@ -29,7 +29,7 @@ FileGlobLivestream path site -glob glob_pattern
 Example: all AVI videos in directory `~/Videos`:
 
 ```sh
-FileGlobLivestream ~/Videos youtube -glob "*.avi"
+python -m pylivestream.glob ~/Videos youtube -glob "*.avi"
 ```
 
 ## stream endlessly looping videos
@@ -37,7 +37,7 @@ FileGlobLivestream ~/Videos youtube -glob "*.avi"
 Example: all AVI videos in `~/Videos` are endlessly looped:
 
 ```sh
-FileGlobLivestream ~/Videos youtube -glob "*.avi" -loop
+python -m pylivestream.glob ~/Videos youtube -glob "*.avi" -loop
 ```
 
 ## stream m3u8 playlist
@@ -49,7 +49,7 @@ m3u8 playlist [example](./Examples/playlist_m3u8.py)
 Glob list of video files to stream. Suggest including a static -image (could be your logo):
 
 ```sh
-FileGlobLivestream path site -glob glob_pattern -image image
+python -m pylivestream.glob path site -glob glob_pattern -image image
 ```
 
 * `path` path to where video files are
@@ -59,17 +59,17 @@ FileGlobLivestream path site -glob glob_pattern -image image
 Example: stream all .mp3 audio under `~/music` directory:
 
 ```sh
-FileGlobLivestream ~/music youtube -glob "*.mp3" -image mylogo.jpg
+python -m pylivestream.glob ~/music youtube -glob "*.mp3" -image mylogo.jpg
 ```
 
 Example: stream all .mp3 audio in `~/music` with an animated GIF or video clip repeating:
 
 ```sh
-FileGlobLivestream ~/music youtube -glob "*.mp3" -image myclip.avi
+python -m pylivestream.glob ~/music youtube -glob "*.mp3" -image myclip.avi
 ```
 
 or
 
 ```sh
-FileGlobLivestream ~/music youtube -glob "*.mp3" -image animated.gif
+python -m pylivestream.glob ~/music youtube -glob "*.mp3" -image animated.gif
 ```
