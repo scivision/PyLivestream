@@ -11,7 +11,7 @@ on:
 
 jobs:
 
-  linux:
+  core:
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -23,8 +23,6 @@ jobs:
           os: macos-latest
         - python-version: '3.x'
           os: windows-latest
-
-    name: Python ${{ matrix.python-version }}
 
     steps:
     - uses: actions/checkout@v3

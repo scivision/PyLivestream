@@ -2,6 +2,7 @@ from __future__ import annotations
 from pathlib import Path
 import logging
 import os
+import typing
 
 #
 from .stream import Stream
@@ -28,7 +29,7 @@ class Livestream(Stream):
         audIn: list[str] = self.audioIn()
         audOut: list[str] = self.audioOut()
 
-        buf: list[str] = self.buffer(self.server)
+        buf: list[str] = self.buffer()
         # %% begin to setup command line
         cmd: list[str] = []
         cmd.append(self.exe)
@@ -166,7 +167,7 @@ class Livestream(Stream):
 
 # %% operators
 class Screenshare:
-    def __init__(self, inifn: Path, websites: list[str], **kwargs):
+    def __init__(self, inifn: Path, websites: list[str], **kwargs) -> None:
 
         if isinstance(websites, str):
             websites = [websites]
@@ -175,9 +176,9 @@ class Screenshare:
         for site in websites:
             streams[site] = Livestream(inifn, site, vidsource="screen", **kwargs)
 
-        self.streams: dict[str, Livestream] = streams
+        self.streams: typing.Mapping[str, Livestream] = streams
 
-    def golive(self):
+    def golive(self) -> None:
 
         sinks: list[str] = [self.streams[stream].sink for stream in self.streams]
 
@@ -199,7 +200,7 @@ class Webcam:
 
         self.streams: dict[str, Livestream] = streams
 
-    def golive(self):
+    def golive(self) -> None:
 
         sinks: list[str] = [self.streams[stream].sink for stream in self.streams]
 
@@ -221,7 +222,7 @@ class Microphone:
 
         self.streams: dict[str, Livestream] = streams
 
-    def golive(self):
+    def golive(self) -> None:
 
         sinks: list[str] = [self.streams[stream].sink for stream in self.streams]
 
@@ -244,7 +245,7 @@ class FileIn:
 
         self.streams: dict[str, Livestream] = streams
 
-    def golive(self):
+    def golive(self) -> None:
 
         sinks: list[str] = [self.streams[stream].sink for stream in self.streams]
 
@@ -295,7 +296,7 @@ class SaveDisk(Stream):
             print("specify filename to save screen capture w/ audio to disk.")
 
 
-def unify_streams(streams: dict[str, Stream]) -> str:
+def unify_streams(streams: typing.Mapping[str, Stream]) -> str:
     """
     find least common denominator stream settings,
         so "tee" output can generate multiple streams.

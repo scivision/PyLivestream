@@ -6,7 +6,6 @@ import os
 import sys
 from configparser import ConfigParser
 
-#
 from . import utils
 from .ffmpeg import Ffmpeg, get_exe
 
@@ -220,7 +219,7 @@ class Stream:
 
         return ["-codec:a", "aac", "-b:a", str(self.audio_bps), "-ar", str(self.audiofs)]
 
-    def video_bitrate(self):
+    def video_bitrate(self) -> None:
         """
         get "best" video bitrate.
         Based on YouTube Live minimum specified stream rate.
@@ -240,11 +239,16 @@ class Stream:
             )
 
         if self.fps is None or self.fps < 20:
-            self.video_kbps: int = list(BRS.values())[bisect.bisect_left(list(BRS.keys()), x)]
+            k = BRS.keys()
+            v = BRS.values()
         elif 20 <= self.fps <= 35:
-            self.video_kbps: int = list(BR30.values())[bisect.bisect_left(list(BR30.keys()), x)]
+            k = BR30.keys()
+            v = BR30.values()
         else:
-            self.video_kbps: int = list(BR60.values())[bisect.bisect_left(list(BR60.keys()), x)]
+            k = BR60.keys()
+            v = BR60.values()
+
+        self.video_kbps: int = list(v)[bisect.bisect_left(list(k), x)]  # type: ignore  # allow redef mypy bug?
 
     def screengrab(self, quick: bool = False) -> list[str]:
         """
@@ -252,7 +256,7 @@ class Stream:
         May not work for Wayland desktop.
         """
 
-        v: list[str] = ["-f", self.vcap]
+        v = ["-f", self.vcap]
 
         # FIXME: explict frame rate is problematic for MacOS with screenshare. Just leave it off?
         # if not quick:
@@ -289,7 +293,7 @@ class Stream:
             if not webcam_chan:
                 webcam_chan = "default"
 
-        v: list[str] = ["-f", self.hcam, "-i", webcam_chan]
+        v = ["-f", self.hcam, "-i", webcam_chan]
 
         #  '-r', str(self.fps),  # -r causes bad dropouts
 
@@ -334,7 +338,7 @@ class Stream:
 
         return v
 
-    def buffer(self, server: str) -> list[str]:
+    def buffer(self) -> list[str]:
         """configure network buffer. Tradeoff: latency vs. robustness"""
         # constrain to single thread, default is multi-thread
         # buf = ['-threads', '1']
