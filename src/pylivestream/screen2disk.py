@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 from .api import capture_screen
 
 
-def screencapture():
+if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal.SIG_DFL)
 
     p = ArgumentParser()

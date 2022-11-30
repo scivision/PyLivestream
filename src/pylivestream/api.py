@@ -78,7 +78,7 @@ def capture_screen(
     if assume_yes:
         print("saving screen capture to", s.outfn)
     else:
-        input(f"Press Enter to screen capture to file {s.outfn}" "Or Ctrl C to abort.")
+        input(f"Press Enter to screen capture to file {s.outfn}   Or Ctrl C to abort.")
 
     s.save()
 

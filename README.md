@@ -130,7 +130,7 @@ Both do the same thing.
   * python -m pylivestream.glob
   * python -m pylivestream.screen
   * python -m pylivestream.loopfile
-  * ScreenCapture2disk
+  * python -m pylivestream.screen2disk
   * python -m pylivestream.camera
   * python -m pylivestream.microphone
 * `import pylivestream.api as pls` from within your Python script. For more information type `help(pls)` or `help(pls.stream_microphone)`
@@ -241,7 +241,7 @@ python -m pylivestream.microphone localhost
 This script saves your screen capture to a file on your disk:
 
 ```sh
-ScreenCapture2disk myvid.avi
+python -m pylivestream.screen2disk myvid.avi
 ```
 
 ## Utilities
