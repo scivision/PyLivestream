@@ -12,7 +12,7 @@ pls.microphone('twitch')
 from __future__ import annotations
 from pathlib import Path
 
-from .base import FileIn, Microphone, SaveDisk, Webcam
+from .base import FileIn, Microphone, SaveDisk, Camera
 from .glob import stream_files
 from .screen import stream_screen
 
@@ -20,7 +20,7 @@ __all__ = [
     "stream_file",
     "stream_files",
     "stream_microphone",
-    "stream_webcam",
+    "stream_camera",
     "stream_screen",
     "capture_screen",
 ]
@@ -83,8 +83,8 @@ def capture_screen(
     s.save()
 
 
-def stream_webcam(ini_file: Path, websites: list[str], *, assume_yes: bool, timeout: float):
-    S = Webcam(ini_file, websites, yes=assume_yes, timeout=timeout)
+def stream_camera(ini_file: Path, websites: list[str], *, assume_yes: bool, timeout: float):
+    S = Camera(ini_file, websites, yes=assume_yes, timeout=timeout)
     sites: list[str] = list(S.streams.keys())
     # %% Go live
     if assume_yes:

@@ -1,13 +1,13 @@
 import signal
 import argparse
 
-from .api import stream_webcam
+from .api import stream_camera
 
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal.SIG_DFL)
 
-    p = argparse.ArgumentParser(description="livestream webcam")
+    p = argparse.ArgumentParser(description="livestream camera")
     p.add_argument(
         "websites",
         help="site to stream, e.g. localhost youtube facebook twitch",
@@ -18,4 +18,4 @@ if __name__ == "__main__":
     p.add_argument("-t", "--timeout", help="stop streaming after --timeout seconds", type=int)
     P = p.parse_args()
 
-    stream_webcam(ini_file=P.json, websites=P.websites, assume_yes=P.yes, timeout=P.timeout)
+    stream_camera(ini_file=P.json, websites=P.websites, assume_yes=P.yes, timeout=P.timeout)

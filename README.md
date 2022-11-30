@@ -17,7 +17,7 @@ FFmpeg is used from Python `subprocess` to stream to sites including:
 * [Twitch](#twitch)
 * also Ustream, Vimeo, Restream.io and more for streaming broadcasts.
 
-![PyLivestream diagram showing screen capture or webcam simultaneously livestreaming to multiple services.](./doc/logo.png)
+![PyLivestream diagram showing screen capture or camera simultaneously livestreaming to multiple services.](./doc/logo.png)
 
 [Troubleshooting](./Troubleshooting.md)
 
@@ -25,7 +25,7 @@ FFmpeg is used from Python `subprocess` to stream to sites including:
 
 * Python scripts compute good streaming parameters, and emit the command used to copy and paste if desired.
 * Works on any OS (Mac, Linux, Windows) and computing platform, including PC, Mac, and Raspberry Pi.
-* Uses a [pylivestream.ini](./src/pylivestream/pylivestream.ini) file to adjust all parameters.
+* Uses single JSON file pylivestream.json to adjust parameters.
 
 ### PyLivestream limitations
 
@@ -68,12 +68,12 @@ cd PyLivestream
 python3 -m pip install -e .
 ```
 
-## Configuration: pylivestream.ini
+## Configuration: pylivestream.json
 
 You can skip past this section to "stream start" if it's confusing.
 The defaults might work to get you started.
 
-The [pylivestream.ini](./src/pylivestream/pylivestream.ini) file contains parameters relevant to your stream.
+The pylivestream.json file has parameters relevant to the live stream.
 This file is copied into your `sys.prefix`/share/pylivestream directory upon `pip install pylivestream`.
 
 We suggest copying this file to another location on your hard drive and editing, then specifying it for your streams.
@@ -81,32 +81,27 @@ We suggest copying this file to another location on your hard drive and editing,
 The `[DEFAULT]` section has parameters that can be overridden for each site, if desired.
 
 * `screencap_origin`: origin (upper left corner) of screen capture region in pixels.
-* `screencap_res`: resolution of screen capture (area to capture, starting from origin)
+* `screencap_size`: resolution of screen capture (area to capture, starting from origin)
 * `screencap_fps`: frames/sec of screen capture
 * `video_kbps`: override automatic video bitrate in kbps
 
-* `audiofs`: audio sampling frequency. Typically 44100 Hz (CD quality).
+* `audio_rate`: audio sampling frequency. Typically 44100 Hz (CD quality).
 * `audio_bps`: audio data rate--**leave blank if you want no audio** (usually used for "file", to make an animated GIF in  post-processing)
 * `preset`: `veryfast` or `ultrafast` if CPU not able to keep up.
 
 Next are `sys.platform` specific parameters.
 
-Seek help in FFmpeg documentation, try capturing to a file first and then update
-[pylivestream.ini](./src/pylivestream/pylivestream.ini) for your `sys.platform`.
+Seek help in FFmpeg documentation, try capturing to a file first and then update ~/pylivestream.json for `sys.platform`.
 
 * exe: override path to desired FFmpeg executable. In case you have multiple FFmpeg versions installed (say, from Anaconda Python).
 
-Finally are the per-site parameters.
-The only thing you would possibly need to change here is the `server` for best performance for your geographic region.
-The included [pylivestream.ini](./src/pylivestream/pylivestream.ini) is with default servers for the Northeastern USA.
-
 ### Deduce inputs
 
-Each computer will need distinct pylivestream.ini device input parameters:
+Each computer will need distinct pylivestream.json device input parameters:
 
-* audiochan: audio device
-* webcamchan: webcam device
-* screenchan: desktop capture software port name
+* audio_chan: audio device
+* camera_chan: camera device
+* screen_chan: desktop capture software port name
 
 Loopback devices that let you "record what you hear" are operating system dependent.
 You may need to search documentation for your operating system to enable such a virtual loopback device.
@@ -144,7 +139,7 @@ Both do the same thing.
 * `import pylivestream.api as pls` from within your Python script. For more information type `help(pls)` or `help(pls.stream_microphone)`
   * pls.stream_file()
   * pls.stream_microphone()
-  * pls.stream_webcam()
+  * pls.stream_camera()
 
 ## Authentication
 
@@ -181,46 +176,44 @@ TODO
 
 ### Twitch
 
-1. create stream from [Twitch Dashboard](https://dashboard.twitch.tv/settings/channel#stream-preferences). Edit [pylivestream.ini](./src/pylivestream/pylivestream.ini) to have the [closest ingest server](https://stream.twitch.tv/ingests/).
-2. put Twitch stream key into file `~/twitch.json`
-3. Run Python script for Twitch with chosen input
+Create stream from [Twitch Dashboard](https://dashboard.twitch.tv/settings/channel#stream-preferences).
+Create pylivestream.json file with "url" and "streamid" for Twitch.
+Run Python script for Twitch with chosen input:
 
 ```sh
-python -m pylivestream.screen twitch
+python -m pylivestream.screen twitch ./pylivestream.json
 ```
 
 ## Usage
 
 Due to the complexity of streaming and the non-specific error codes FFmpeg emits, the default behavior is that if FFmpeg detects one stream has failed, ALL streams will stop streaming and the program ends.
 
-* [pylivestream.ini](./src/pylivestream/pylivestream.ini) is setup for your computer and desired parameters
-* `site` is `facebook`, `twitch`, `youtube`, etc.
-* For `pylivestream.camera` and `pylivestream.screen`, more than one `site` can be specified for simultaneous multi-streaming
-* Setup a JSON file "pylivestream.json" with values you determine, not these dummy values:
+Setup ~/pylivestream.json for computer and desired parameters.
+Setup a JSON file "pylivestream.json" with values you determine, not these dummy values:
 
 ```json
 {
   "facebook": {
-    "url": "rtmps://their.server",
-    "streamid": "your-facebook-key",
+    "url": "rtmps://live-api-s.facebook.com:443/rtmp",
+    "streamid": "your-stream-id",
   },
   "youtube": {
-    "url": "rtmp://your.value",
-    "streamid": "your-key"
+    "url": "rtmp://a.rtmp.youtube.com/live2",
+    "streamid": "your-stream-id"
   }
 }
 ```
 
 [File-Streaming](./File-Streaming.md)
 
-### Webcam
+### Camera
 
 Note: your system may not have a camera, particularly if it's a virtual machine.
 
-Config:
+JSON:
 
-* `webcam_res`: camera resolution -- find from `v4l2-ctl --list-formats-ext` or camera spec sheet.
-* `webcam_fps`: camera fps -- found from command above or camera spec sheet
+* `camera_size`: camera resolution -- find from `v4l2-ctl --list-formats-ext` or camera spec sheet.
+* `camera_fps`: camera fps -- found from command above or camera spec sheet
 
 Stream to multiple sites, in this example Facebook Live and YouTube Live simultaneously:
 
@@ -279,8 +272,8 @@ python -m pylivestream.screen2disk myvid.avi
 ### FFmpeg References
 
 * [streaming](https://trac.ffmpeg.org/wiki/EncodingForStreamingSites)
-* [webcam](https://trac.ffmpeg.org/wiki/Capture/Webcam)
-* webcam [overlay](https://trac.ffmpeg.org/wiki/EncodingForStreamingSites#Withwebcamoverlay)
+* [camera](https://trac.ffmpeg.org/wiki/Capture/Webcam)
+* Camera [overlay](https://trac.ffmpeg.org/wiki/EncodingForStreamingSites#Withwebcamoverlay)
 
 ### Windows
 

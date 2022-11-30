@@ -5,7 +5,6 @@ import logging
 import os
 import sys
 import json
-from configparser import ConfigParser
 
 from . import utils
 from .ffmpeg import Ffmpeg, get_exe
@@ -53,34 +52,40 @@ class Stream:
 
         self.timelimit: list[str] = self.F.timelimit(kwargs.get("timeout"))
 
-    def osparam(self) -> None:
+    def osparam(self, fn: Path) -> None:
         """load OS specific config"""
 
-        C = ConfigParser(inline_comment_prefixes=("#", ";"))
-        fn = utils.get_inifile("pylivestream.ini")
+        fn = Path(fn).expanduser().resolve(strict=True)
 
-        C.read_string(fn.read_text())
+        C = json.loads(fn.read_text())
 
-        self.exe = get_exe(C.get(sys.platform, "exe", fallback="ffmpeg"))
-        self.probeexe = get_exe(C.get(sys.platform, "ffprobe_exe", fallback="ffprobe"))
+        try:
+            syscfg = C[sys.platform]
+        except KeyError:
+            raise KeyError(f"No system config {sys.platform} in {fn}")
 
-        if self.site not in C:
-            raise ValueError(
-                f"streaming site {self.site} not found in configuration files {fn}   {self.inifn}"
-            )
+        self.json_file = fn
+
+        self.exe = get_exe(C.get("exe", "ffmpeg"))
+        self.probeexe = get_exe(C.get("ffprobe_exe", "ffprobe"))
 
         if "XDG_SESSION_TYPE" in os.environ:
             if os.environ["XDG_SESSION_TYPE"] == "wayland":
                 logging.error("Wayland may only give black output. Try X11")
 
+        try:
+            sitecfg = C["sites"][self.site]
+        except KeyError:
+            raise KeyError(f"No config sites: {self.site} in {fn}")
+
         if self.vidsource == "camera":
-            self.res: list[str] = C.get(self.site, "webcam_res").split("x")
-            self.fps: float = C.getint(self.site, "webcam_fps")
+            self.res: list[str] = C.get("camera_size")
+            self.fps: float = C.get("camera_fps")
             self.movingimage = self.staticimage = False
         elif self.vidsource == "screen":
-            self.res = C.get(self.site, "screencap_res").split("x")
-            self.fps = C.getint(self.site, "screencap_fps")
-            self.origin: list[str] = C.get(self.site, "screencap_origin").split(",")
+            self.res = C.get("screencap_size")
+            self.fps = C.get("screencap_fps")
+            self.origin: list[str] = C.get("screencap_origin", [1, 1])
             self.movingimage = self.staticimage = False
         elif self.vidsource == "file":  # streaming video from a file
             self.res = utils.get_resolution(self.infn, self.probeexe)
@@ -95,37 +100,29 @@ class Stream:
         if self.res is not None and len(self.res) != 2:
             raise ValueError(f"need height, width of video resolution, I have: {self.res}")
 
-        self.audiofs: str = C.get(self.site, "audiofs")
-        self.preset: str = C.get(self.site, "preset")
+        self.audio_rate: str = C.get("audio_rate")
+        self.preset: str = C.get("preset")
 
         if not self.timelimit:
-            self.timelimit = self.F.timelimit(C.get(self.site, "timelimit", fallback=None))
+            self.timelimit = self.F.timelimit(sitecfg.get("timelimit"))
 
-        # NOTE: This used to be 'videochan' but that was too generic.
-        self.webcamchan: str = C.get(sys.platform, "webcamchan", fallback=None)
-        self.screenchan: str = C.get(sys.platform, "screenchan", fallback=None)
+        self.camera_chan: str = syscfg.get("camera_chan")
+        self.screen_chan: str = syscfg.get("screen_chan")
 
-        self.audiochan: str = C.get(sys.platform, "audiochan", fallback=None)
+        self.audio_chan: str = syscfg.get("audio_chan")
 
-        self.vcap: str = C.get(sys.platform, "vcap")
-        self.acap: str = C.get(sys.platform, "acap", fallback=None)
+        self.vcap: str = syscfg.get("vcap")
+        self.acap: str = syscfg.get("acap")
 
-        self.hcam: str = C.get(sys.platform, "hcam")
+        self.hcam: str = syscfg.get("hcam")
 
-        self.video_kbps: int = C.getint(self.site, "video_kbps", fallback=None)
-        self.audio_bps: str = C.get(self.site, "audio_bps")
+        self.video_kbps: int = sitecfg.get("video_kbps")
+        self.audio_bps: str = sitecfg.get("audio_bps")
 
-        self.keyframe_sec: int = C.getint(self.site, "keyframe_sec")
+        self.keyframe_sec: int = sitecfg.get("keyframe_sec")
 
-        self.url: str = C.get(self.site, "url", fallback=None)
-
-        # %% user JSON (overrides defaults)
-        cfg = json.loads(Path(self.inifn).expanduser().read_text())
-        scfg = cfg.get(self.site)
-        if scfg is None:
-            raise KeyError(f"streaming site {self.site} not found in {self.inifn}")
-        for k in scfg:
-            setattr(self, k, scfg[k])
+        self.url: str = sitecfg.get("url")
+        self.streamid: str = sitecfg.get("streamid", "")
 
     def videoIn(self, quick: bool = False) -> list[str]:
         """
@@ -138,7 +135,7 @@ class Stream:
                 # not for files "option pixel_format not found"
                 v = ["-pix_fmt", "uyvy422"] + v
         elif self.vidsource == "camera":
-            v = self.webcam(quick)
+            v = self.camera(quick)
             if sys.platform == "darwin":
                 # not for files "option pixel_format not found"
                 v = ["-pix_fmt", "uyvy422"] + v
@@ -185,23 +182,24 @@ class Stream:
 
         NOTE: -ac 2 NOT -ac 1 to avoid "non monotonous DTS in output stream" errors
         """
-        if not (self.audio_bps and self.acap and self.audiochan and self.audiofs):
+
+        if not (self.audio_bps and self.acap and self.audio_chan and self.audio_rate):
             return []
 
-        if self.audiochan == "null" or self.acap == "null":
+        if self.audio_chan == "null" or self.acap == "null":
             self.acap = "null"
             if not self.audio_bps:
                 self.audio_bps = "128000"
-            if not self.audiofs:
-                self.audiofs = "48000"
-            self.audiochan = f"anullsrc=sample_rate={self.audiofs}:channel_layout=stereo"
+            if not self.audio_rate:
+                self.audio_rate = "48000"
+            self.audio_chan = f"anullsrc=sample_rate={self.audio_rate}:channel_layout=stereo"
 
         if self.vidsource == "file":
             a: list[str] = []
         elif self.acap == "null":
-            a = ["-f", "lavfi", "-i", self.audiochan]
+            a = ["-f", "lavfi", "-i", self.audio_chan]
         else:
-            a = ["-f", self.acap, "-i", self.audiochan]
+            a = ["-f", self.acap, "-i", self.audio_chan]
 
         return a
 
@@ -214,16 +212,17 @@ class Stream:
         https://www.facebook.com/facebookmedia/get-started/live
         """
 
-        if not (self.audio_bps and self.acap and self.audiochan and self.audiofs):
+        if not (self.audio_bps and self.acap and self.audio_chan and self.audio_rate):
             return []
 
-        return ["-codec:a", "aac", "-b:a", str(self.audio_bps), "-ar", str(self.audiofs)]
+        return ["-codec:a", "aac", "-b:a", str(self.audio_bps), "-ar", str(self.audio_rate)]
 
     def video_bitrate(self) -> None:
         """
         get "best" video bitrate.
         Based on YouTube Live minimum specified stream rate.
         """
+
         if self.video_kbps:  # per-site override
             return
 
@@ -234,8 +233,10 @@ class Stream:
             x = 480
         else:
             raise ValueError(
-                "Unsure of your video resolution request."
-                "Try setting video_kpbs in PyLivestream configuration file (see README.md)"
+                """
+Unsure of your video resolution request.
+Try setting video_kpbs in pylivestream.json file (see README.md)
+"""
             )
 
         if self.fps is None or self.fps < 20:
@@ -267,33 +268,34 @@ class Stream:
 
         if sys.platform == "linux":
             if quick:
-                v += ["-i", self.screenchan]
+                v += ["-i", self.screen_chan]
             else:
-                v += ["-i", f"{self.screenchan}+{self.origin[0]},{self.origin[1]}"]
+                v += ["-i", f"{self.screen_chan}+{self.origin[0]},{self.origin[1]}"]
         elif sys.platform == "win32":
             if not quick:
                 v += ["-offset_x", str(self.origin[0]), "-offset_y", str(self.origin[1])]
 
-            v += ["-i", self.screenchan]
+            v += ["-i", self.screen_chan]
 
         elif sys.platform == "darwin":
-            v += ["-i", self.screenchan]
+            v += ["-i", self.screen_chan]
 
         return v
 
-    def webcam(self, quick: bool = False) -> list[str]:
+    def camera(self, quick: bool = False) -> list[str]:
         """
-        configure webcam
+        configure camera
 
         https://trac.ffmpeg.org/wiki/Capture/Webcam
         """
-        webcam_chan = self.webcamchan
+
+        c = self.camera_chan
 
         if sys.platform == "darwin":
-            if not webcam_chan:
-                webcam_chan = "default"
+            if not c:
+                c = "default"
 
-        v = ["-f", self.hcam, "-i", webcam_chan]
+        v = ["-f", self.hcam, "-i", c]
 
         #  '-r', str(self.fps),  # -r causes bad dropouts
 
@@ -310,7 +312,7 @@ class Stream:
         v: list[str] = []
 
         """
-        -re is NOT for actual streaming devices (webcam, microphone)
+        -re is NOT for actual streaming devices (camera, microphone)
         https://ffmpeg.org/ffmpeg.html
         """
         # assumes GIF is animated

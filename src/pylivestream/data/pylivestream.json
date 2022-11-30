@@ -1,0 +1,55 @@
+{
+  "screencap_origin": [50,30],
+  "screencap_size": [640, 480],
+  "screencap_fps": 30,
+  "camera_size": [640, 480],
+  "camera_fps": 30,
+  "audio_rate": 44100,
+  "audio_bps": 128000,
+  "preset": "veryfast",
+  "exe": "ffmpeg",
+  "ffprobe_exe": "ffprobe",
+  "win32": {
+    "vcap": "gdigrab",
+    "acap": "dshow",
+    "hcam": "dshow",
+    "screen_chan": "desktop",
+    "camera_chan": "video=Integrated Camera",
+    "audio_chan": "audio=Internal Microphone"
+  },
+  "darwin": {
+    "screen_chan": "1:0",
+    "audio_chan": "default",
+    "vcap": "avfoundation",
+    "hcam": "avfoundation"
+  },
+  "linux": {
+    "camera_chan": "/dev/video0",
+    "screen_chan": ":0.0",
+    "audio_chan": "default",
+    "vcap": "x11grab",
+    "acap": "pulse",
+    "hcam": "v4l2"
+  },
+  "sites":{
+    "localhost": {
+      "keyframe_sec": 2,
+      "url": "rtmp://localhost"
+    },
+    "file": {
+      "keyframe_sec": 2,
+      "video_kbps": 2000,
+      "screencap_size": [640, 480]
+    },
+    "facebook": {
+      "keyframe_sec": 2,
+      "url": "rtmps://live-api-s.facebook.com:443/rtmp",
+      "streamid": "xxxx-xxxx-xxxx-xxxx"
+    },
+    "youtube": {
+      "keyframe_sec": 2,
+      "url": "rtmp://a.rtmp.youtube.com/live2",
+      "streamid": "xxxx-xxxx-xxxx-xxxx"
+    }
+  }
+}

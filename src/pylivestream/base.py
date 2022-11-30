@@ -7,7 +7,7 @@ import typing
 from .stream import Stream
 from .utils import run, check_device
 
-__all__ = ["FileIn", "Microphone", "SaveDisk", "Screenshare", "Webcam"]
+__all__ = ["FileIn", "Microphone", "SaveDisk", "Screenshare", "Camera"]
 
 
 class Livestream(Stream):
@@ -16,7 +16,7 @@ class Livestream(Stream):
 
         self.site = site.lower()
 
-        self.osparam()
+        self.osparam(inifn)
 
         self.docheck = kwargs.get("docheck")
 
@@ -72,11 +72,13 @@ class Livestream(Stream):
             + self.videoIn(quick=True)
             + self.audioIn(quick=True)
             + ["-t", CHECKTIMEOUT]
-            + ["-f", "null", "-"]  # webcam needs at output
+            + ["-f", "null", "-"]  # camera needs at output
         )
 
     def startlive(self, sinks: list[str] = None):
-        """finally start the stream(s)"""
+        """
+        start the stream(s)
+        """
 
         if self.docheck:
             self.check_device()
@@ -113,7 +115,7 @@ class Livestream(Stream):
                 if self.vidsource == "file":
                     # picks first video and audio stream, often correct
                     cmd += ["-map", "0:v", "-map", "0:a:0"]
-                else:  # device (webcam)
+                else:  # device (Camera)
                     # connect video device to video stream,
                     # audio device to audio stream
                     cmd += ["-map", "0:v", "-map", "1:a"]
@@ -181,7 +183,7 @@ class Screenshare:
             pass
 
 
-class Webcam:
+class Camera:
     def __init__(self, inifn: Path, websites: list[str], **kwargs):
 
         if isinstance(websites, str):
@@ -259,7 +261,7 @@ class SaveDisk(Stream):
 
         self.outfn = Path(outfn).expanduser() if outfn else None
 
-        self.osparam()
+        self.osparam(inifn)
 
         vidIn: list[str] = self.videoIn()
         vidOut: list[str] = self.videoOut()

@@ -1,5 +1,6 @@
 from __future__ import annotations
 import logging
+import contextlib
 import subprocess
 from pathlib import Path
 import sys
@@ -11,7 +12,7 @@ from .ffmpeg import get_meta
 
 def run(cmd: list[str]):
     """
-    FIXME: shell=True for Windows seems necessary to specify devices enclosed by "" quotes
+    shell=True for Windows seems necessary to specify devices enclosed by "" quotes
     """
 
     print("\n", " ".join(cmd), "\n")
@@ -56,34 +57,21 @@ def check_display(fn: Path = None) -> bool:
     if not exe:
         raise FileNotFoundError("FFplay not found")
 
-    def _check_disp(fn: Path) -> int:
+    def _check_disp(fn: Path | contextlib.AbstractContextManager[Path]) -> int:
         cmd = [exe, "-loglevel", "error", "-t", "1.0", "-autoexit", str(fn)]
         return subprocess.run(cmd, timeout=10).returncode
 
     if fn:
         ret = _check_disp(fn)
+    elif sys.version_info >= (3, 9):
+        with importlib.resources.as_file(
+            importlib.resources.files(f"{__package__}.data").joinpath("logo.png")
+        ) as f:
+            ret = _check_disp(f)
     else:
-        with importlib.resources.path(f"{__package__}.data", "logo.png") as fn:
-            ret = _check_disp(fn)
+        return None
 
     return ret == 0
-
-
-def get_inifile(fn: str) -> Path:
-
-    inifn = None
-    for file in (fn, "~/pylivestream.ini"):
-        if not file:
-            continue
-        ini = Path(file).expanduser()
-        if ini.is_file():
-            inifn = ini
-            break
-
-    if inifn is None:
-        inifn = importlib.resources.path(__package__, "pylivestream.ini")  # type: ignore
-
-    return inifn
 
 
 def meta_caption(meta) -> str:

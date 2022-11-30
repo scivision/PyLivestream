@@ -68,8 +68,8 @@ def main():
     # %% loop video
     print("Looping video")
     subprocess.check_call([sys.executable, "-m", "pylivestream.loopfile", "-y", str(VIDEO), HOST])
-    # %% Webcam
-    print("Webcam test - will fail if no webcam present on your system")
+    # %% Camera
+    print("Camera test - will fail if no camera present on your system")
     subprocess.check_call([sys.executable, "-m", "pylivestream.camera", "-y", HOST])
 
 
