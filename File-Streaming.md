@@ -7,7 +7,7 @@ audio/video files.
 ## Loop single video endlessly
 
 ```sh
-FileLoopLivestream videofile site
+python -m pylivestream.loopfile videofile site
 ```
 
 ## several video files

@@ -129,7 +129,7 @@ Both do the same thing.
 * command line
   * python -m pylivestream.glob
   * python -m pylivestream.screen
-  * FileLoopLivestream
+  * python -m pylivestream.loopfile
   * ScreenCapture2disk
   * WebcamLivestream
   * MicrophoneLivestream
