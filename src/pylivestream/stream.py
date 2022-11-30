@@ -121,7 +121,9 @@ class Stream:
 
         # %% user JSON (overrides defaults)
         cfg = json.loads(Path(self.inifn).expanduser().read_text())
-        scfg = cfg[self.site]
+        scfg = cfg.get(self.site)
+        if scfg is None:
+            raise KeyError(f"streaming site {self.site} not found in {self.inifn}")
         for k in scfg:
             setattr(self, k, scfg[k])
 
