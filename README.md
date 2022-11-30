@@ -40,6 +40,14 @@ Why not do things without the command line, via linking libffmpeg, libgstreamer 
 * the command-line approach does not require a compiler or OS-dependent libraries
 * once you get a setup working once, you don't even need Python anymore--just copy and paste the command line
 
+### Alternatives
+
+Other projects using FFmpeg from Python include:
+
+* [python-ffmpeg](https://github.com/jonghwanhyeon/python-ffmpeg) lower level use of FFmpeg with Python asyncio
+* [asyncio-subprocess-ffpmeg](https://github.com/scivision/asyncio-subprocess-ffmpeg) simple asyncio subprocess example that could also be used as a template for general asyncio subprocess Python use.
+* [ffmpy](https://github.com/Ch00k/ffmpy) FFmpeg subprocess without asyncio
+
 ## Install
 
 Requires FFmpeg &ge; 3.0 (&ge; 4.2 for Facebook Live RTMPS)
@@ -199,7 +207,7 @@ Note: your system may not have a camera, particularly if it's a virtual machine.
 Config:
 
 * `webcam_res`: camera resolution -- find from `v4l2-ctl --list-formats-ext` or camera spec sheet.
-* `webcam_fps`: camea fps -- found from command above or camera spec sheet
+* `webcam_fps`: camera fps -- found from command above or camera spec sheet
 
 Stream to multiple sites, in this example Facebook Live and YouTube Live simultaneously:
 
