@@ -104,7 +104,7 @@ def cli():
     p.add_argument("path", help="path to discover files from")
     p.add_argument(
         "websites",
-        help="site to stream, e.g. localhost youtube periscope facebook twitch",
+        help="site to stream, e.g. localhost youtube facebook twitch",
         nargs="+",
     )
     p.add_argument("-glob", help="file glob pattern to stream.")

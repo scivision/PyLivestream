@@ -11,7 +11,7 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser(description="livestream microphone audio")
     p.add_argument(
         "websites",
-        help="site to stream, e.g. localhost youtube periscope facebook twitch",
+        help="site to stream, e.g. localhost youtube facebook twitch",
         nargs="+",
     )
     p.add_argument("-image", help="static image to display.")

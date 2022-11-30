@@ -7,23 +7,20 @@ import sys
 
 import pylivestream as pls
 
-sites = ["periscope", "youtube", "facebook"]
+sites = ["youtube", "facebook"]
 
 TIMEOUT = 30
 CI = os.environ.get("CI", None) in ("true", "True")
 WSL = "Microsoft" in platform.uname().release
 
 
-def test_props(periscope_kbps):
+def test_props():
     S = pls.Screenshare(inifn=None, websites=sites, key="abc")
     for s in S.streams:
         assert "-re" not in S.streams[s].cmd
         assert S.streams[s].fps == approx(30.0)
 
-        if s == "periscope":
-            assert S.streams[s].video_kbps == periscope_kbps
-        else:
-            assert S.streams[s].video_kbps == 500
+        assert S.streams[s].video_kbps == 500
 
 
 @pytest.mark.timeout(TIMEOUT)

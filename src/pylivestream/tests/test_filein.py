@@ -7,12 +7,12 @@ import importlib.resources
 
 import pylivestream as pls
 
-sites = ["periscope", "youtube", "facebook"]
+sites = ["youtube", "facebook"]
 TIMEOUT = 30
 CI = os.environ.get("CI", None) in ("true", "True")
 
 
-def test_props(periscope_kbps):
+def test_props():
 
     with importlib.resources.path("pylivestream.data", "bunny.avi") as fn:
         S = pls.FileIn(inifn=None, websites=sites, infn=fn, key="abc")
@@ -20,16 +20,13 @@ def test_props(periscope_kbps):
             assert "-re" in S.streams[s].cmd
             assert S.streams[s].fps == approx(24.0)
 
-            if s == "periscope":
-                assert S.streams[s].video_kbps == periscope_kbps
-            else:
-                if int(S.streams[s].res[1]) == 480:
-                    assert S.streams[s].video_kbps == 500
-                elif int(S.streams[s].res[1]) == 720:
-                    assert S.streams[s].video_kbps == 1800
+            if int(S.streams[s].res[1]) == 480:
+                assert S.streams[s].video_kbps == 500
+            elif int(S.streams[s].res[1]) == 720:
+                assert S.streams[s].video_kbps == 1800
 
 
-def test_audio(periscope_kbps):
+def test_audio():
 
     with importlib.resources.path(
         "pylivestream.data", "logo.png"
@@ -39,10 +36,7 @@ def test_audio(periscope_kbps):
             assert "-re" in S.streams[s].cmd
             assert S.streams[s].fps is None
 
-            if s == "periscope":
-                assert S.streams[s].video_kbps == periscope_kbps
-            else:
-                assert S.streams[s].video_kbps == 400
+            assert S.streams[s].video_kbps == 400
 
 
 @pytest.mark.timeout(TIMEOUT)
