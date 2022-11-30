@@ -1,5 +1,8 @@
 name: ci
 
+env:
+  HOMEBREW_NO_INSTALL_CLEANUP: 1
+
 on:
   push:
     paths:
@@ -9,15 +12,23 @@ on:
 jobs:
 
   linux:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+
     strategy:
       matrix:
-        python-version: [ '3.7', '3.10' ]
-    name: Lint Python ${{ matrix.python-version }}
+        os: [ubuntu-latest]
+        python-version: ['3.7', '3.x']
+        include:
+        - python-version: '3.x'
+          os: macos-latest
+        - python-version: '3.x'
+          os: windows-latest
+
+    name: Python ${{ matrix.python-version }}
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -26,44 +37,18 @@ jobs:
     - run: flake8
     - run: mypy
 
-    - name: install prereqs
+    - name: install prereqs (Linux)
+      if: runner.os == 'Linux'
       run: |
-        sudo apt update -yq
-        sudo apt install -yq --no-install-recommends ffmpeg
+        sudo apt update
+        sudo apt install --no-install-recommends ffmpeg
 
-    - run: pytest
+    - name: install prereqs (macOS)
+      if : runner.os == 'macOS'
+      run: brew install ffmpeg
 
-
-  macos:
-    needs: linux
-    runs-on: macos-latest
-    env:
-      HOMEBREW_NO_INSTALL_CLEANUP: 1
-
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'
-
-    - run: pip install .[tests]
-
-    - run: brew install ffmpeg
-
-    - run: pytest
-
-
-  windows:
-    needs: linux
-    runs-on: windows-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'
-
-    - run: pip install .[tests]
-
-    - run: cinst -y ffmpeg
+    - name: install prereqs (Windows)
+      if: runner.os == 'Windows'
+      run: cinst -y ffmpeg
 
     - run: pytest
