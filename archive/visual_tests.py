@@ -30,10 +30,14 @@ def main():
     # %% Microphone
     print("PyLivestream splash with live microphone audio")
     with importlib.resources.path("pylivestream.data", "logo.png") as fn:
-        subprocess.check_call(["MicrophoneLivestream", "-y", HOST, "-image", str(fn)])
+        subprocess.check_call(
+            [sys.executable, "-m", "pylivestream.microphone", "-y", HOST, "-image", str(fn)]
+        )
 
     print("1990s vector graphics with live microphone audio")
-    subprocess.check_call(["MicrophoneLivestream", "-y", HOST, "-image", str(MOVING)])
+    subprocess.check_call(
+        [sys.executable, "-m", "pylivestream.microphone", "-y", HOST, "-image", str(MOVING)]
+    )
     # %%  Music
     print("PyLivestream splash with orchestra music  (caption)")
     with importlib.resources.path("pylivestream.data", "logo.png") as fn:

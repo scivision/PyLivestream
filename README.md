@@ -132,7 +132,7 @@ Both do the same thing.
   * python -m pylivestream.loopfile
   * ScreenCapture2disk
   * WebcamLivestream
-  * MicrophoneLivestream
+  * python -m pylivestream.microphone
 * `import pylivestream.api as pls` from within your Python script. For more information type `help(pls)` or `help(pls.stream_microphone)`
   * pls.stream_file()
   * pls.stream_microphone()
@@ -220,7 +220,7 @@ python -m pylivestream.screen youtube facebook
 Microphone audio + static image is accomplished by
 
 ```sh
-MicrophoneLivestream youtube facebook -image doc/logo.jpg
+python -m pylivestream.microphone youtube facebook -image doc/logo.jpg
 ```
 
 or wherever your image file is.
@@ -233,7 +233,7 @@ That's not something we can fix within the scope of this project.
 You can test it to your own computer by:
 
 ```sh
-MicrophoneLivestream localhost
+python -m pylivestream.microphone localhost
 ```
 
 ### Screen capture to disk

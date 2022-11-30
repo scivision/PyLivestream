@@ -2,6 +2,7 @@
 timeout= parameter needs to be at least 10 seconds for audio stream to show in FFplay
 """
 
+import sys
 import pylivestream as pls
 import pytest
 import subprocess
@@ -59,5 +60,6 @@ def test_stream():
 @pytest.mark.skipif(CI or WSL, reason="has no audio hardware typically")
 def test_script():
     subprocess.check_call(
-        ["MicrophoneLivestream", "localhost", "--yes", "--timeout", "10"], timeout=TIMEOUT
+        [sys.executable, "-m", "pylivestream.microphone", "localhost", "--yes", "--timeout", "10"],
+        timeout=TIMEOUT,
     )
