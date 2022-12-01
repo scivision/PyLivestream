@@ -12,10 +12,9 @@ Python >= 3.9 is recommended for full capabilities.
 `visual_tests.py` is a quick check of several command line scripting scenarios on your laptop.
 FFmpeg is used from Python `subprocess` to stream to sites including:
 
-* [Facebook Live](#facebook-live)  (requires FFmpeg >= 4.2 due to mandatory RTMPS)
-* [YouTube Live](#youtube-live)
-* [Twitter Live](#twitter)
-* [Twitch](#twitch)
+* Facebook Live  (requires FFmpeg >= 4.2 due to mandatory RTMPS)
+* YouTube Live
+* Twitch
 * also Ustream, Vimeo, Restream.io and more for streaming broadcasts.
 
 ![PyLivestream diagram showing screen capture or camera simultaneously livestreaming to multiple services.](./doc/logo.png)
@@ -74,27 +73,23 @@ python3 -m pip install -e .
 You can skip past this section to "stream start" if it's confusing.
 The defaults might work to get you started.
 
-The pylivestream.json file has parameters relevant to the live stream.
-This file is copied into your `sys.prefix`/share/pylivestream directory upon `pip install pylivestream`.
-
-We suggest copying this file to another location on your hard drive and editing, then specifying it for your streams.
-
-The `[DEFAULT]` section has parameters that can be overridden for each site, if desired.
+The pylivestream.json file you create has parameters relevant to the live stream.
+We suggest copying the example
+[pylivestream.json](./src/pylivestream/data/pylivestream.json)
+and editing, then specify it for your streams.
 
 * `screencap_origin`: origin (upper left corner) of screen capture region in pixels.
 * `screencap_size`: resolution of screen capture (area to capture, starting from origin)
 * `screencap_fps`: frames/sec of screen capture
 * `video_kbps`: override automatic video bitrate in kbps
-
 * `audio_rate`: audio sampling frequency. Typically 44100 Hz (CD quality).
 * `audio_bps`: audio data rate--**leave blank if you want no audio** (usually used for "file", to make an animated GIF in  post-processing)
 * `preset`: `veryfast` or `ultrafast` if CPU not able to keep up.
+* `exe`: override path to desired FFmpeg executable. In case you have multiple FFmpeg versions installed (say, from Anaconda Python).
 
 Next are `sys.platform` specific parameters.
 
 Seek help in FFmpeg documentation, try capturing to a file first and then update ~/pylivestream.json for `sys.platform`.
-
-* exe: override path to desired FFmpeg executable. In case you have multiple FFmpeg versions installed (say, from Anaconda Python).
 
 ### Deduce inputs
 
@@ -150,11 +145,11 @@ The user must specify this JSON file location.
 ### YouTube Live
 
 1. [configure](https://www.youtube.com/live_dashboard) YouTube Live.
-2. Edit file `youtube.json` to have the YouTube hexadecimal stream key
+2. Edit "pylivestream.json" to have the YouTube streamid
 3. Run Python script and chosen input will stream on YouTube Live.
 
 ```sh
-python -m pylivestream.screen youtube
+python -m pylivestream.screen youtube ./pylivestream.json
 ```
 
 ### Facebook Live
@@ -162,13 +157,11 @@ python -m pylivestream.screen youtube
 Facebook Live requires FFmpeg >= 4.2 due to mandatory RTMPS
 
 1. configure your Facebook Live stream
-2. Put stream ID from
-    [<https://www.facebook.com/live/create>](https://www.facebook.com/live/create)
-    into the file `~/facebook.json`
+2. Put [stream ID](https://www.facebook.com/live/create) into the JSON file
 3. Run Python script for Facebook with chosen input
 
 ```sh
-python -m pylivestream.screen facebook
+python -m pylivestream.screen facebook ./pylivestream.json
 ```
 
 ### Twitter
@@ -177,8 +170,9 @@ TODO
 
 ### Twitch
 
-Create stream from [Twitch Dashboard](https://dashboard.twitch.tv/settings/channel#stream-preferences).
-Create pylivestream.json file with "url" and "streamid" for Twitch.
+Create stream from
+[Twitch Dashboard](https://dashboard.twitch.tv/settings/channel#stream-preferences).
+Edit pylivestream.json file with "url" and "streamid" for Twitch.
 Run Python script for Twitch with chosen input:
 
 ```sh
@@ -189,21 +183,10 @@ python -m pylivestream.screen twitch ./pylivestream.json
 
 Due to the complexity of streaming and the non-specific error codes FFmpeg emits, the default behavior is that if FFmpeg detects one stream has failed, ALL streams will stop streaming and the program ends.
 
-Setup ~/pylivestream.json for computer and desired parameters.
-Setup a JSON file "pylivestream.json" with values you determine, not these dummy values:
-
-```json
-{
-  "facebook": {
-    "url": "rtmps://live-api-s.facebook.com:443/rtmp",
-    "streamid": "your-stream-id",
-  },
-  "youtube": {
-    "url": "rtmp://a.rtmp.youtube.com/live2",
-    "streamid": "your-stream-id"
-  }
-}
-```
+Setup a pylivestream.json for computer and desired parameters.
+Copy the provided
+[pylivestream.json](./src/pylivestream/data/pylivestream.json)
+and edit with values you determine.
 
 [File-Streaming](./File-Streaming.md)
 
@@ -219,7 +202,7 @@ JSON:
 Stream to multiple sites, in this example Facebook Live and YouTube Live simultaneously:
 
 ```sh
-python -m pylivestream.camera youtube facebook
+python -m pylivestream.camera youtube facebook ./pylivestream.json
 ```
 
 ### Screen Share Livestream
@@ -227,7 +210,7 @@ python -m pylivestream.camera youtube facebook
 Stream to multiple sites, in this example Facebook Live and YouTube Live simultaneously:
 
 ```sh
-python -m pylivestream.screen youtube facebook
+python -m pylivestream.screen youtube facebook ./pylivestream.json
 ```
 
 ### Image + Audio Livestream
@@ -235,7 +218,7 @@ python -m pylivestream.screen youtube facebook
 Microphone audio + static image is accomplished by
 
 ```sh
-python -m pylivestream.microphone youtube facebook -image doc/logo.jpg
+python -m pylivestream.microphone youtube facebook ./pylivestream.json -image doc/logo.jpg
 ```
 
 or wherever your image file is.
@@ -248,7 +231,7 @@ That's not something we can fix within the scope of this project.
 You can test it to your own computer by:
 
 ```sh
-python -m pylivestream.microphone localhost
+python -m pylivestream.microphone localhost ./pylivestream.json
 ```
 
 ### Screen capture to disk
@@ -256,7 +239,7 @@ python -m pylivestream.microphone localhost
 This script saves your screen capture to a file on your disk:
 
 ```sh
-python -m pylivestream.screen2disk myvid.avi
+python -m pylivestream.screen2disk myvid.avi ./pylivestream.json
 ```
 
 ## Utilities
