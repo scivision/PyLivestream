@@ -8,6 +8,7 @@
 
 Streams to one or **multiple** streaming sites simultaneously, using pure object-oriented Python (no extra packages) and FFmpeg.
 Tested with `flake8`, `mypy` type checking and `pytest`.
+Python >= 3.9 is recommended for full capabilities.
 `visual_tests.py` is a quick check of several command line scripting scenarios on your laptop.
 FFmpeg is used from Python `subprocess` to stream to sites including:
 
