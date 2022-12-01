@@ -7,9 +7,12 @@
   "audio_rate": 44100,
   "audio_bps": 128000,
   "preset": "veryfast",
+  "video_codec": "libx264",
+  "audio_codec": "aac",
   "exe": "ffmpeg",
   "ffprobe_exe": "ffprobe",
   "win32": {
+    "video_format": "yuv420p",
     "vcap": "gdigrab",
     "acap": "dshow",
     "hcam": "dshow",
@@ -18,12 +21,14 @@
     "audio_chan": "audio=Internal Microphone"
   },
   "darwin": {
+    "video_format": "uyvy422",
     "screen_chan": "1:0",
     "audio_chan": "default",
     "vcap": "avfoundation",
     "hcam": "avfoundation"
   },
   "linux": {
+    "video_format": "yuv420p",
     "camera_chan": "/dev/video0",
     "screen_chan": ":0.0",
     "audio_chan": "default",

@@ -116,6 +116,10 @@ class Stream:
 
         self.hcam: str = syscfg.get("hcam")
 
+        self.video_codec = C.get("video_codec")
+        self.audio_codec = C.get("audio_codec")
+        self.video_format = syscfg.get("video_format")
+
         self.video_kbps: int = sitecfg.get("video_kbps")
         self.audio_bps: str = sitecfg.get("audio_bps")
 
@@ -133,12 +137,12 @@ class Stream:
             v = self.screengrab(quick)
             if sys.platform == "darwin":
                 # not for files "option pixel_format not found"
-                v = ["-pix_fmt", "uyvy422"] + v
+                v = ["-pix_fmt", self.video_format] + v
         elif self.vidsource == "camera":
             v = self.camera(quick)
             if sys.platform == "darwin":
                 # not for files "option pixel_format not found"
-                v = ["-pix_fmt", "uyvy422"] + v
+                v = ["-pix_fmt", self.video_format] + v
         elif self.vidsource is None or self.vidsource == "file":
             v = self.filein(quick)
         else:
@@ -151,8 +155,7 @@ class Stream:
         configure video output
         """
 
-        vid_format = "uyvy422" if sys.platform == "darwin" else "yuv420p"
-        v: list[str] = ["-codec:v", "libx264", "-pix_fmt", vid_format]
+        v: list[str] = ["-codec:v", self.video_codec, "-pix_fmt", self.video_format]
         # %% set frames/sec, bitrate and keyframe interval
         """
          DON'T DO THIS.
@@ -215,7 +218,14 @@ class Stream:
         if not (self.audio_bps and self.acap and self.audio_chan and self.audio_rate):
             return []
 
-        return ["-codec:a", "aac", "-b:a", str(self.audio_bps), "-ar", str(self.audio_rate)]
+        return [
+            "-codec:a",
+            self.audio_codec,
+            "-b:a",
+            str(self.audio_bps),
+            "-ar",
+            str(self.audio_rate),
+        ]
 
     def video_bitrate(self) -> None:
         """
