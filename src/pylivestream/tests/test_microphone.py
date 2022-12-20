@@ -19,7 +19,6 @@ WSL = "Microsoft" in platform.uname().release
 ini = Path(__file__).parents[1] / "data/pylivestream.json"
 
 
-@pytest.mark.skipif(sys.version_info < (3, 9), reason="python >= 3.9 required")
 def test_microphone_props():
 
     with importlib.resources.as_file(
@@ -35,7 +34,6 @@ def test_microphone_props():
             assert S.streams[s].video_kbps == 800
 
 
-@pytest.mark.skipif(sys.version_info < (3, 9), reason="python >= 3.9 required")
 def test_microphone_image():
 
     with importlib.resources.as_file(

@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import shutil
 import json
+import functools
 
 
 class Ffmpeg:
@@ -99,23 +100,30 @@ class Ffmpeg:
         return ["-filter_complex", f"movie={bg}:loop=0,setpts=N/FRAME_RATE/TB"]
 
 
-def get_exe(exein: str) -> str:
-    """checks that host streaming program is installed"""
-
-    exe = str(Path(exein).expanduser())
-    # %% verify
-    if not shutil.which(exe):
+@functools.cache
+def get_exe(name: str) -> str:
+    if not (exe := shutil.which(name)):
         raise FileNotFoundError(
             f"""
-
 *** Must have FFmpeg + FFprobe installed to use PyLivestream.
 https://www.ffmpeg.org/download.html
 
-could not find {exein}
+could not find {name}
 """
         )
-
     return exe
+
+
+def get_ffmpeg() -> str:
+    return get_exe("ffmpeg")
+
+
+def get_ffplay() -> str:
+    return get_exe("ffplay")
+
+
+def get_ffprobe() -> str:
+    return get_exe("ffprobe")
 
 
 def get_meta(fn: Path, exein: str = None) -> dict[str, T.Any]:

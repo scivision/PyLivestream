@@ -5,9 +5,8 @@ import subprocess
 from pathlib import Path
 import sys
 import importlib.resources
-import shutil
 
-from .ffmpeg import get_meta
+from .ffmpeg import get_meta, get_ffplay
 
 
 def run(cmd: list[str]):
@@ -52,24 +51,17 @@ def check_device(cmd: list[str]) -> bool:
 def check_display(fn: Path = None) -> bool:
     """see if it's possible to display something with a test file"""
 
-    exe = shutil.which("ffplay")
-
-    if not exe:
-        raise FileNotFoundError("FFplay not found")
-
     def _check_disp(fn: Path | contextlib.AbstractContextManager[Path]) -> int:
-        cmd = [exe, "-loglevel", "error", "-t", "1.0", "-autoexit", str(fn)]
+        cmd = [get_ffplay(), "-loglevel", "error", "-t", "1.0", "-autoexit", str(fn)]
         return subprocess.run(cmd, timeout=10).returncode
 
     if fn:
         ret = _check_disp(fn)
-    elif sys.version_info >= (3, 9):
+    else:
         with importlib.resources.as_file(
             importlib.resources.files(f"{__package__}.data").joinpath("logo.png")
         ) as f:
             ret = _check_disp(f)
-    else:
-        return None
 
     return ret == 0
 

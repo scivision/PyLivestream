@@ -14,7 +14,6 @@ CI = os.environ.get("CI", None) in ("true", "True")
 ini = Path(__file__).parents[1] / "data/pylivestream.json"
 
 
-@pytest.mark.skipif(sys.version_info < (3, 9), reason="python >= 3.9 required")
 def test_props():
 
     with importlib.resources.as_file(
@@ -31,7 +30,6 @@ def test_props():
                 assert S.streams[s].video_kbps == 1800
 
 
-@pytest.mark.skipif(sys.version_info < (3, 9), reason="python >= 3.9 required")
 def test_audio():
 
     with importlib.resources.as_file(
@@ -49,7 +47,6 @@ def test_audio():
 
 @pytest.mark.timeout(TIMEOUT)
 @pytest.mark.skipif(CI, reason="CI has no audio hardware typically")
-@pytest.mark.skipif(sys.version_info < (3, 9), reason="python >= 3.9 required")
 def test_simple():
     """stream to localhost"""
     with importlib.resources.as_file(
@@ -63,7 +60,6 @@ def test_simple():
 
 
 @pytest.mark.skipif(CI, reason="CI has no audio hardware typically")
-@pytest.mark.skipif(sys.version_info < (3, 9), reason="python >= 3.9 required")
 def test_script():
     with importlib.resources.as_file(
         importlib.resources.files("pylivestream.data").joinpath("bunny.avi")

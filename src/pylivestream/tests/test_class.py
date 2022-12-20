@@ -2,7 +2,6 @@ import pytest
 from pytest import approx
 from pathlib import Path
 import importlib.resources
-import sys
 
 import pylivestream as pls
 
@@ -17,7 +16,6 @@ def test_exe(rex):
 
 
 @pytest.mark.parametrize("inp", (None, ""))
-@pytest.mark.skipif(sys.version_info < (3, 9), reason="python >= 3.9 required")
 def test_attrs(inp):
     assert pls.utils.get_resolution(inp) is None
 
