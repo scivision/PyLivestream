@@ -87,11 +87,11 @@ class Stream:
             self.fps = C.get("screencap_fps")
             self.origin: list[str] = C.get("screencap_origin", [1, 1])
             self.movingimage = self.staticimage = False
+        elif self.image:  # audio-only stream + background image
+            self.res = utils.get_resolution(self.image, self.probeexe)
+            self.fps = utils.get_framerate(self.infn, self.probeexe)
         elif self.vidsource == "file":  # streaming video from a file
             self.res = utils.get_resolution(self.infn, self.probeexe)
-            self.fps = utils.get_framerate(self.infn, self.probeexe)
-        elif self.vidsource is None and self.image:  # audio-only stream + background image
-            self.res = utils.get_resolution(self.image, self.probeexe)
             self.fps = utils.get_framerate(self.infn, self.probeexe)
         else:  # audio-only
             self.res = None
