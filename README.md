@@ -66,6 +66,12 @@ cd PyLivestream
 python3 -m pip install -e .
 ```
 
+FFmpeg can be obtained like:
+
+* Windows: `winget install ffmpeg`
+* Linux: `sudo apt install ffmpeg`
+* MacOS: `brew install ffmpeg`
+
 If errors result from FFmpeg not in PATH environment variable, optionally set environment variable "FFMPEG_ROOT" to the directory containing FFmpeg executable.
 
 ## Configuration: pylivestream.json

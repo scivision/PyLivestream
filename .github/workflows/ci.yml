@@ -45,8 +45,14 @@ jobs:
       if : runner.os == 'macOS'
       run: brew install ffmpeg
 
+    - name: Install winget
+      if: runner.os == 'Windows'
+      uses: Cyberboss/install-winget@v1
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     - name: install prereqs (Windows)
       if: runner.os == 'Windows'
-      run: cinst -y ffmpeg
+      run: winget install ffmpeg --disable-interactivity --accept-source-agreements
 
     - run: pytest
