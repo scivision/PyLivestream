@@ -32,11 +32,14 @@ def test_props():
 
 def test_audio():
 
-    with importlib.resources.as_file(
-        importlib.resources.files("pylivestream.data").joinpath("logo.png")
-    ) as logo, importlib.resources.as_file(
-        importlib.resources.files("pylivestream.data").joinpath("orch_short.ogg")
-    ) as fn:
+    with (
+        importlib.resources.as_file(
+            importlib.resources.files("pylivestream.data").joinpath("logo.png")
+        ) as logo,
+        importlib.resources.as_file(
+            importlib.resources.files("pylivestream.data").joinpath("orch_short.ogg")
+        ) as fn,
+    ):
         S = pls.FileIn(ini, websites=sites, infn=fn, image=logo)
         for s in S.streams:
             assert "-re" in S.streams[s].cmd
@@ -49,11 +52,14 @@ def test_audio():
 @pytest.mark.skipif(CI, reason="CI has no audio hardware typically")
 def test_simple():
     """stream to localhost"""
-    with importlib.resources.as_file(
-        importlib.resources.files("pylivestream.data").joinpath("logo.png")
-    ) as logo, importlib.resources.as_file(
-        importlib.resources.files("pylivestream.data").joinpath("orch_short.ogg")
-    ) as fn:
+    with (
+        importlib.resources.as_file(
+            importlib.resources.files("pylivestream.data").joinpath("logo.png")
+        ) as logo,
+        importlib.resources.as_file(
+            importlib.resources.files("pylivestream.data").joinpath("orch_short.ogg")
+        ) as fn,
+    ):
         S = pls.FileIn(ini, websites="localhost", infn=fn, image=logo, yes=True, timeout=5)
 
         S.golive()

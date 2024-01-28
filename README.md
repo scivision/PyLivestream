@@ -66,6 +66,8 @@ cd PyLivestream
 python3 -m pip install -e .
 ```
 
+If errors result from FFmpeg not in PATH environment variable, optionally set environment variable "FFMPEG_ROOT" to the directory containing FFmpeg executable.
+
 ## Configuration: pylivestream.json
 
 You can skip past this section to "stream start" if it's confusing.

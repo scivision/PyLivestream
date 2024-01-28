@@ -67,11 +67,7 @@ class Ffmpeg:
 
         TIMEOUT = 0.5
 
-        exe = shutil.which("ffplay")
-        if not exe:
-            raise FileNotFoundError("FFplay not found, cannot start listener")
-
-        cmd = [exe, "-loglevel", "error", "-timeout", "5", "-autoexit", "rtmp://localhost"]
+        cmd = [get_ffplay(), "-loglevel", "error", "-timeout", "5", "-autoexit", "rtmp://localhost"]
 
         print(
             "starting Localhost RTMP listener. \n\n",
@@ -102,16 +98,19 @@ class Ffmpeg:
 
 @functools.cache
 def get_exe(name: str) -> str:
-    if not (exe := shutil.which(name)):
-        raise FileNotFoundError(
-            f"""
+
+    for p in (os.environ.get("FFMPEG_ROOT"), None):
+        if exe := shutil.which(name, path=p):
+            return exe
+
+    raise FileNotFoundError(
+        f"""
 *** Must have FFmpeg + FFprobe installed to use PyLivestream.
 https://www.ffmpeg.org/download.html
 
 could not find {name}
 """
-        )
-    return exe
+    )
 
 
 def get_ffmpeg() -> str:

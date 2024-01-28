@@ -1,6 +1,7 @@
 """
 This is no longer necessary due to PyLivestream improvements
 """
+
 import pytest
 import subprocess
 
