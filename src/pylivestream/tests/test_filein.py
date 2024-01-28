@@ -45,7 +45,7 @@ def test_audio():
             assert "-re" in S.streams[s].cmd
             assert S.streams[s].fps is None
 
-            assert S.streams[s].video_kbps == 400
+            assert S.streams[s].video_kbps == 800
 
 
 @pytest.mark.timeout(TIMEOUT)
