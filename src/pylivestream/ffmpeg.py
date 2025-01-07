@@ -7,7 +7,7 @@ from pathlib import Path
 import shutil
 import json
 import functools
-
+import re
 
 class Ffmpeg:
     def __init__(self):
@@ -95,6 +95,53 @@ class Ffmpeg:
 
         return ["-filter_complex", f"movie={bg}:loop=0,setpts=N/FRAME_RATE/TB"]
 
+    def add_silent_audio(self):
+        return ["-f", "lavfi", "-i", "anullsrc=channel_layout=stereo:sample_rate=44100"]
+
+    def detect_frame_rate(self, input_url):
+        ffmpeg_command = [
+            get_ffmpeg(),
+            "-i", input_url
+        ]
+        process = subprocess.run(ffmpeg_command, stderr=subprocess.PIPE, text=True)
+        output = process.stderr
+
+        match = re.search(r"(\d+(\.\d+)?)\s*fps", output)
+        if match:
+            return float(match.group(1))
+        else:
+            raise ValueError("Frame rate not found in FFmpeg output.")
+
+    def process_stream(self, input_stream: str, output_stream: str):
+        try:
+            FRAME_RATE = self.detect_frame_rate(input_stream)
+            print(f"Detected frame rate: {FRAME_RATE} FPS")
+        except Exception as e:
+            print(f"Error detecting frame rate: {e}")
+            FRAME_RATE = 30  # Fallback to 30 FPS if detection fails
+
+        KEYFRAME_INTERVAL = 2 * FRAME_RATE  # e.g., 60 for 30 FPS
+
+        cmd = [
+            self.THROTTLE,
+            "-reconnect", "1",
+            "-reconnect_streamed", "1",
+            "-i", input_stream,
+            *self.add_silent_audio(),
+            "-c:v", "libx264",
+            "-preset", "veryfast",
+            "-maxrate", "3000k",
+            "-bufsize", "6000k",
+            "-pix_fmt", "yuv420p",
+            "-vf", "scale=1280:720",
+            "-g:v", str(KEYFRAME_INTERVAL),  # Keyframe interval (2 * frame rate)
+            "-c:a", "aac",
+            "-b:a", "128k",
+            "-ar", "44100",
+            "-f", "flv",
+            output_stream
+        ]
+        subprocess.run(cmd)
 
 @functools.cache
 def get_exe(name: str) -> str:
@@ -112,18 +159,14 @@ could not find {name}
 """
     )
 
-
 def get_ffmpeg() -> str:
     return get_exe("ffmpeg")
-
 
 def get_ffplay() -> str:
     return get_exe("ffplay")
 
-
 def get_ffprobe() -> str:
     return get_exe("ffprobe")
-
 
 def get_meta(fn: Path, exein: str | None = None) -> dict[str, T.Any]:
     if not fn:  # audio-only
